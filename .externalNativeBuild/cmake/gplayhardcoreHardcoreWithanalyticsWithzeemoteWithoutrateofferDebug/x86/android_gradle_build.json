@@ -1,0 +1,41 @@
+
+{
+	"buildFiles" : 
+	[
+		"C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/src/main/jni/CMakeLists.txt"
+	],
+	"cFileExtensions" : [ "c" ],
+	"cleanCommands" : 
+	[
+		"C:\\Android\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\.externalNativeBuild\\cmake\\gplayhardcoreHardcoreWithanalyticsWithzeemoteWithoutrateofferDebug\\x86 --target clean"
+	],
+	"libraries" : 
+	{
+		"zameJniRenderer-Debug-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "zameJniRenderer",
+			"buildCommand" : "C:\\Android\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\.externalNativeBuild\\cmake\\gplayhardcoreHardcoreWithanalyticsWithzeemoteWithoutrateofferDebug\\x86 --target zameJniRenderer",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=i686-none-linux-android --gcc-toolchain=C:/Android/sdk/ndk-bundle/toolchains/x86-4.9/prebuilt/windows-x86_64 --sysroot=C:/Android/sdk/ndk-bundle/sysroot -DzameJniRenderer_EXPORTS  -isystem C:/Android/sdk/ndk-bundle/sysroot/usr/include/i686-linux-android -D__ANDROID_API__=9 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -Wa,--noexecstack -Wformat -Werror=format-security -Werror -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/src/main/jni/zameJniRenderer.c",
+					"workingDirectory" : "C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/.externalNativeBuild/cmake/gplayhardcoreHardcoreWithanalyticsWithzeemoteWithoutrateofferDebug/x86"
+				}
+			],
+			"output" : "C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/build/intermediates/cmake/gplayhardcoreHardcoreWithanalyticsWithzeemoteWithoutrateoffer/debug/obj/x86/libzameJniRenderer.so",
+			"toolchain" : "1629680541"
+		}
+	},
+	"toolchains" : 
+	{
+		"1629680541" : 
+		{
+			"cCompilerExecutable" : "C:/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "C:/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+		}
+	}
+}
