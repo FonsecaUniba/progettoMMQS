@@ -1,0 +1,143 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << '-Xlint:all'
+        options.compilerArgs << '-Xlint:-deprecation'
+        options.compilerArgs << '-Xlint:-unchecked'
+    }
+}
+
+android {
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/jni/CMakeLists.txt'
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+
+        versionName project.VERSION_NAME
+        versionCode Integer.parseInt(project.VERSION_CODE)
+
+        externalNativeBuild {
+            cmake {
+                cFlags '-Werror'
+            }
+        }
+
+        ndk {
+            abiFilters 'armeabi', 'armeabi-v7a', 'mips', 'x86' // 'arm64-v8a', 'mips64', 'x86_64'
+        }
+    }
+
+    if (new File('tools/signing.properties').exists()) {
+        Properties props = new Properties()
+        props.load(new FileInputStream(file('tools/signing.properties')))
+
+        signingConfigs {
+            release {
+                storeFile file('tools/signing.keystore')
+                keyAlias props['keyAlias']
+                storePassword props['storePassword']
+                keyPassword props['keyPassword']
+            }
+        }
+
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+        }
+    }
+
+    flavorDimensions 'package', 'difficulty', 'analytics', 'zeemote', 'rateoffer'
+
+    productFlavors {
+        gplaynormal {
+            dimension 'package'
+            applicationId 'zame.GloomyDungeons.freedemo.game'
+            buildConfigField 'String', 'GA_ACCT', '"UA-1782921-31"'
+        }
+
+        gplayhardcore {
+            dimension 'package'
+            applicationId 'org.zamedev.gloomydungeons1hardcore.gplay'
+            buildConfigField 'String', 'GA_ACCT', '"UA-1782921-32"'
+        }
+
+        fdroidnormal {
+            dimension 'package'
+            applicationId 'zame.GloomyDungeons.opensource.game'
+        }
+
+        fdroidhardcore {
+            dimension 'package'
+            applicationId 'org.zamedev.gloomydungeons1hardcore.opensource'
+        }
+
+        normal {
+            dimension 'difficulty'
+        }
+
+        hardcore {
+            dimension 'difficulty'
+        }
+
+        withoutanalytics {
+            dimension 'analytics'
+            buildConfigField 'boolean', 'WITH_ANALYTICS', 'false'
+            buildConfigField 'String', 'GA_ACCT', '""'
+        }
+
+        withanalytics {
+            dimension 'analytics'
+            buildConfigField 'boolean', 'WITH_ANALYTICS', 'true'
+        }
+
+        withoutzeemote {
+            dimension 'zeemote'
+            buildConfigField 'boolean', 'WITH_ZEEMOTE', 'false'
+        }
+
+        withzeemote {
+            dimension 'zeemote'
+            buildConfigField 'boolean', 'WITH_ZEEMOTE', 'true'
+        }
+
+        withoutrateoffer {
+            dimension 'rateoffer'
+        }
+
+        withrateoffer {
+            dimension 'rateoffer'
+        }
+    }
+}
+
+dependencies {
+    withanalyticsCompile fileTree(dir: 'src/withanalytics/libs', include: [ '*.jar' ])
+    withzeemoteCompile fileTree(dir: 'src/withzeemote/libs', include: [ '*.jar' ])
+}
