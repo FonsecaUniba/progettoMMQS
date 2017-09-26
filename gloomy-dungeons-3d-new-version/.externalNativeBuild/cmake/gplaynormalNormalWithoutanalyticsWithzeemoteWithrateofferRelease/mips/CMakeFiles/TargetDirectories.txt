@@ -1,0 +1,3 @@
+C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/.externalNativeBuild/cmake/gplaynormalNormalWithoutanalyticsWithzeemoteWithrateofferRelease/mips/CMakeFiles/zameJniRenderer.dir
+C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/.externalNativeBuild/cmake/gplaynormalNormalWithoutanalyticsWithzeemoteWithrateofferRelease/mips/CMakeFiles/edit_cache.dir
+C:/Users/Ntrenta/StudioProjects/gloomy-dungeons-3d-retry-version/.externalNativeBuild/cmake/gplaynormalNormalWithoutanalyticsWithzeemoteWithrateofferRelease/mips/CMakeFiles/rebuild_cache.dir

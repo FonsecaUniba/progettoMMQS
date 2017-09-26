@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\build\\intermediates\\res\\merged\\fdroidhardcoreHardcoreWithanalyticsWithoutzeemoteWithoutrateoffer\\debug\\anim\\rotation.xml",
+        "source": "C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\src\\main\\res\\anim\\rotation.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\build\\intermediates\\res\\merged\\fdroidhardcoreHardcoreWithanalyticsWithoutzeemoteWithoutrateoffer\\debug\\anim\\no_rotation.xml",
+        "source": "C:\\Users\\Ntrenta\\StudioProjects\\gloomy-dungeons-3d-retry-version\\src\\main\\res\\anim\\no_rotation.xml"
+    }
+]
