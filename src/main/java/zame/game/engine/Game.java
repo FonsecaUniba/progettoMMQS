@@ -36,41 +36,41 @@ public class Game extends ZameGame {
 
     public static final String INSTANT_NAME = "instant";
     public static final String AUTOSAVE_NAME = "autosave";
-    private static boolean pathsInitialized;
+    private static boolean pathsInitialized=false;
 
     private static final int FPS_AVG_LEN = 2;
 
     // paths initialized in MenuActivity (which started first)
     // TODO: initialize paths in some common place, and re-initialize in necessary
     // but I'm think this is already fixed. anyway, check it.
-    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_FOLDER;
-    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_ROOT;
-    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String INSTANT_PATH;
-    @SuppressWarnings("NonConstantFieldWithUpperCaseName") private static String AUTOSAVE_PATH;
+    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_FOLDER="";
+    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_ROOT="";
+    @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String INSTANT_PATH="";
+    @SuppressWarnings("NonConstantFieldWithUpperCaseName") private static String AUTOSAVE_PATH="";
 
-    private boolean showFps;
-    private int actionsMask;
-    private int processedMask;
-    private boolean hasMoved;
-    private long prevMovedTime;
+    private boolean showFps=true;
+    private int actionsMask=0;
+    private int processedMask=0;
+    private boolean hasMoved=true;
+    private long prevMovedTime=0;
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private String unprocessedGameCode = "";
 
-    private static long nextLevelTime;
-    private static long killedTime;
-    private static float killedAngle;
-    private static float killedHeroAngle;
-    private static boolean isGameOverFlag;
-    private static boolean playStartLevelSound;
-    @SuppressWarnings("BooleanVariableAlwaysNegated") private static boolean skipEndLevelActivityOnce;
-    public static boolean renderBlackScreen;
+    private static long nextLevelTime=0;
+    private static long killedTime=0;
+    private static float killedAngle=0;
+    private static float killedHeroAngle=0;
+    private static boolean isGameOverFlag=true;
+    private static boolean playStartLevelSound=true;
+    @SuppressWarnings("BooleanVariableAlwaysNegated") private static boolean skipEndLevelActivityOnce=false;
+    public static boolean renderBlackScreen=true;
     public static String savedGameParam = INSTANT_NAME;
 
-    public static int endlTotalKills;
-    public static int endlTotalItems;
-    public static int endlTotalSecrets;
+    public static int endlTotalKills=0;
+    public static int endlTotalItems=0;
+    public static int endlTotalSecrets=0;
 
-    private static int heroCellX;
-    private static int heroCellY;
+    private static int heroCellX=0;
+    private static int heroCellY=0;
 
     private int createdTexturesCount;
     private int totalTexturesCount;

@@ -7,25 +7,25 @@ import javax.microedition.khronos.opengles.GL10;
 import zame.game.engine.Controls;
 
 public final class Config {
-    public static int controlsType;
-    public static float maxRotateAngle;
-    public static float trackballAcceleration;
-    public static float moveSpeed;
-    public static float strafeSpeed;
-    public static float rotateSpeed;
-    public static boolean invertRotation;
-    public static float gamma;
-    @SuppressWarnings("WeakerAccess") public static int levelTextureFilter;
-    @SuppressWarnings("WeakerAccess") public static int weaponsTextureFilter;
+    public static int controlsType=0;
+    public static float maxRotateAngle=0;
+    public static float trackballAcceleration=0;
+    public static float moveSpeed=0;
+    public static float strafeSpeed=0;
+    public static float rotateSpeed=0;
+    public static boolean invertRotation=true;
+    public static float gamma=0;
+    @SuppressWarnings("WeakerAccess") public static int levelTextureFilter=0;
+    @SuppressWarnings("WeakerAccess") public static int weaponsTextureFilter=0;
     public static int[] keyMappings;
-    public static float mapPosition;
-    public static boolean showCrosshair;
-    public static boolean rotateScreen;
-    @SuppressWarnings("WeakerAccess") public static boolean accelerometerEnabled;
-    public static float controlsAlpha;
-    public static float padXAccel;
-    public static float padYAccel;
-    public static float accelerometerAcceleration;
+    public static float mapPosition=0;
+    public static boolean showCrosshair=true;
+    public static boolean rotateScreen=true;
+    @SuppressWarnings("WeakerAccess") public static boolean accelerometerEnabled=true;
+    public static float controlsAlpha=0;
+    public static float padXAccel=0;
+    public static float padYAccel=0;
+    public static float accelerometerAcceleration=0;
 
     private Config() {
     }

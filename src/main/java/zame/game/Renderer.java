@@ -22,12 +22,12 @@ public final class Renderer {
     private static float[] lineVertexBuffer = new float[MAX_QUADS * 4];
     private static float[] lineColorsBuffer = new float[MAX_QUADS * 8];
 
-    private static int vertexBufferPos;
-    private static int colorsBufferPos;
-    private static int textureBufferPos;
-    private static int indicesBufferPos;
-    private static int lineVertexBufferPos;
-    private static int lineColorsBufferPos;
+    private static int vertexBufferPos=0;
+    private static int colorsBufferPos=0;
+    private static int textureBufferPos=0;
+    private static int indicesBufferPos=0;
+    private static int lineVertexBufferPos=0;
+    private static int lineColorsBufferPos=0;
 
     private static short vertexCount;
     private static short lineVertexCount;
@@ -137,45 +137,45 @@ public final class Renderer {
         }
     }
 
-    public static float x1;
-    public static float y1;
-    public static float z1;
-    public static float u1;
-    public static float v1;
-    public static float r1;
-    public static float g1;
-    public static float b1;
-    public static float a1;
+    public static float x1=0;
+    public static float y1=0;
+    public static float z1=0;
+    public static float u1=0;
+    public static float v1=0;
+    public static float r1=0;
+    public static float g1=0;
+    public static float b1=0;
+    public static float a1=0;
 
-    public static float x2;
-    public static float y2;
-    public static float z2;
-    public static float u2;
-    public static float v2;
-    public static float r2;
-    public static float g2;
-    public static float b2;
-    public static float a2;
+    public static float x2=0;
+    public static float y2=0;
+    public static float z2=0;
+    public static float u2=0;
+    public static float v2=0;
+    public static float r2=0;
+    public static float g2=0;
+    public static float b2=0;
+    public static float a2=0;
 
-    public static float x3;
-    public static float y3;
-    public static float z3;
-    public static float u3;
-    public static float v3;
-    public static float r3;
-    public static float g3;
-    public static float b3;
-    public static float a3;
+    public static float x3=0;
+    public static float y3=0;
+    public static float z3=0;
+    public static float u3=0;
+    public static float v3=0;
+    public static float r3=0;
+    public static float g3=0;
+    public static float b3=0;
+    public static float a3=0;
 
-    public static float x4;
-    public static float y4;
-    public static float z4;
-    public static float u4;
-    public static float v4;
-    public static float r4;
-    public static float g4;
-    public static float b4;
-    public static float a4;
+    public static float x4=0;
+    public static float y4=0;
+    public static float z4=0;
+    public static float u4=0;
+    public static float v4=0;
+    public static float r4=0;
+    public static float g4=0;
+    public static float b4=0;
+    public static float a4=0;
 
     // In-game:
     //

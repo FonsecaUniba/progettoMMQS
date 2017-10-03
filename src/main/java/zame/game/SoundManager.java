@@ -59,11 +59,11 @@ public final class SoundManager {
     private static final float[] soundVolumes = new float[SOUND_LAST];
 
     private static PlayList current;
-    private static boolean musicLoaded;
+    private static boolean musicLoaded=true;
     private static volatile Timer pauseTimer;
     private static volatile TimerTask pauseTask;
 
-    private static boolean soundEnabled;
+    private static boolean soundEnabled=true;
     private static float musicVolume = 1.0f;
     private static float effectsVolume = 1.0f;
 

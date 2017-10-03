@@ -80,22 +80,26 @@ android {
             dimension 'package'
             applicationId 'zame.GloomyDungeons.freedemo.game'
             buildConfigField 'String', 'GA_ACCT', '"UA-1782921-31"'
+            buildConfigField 'String', 'GA_ACCT', '""'
         }
 
         gplayhardcore {
             dimension 'package'
             applicationId 'org.zamedev.gloomydungeons1hardcore.gplay'
             buildConfigField 'String', 'GA_ACCT', '"UA-1782921-32"'
+            buildConfigField 'String', 'GA_ACCT', '""'
         }
 
         fdroidnormal {
             dimension 'package'
             applicationId 'zame.GloomyDungeons.opensource.game'
+            buildConfigField 'String', 'GA_ACCT', '""'
         }
 
         fdroidhardcore {
             dimension 'package'
             applicationId 'org.zamedev.gloomydungeons1hardcore.opensource'
+            buildConfigField 'String', 'GA_ACCT', '""'
         }
 
         normal {
@@ -109,7 +113,6 @@ android {
         withoutanalytics {
             dimension 'analytics'
             buildConfigField 'boolean', 'WITH_ANALYTICS', 'false'
-            buildConfigField 'String', 'GA_ACCT', '""'
         }
 
         withanalytics {

@@ -10,30 +10,30 @@ import zame.game.ZameApplication;
 
 @SuppressWarnings("WeakerAccess")
 public final class State {
-    public static int levelNum;
-    public static float heroX;
-    public static float heroY;
-    public static float heroA;
-    public static int heroKeysMask;
-    public static int heroWeapon;
-    public static int heroHealth;
-    public static int heroArmor;
-    public static boolean[] heroHasWeapon;
+    public static int levelNum=1;
+    public static float heroX=0;
+    public static float heroY=0;
+    public static float heroA=0;
+    public static int heroKeysMask=0;
+    public static int heroWeapon=0;
+    public static int heroHealth=0;
+    public static int heroArmor=0;
+    public static boolean[] heroHasWeapon ;
     public static int[] heroAmmo;
 
-    public static int totalItems;
-    public static int totalMonsters;
-    public static int totalSecrets;
-    public static int pickedItems;
-    public static int killedMonsters;
-    public static int foundSecrets;
-    public static int foundSecretsMask;
+    public static int totalItems=0;
+    public static int totalMonsters=0;
+    public static int totalSecrets=0;
+    public static int pickedItems=0;
+    public static int killedMonsters=0;
+    public static int foundSecrets=0;
+    public static int foundSecretsMask=0;
 
     // *much* better way: reload level, than replace all changed data with data from state
     // (instead of have all these maps in state. but I'm to lazy :)
 
-    public static int levelWidth;
-    public static int levelHeight;
+    public static int levelWidth=0;
+    public static int levelHeight=0;
 
     public static int[][] wallsMap;
     public static int[][] transpMap;
@@ -41,32 +41,32 @@ public final class State {
     public static int[][] decorationsMap;
     public static int[][] passableMap;
 
-    public static int doorsCount;
+    public static int doorsCount=0;
     public static Door[] doors;
 
-    public static int monstersCount;
+    public static int monstersCount=0;
     public static Monster[] monsters;
 
-    public static int marksCount;
+    public static int marksCount=0;
     public static Mark[] marks;
 
     public static ArrayList<ArrayList<Action>> actions;
 
     public static int[][] drawedAutoWalls;
-    public static int autoWallsCount;
+    public static int autoWallsCount=0;
     public static AutoWall[] autoWalls;
 
-    public static boolean showAutoMap;
-    public static long tempElapsedTime;
-    public static long tempLastTime;
-    public static boolean godMode;
+    public static boolean showAutoMap=true;
+    public static long tempElapsedTime=0;
+    public static long tempLastTime=0;
+    public static boolean godMode=true;
 
-    public static int sfcBlockerTimeout;
+    public static int sfcBlockerTimeout=0;
 
-    public static int highlightedControlTypeMask;
-    public static int shownMessageId;
+    public static int highlightedControlTypeMask=0;
+    public static int shownMessageId=0;
 
-    public static boolean tmpReloadLevel;
+    public static boolean tmpReloadLevel=true;
 
     private State() {
     }

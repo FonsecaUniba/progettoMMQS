@@ -58,9 +58,9 @@ public final class Labels {
     private static Paint labelPaint;
     private static Paint msgPaint;
     private static Paint statsPaint;
-    private static int currentMessageId;
-    private static int currentMessageLabelId;
-    private static String currentMessageString;
+    private static int currentMessageId=0;
+    private static int currentMessageLabelId=0;
+    private static String currentMessageString ="";
 
     private Labels() {
     }

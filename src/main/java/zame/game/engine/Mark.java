@@ -8,7 +8,7 @@ import java.io.ObjectOutput;
 @SuppressWarnings("WeakerAccess")
 public class Mark implements Externalizable {
     private static final long serialVersionUID = 0L;
-
+    public Mark(){}
     public int id;
     public int x;
     public int y;

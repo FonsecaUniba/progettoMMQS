@@ -373,33 +373,33 @@ public final class Controls {
     private static boolean[] pointerIsSlide = new boolean[POINTER_MAX_ID];
     private static boolean[] pointerIsPad = new boolean[POINTER_MAX_ID];
     private static float[] pointerPrevX = new float[POINTER_MAX_ID];
-    private static int pointerClickCounter;
+    private static int pointerClickCounter=0;
     private static float[] pointerClickX = new float[POINTER_MAX_ID];
     private static float[] pointerClickY = new float[POINTER_MAX_ID];
     private static boolean[] pointerIsClick = new boolean[POINTER_MAX_ID];
-    private static int touchActionsMask;
-    private static int keysActionsMask;
+    private static int touchActionsMask=0;
+    private static int keysActionsMask=0;
     @SuppressLint("UseSparseArrays") private static Map<Integer, Long> keyDownTimeMap = new HashMap<Integer, Long>();
     @SuppressLint("UseSparseArrays") private static Map<Integer, Long> keyUpTimeMap = new HashMap<Integer, Long>();
-    private static int trackballActionsMask;
-    private static float trackballX;
-    private static float trackballY;
+    private static int trackballActionsMask=0;
+    private static float trackballX=0;
+    private static float trackballY=0;
     private static float[] relativeOffset = new float[MASK_MAX];
-    private static boolean padActive;
-    private static float origPadCenterX;
-    private static float origPadCenterY;
-    private static float padCenterX;
-    private static float padCenterY;
+    private static boolean padActive=true;
+    private static float origPadCenterX=0;
+    private static float origPadCenterY=0;
+    private static float padCenterX=0;
+    private static float padCenterY=0;
 
     @SuppressWarnings("WeakerAccess") public static ControlVariant currentVariant;
-    @SuppressWarnings("WeakerAccess") public static float rotatedAngle;
-    @SuppressWarnings("WeakerAccess") public static float joyX;
-    @SuppressWarnings("WeakerAccess") public static float joyY;
-    @SuppressWarnings("WeakerAccess") public static int joyButtonsMask;
-    public static float accelerometerX;
-    public static float accelerometerY;
-    @SuppressWarnings("WeakerAccess") public static float padX;
-    @SuppressWarnings("WeakerAccess") public static float padY;
+    @SuppressWarnings("WeakerAccess") public static float rotatedAngle=0;
+    @SuppressWarnings("WeakerAccess") public static float joyX=0;
+    @SuppressWarnings("WeakerAccess") public static float joyY=0;
+    @SuppressWarnings("WeakerAccess") public static int joyButtonsMask=0;
+    public static float accelerometerX=0;
+    public static float accelerometerY=0;
+    @SuppressWarnings("WeakerAccess") public static float padX=0;
+    @SuppressWarnings("WeakerAccess") public static float padY=0;
 
     private Controls() {
     }
