@@ -5,9 +5,9 @@ import com.zeemote.zc.event.ButtonEvent;
 
 @SuppressWarnings("WeakerAccess")
 public final class ConfigZeemote {
-    public static float zeemoteXAccel;
-    public static float zeemoteYAccel;
-    public static int[] zeemoteButtonMappings;
+    public static float zeemoteXAccel=0;
+    public static float zeemoteYAccel=0;
+    public static int[] zeemoteButtonMappings=0;
 
     private ConfigZeemote() {
     }

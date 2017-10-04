@@ -29,8 +29,8 @@ public final class Renderer {
     private static int lineVertexBufferPos=0;
     private static int lineColorsBufferPos=0;
 
-    private static short vertexCount;
-    private static short lineVertexCount;
+    private static short vertexCount=0;
+    private static short lineVertexCount=0;
 
     private Renderer() {
     }

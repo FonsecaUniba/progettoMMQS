@@ -14,10 +14,10 @@ public final class Overlay {
             new float[] { 1.0f, 1.0f, 1.0f } // MARK
     };
 
-    private static int overlayType;
-    private static long overlayTime;
-    private static int labelType;
-    private static long labelTime;
+    private static int overlayType=0;
+    private static long overlayTime=0;
+    private static int labelType=0;
+    private static long labelTime=0;
 
     private Overlay() {
     }

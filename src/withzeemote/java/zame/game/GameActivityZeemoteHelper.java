@@ -38,6 +38,7 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
                 }
 
                 return true;
+            default : break;
         }
 
         return false;

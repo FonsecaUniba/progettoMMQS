@@ -1,21 +1,28 @@
 <?php
 
-$mode = (isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '');
+$mode = (isset($_REQUEST['mode']) ? $_POST['mode'] : '');
 
 switch (strtolower($mode))
 {
 	case 'load_map':
-		$name = preg_replace('/^[a-z0-9\-_.]/i', '', $_REQUEST['name']);
-		echo @file_get_contents("levels/$name");
+		$name = preg_replace('/^[a-z0-9\-_.]/i', '', $_POST['name']);
+
+        $to_print = htmlspecialchars( @file_get_contents("levels/$name") );
+        echo $to_print;
+
+		//echo @file_get_contents("levels/$name");
 		break;
 
 	case 'save_map':
-		$name = preg_replace('/^[a-z0-9\-_.]/i', '', $_REQUEST['name']);
-		$data = $_REQUEST['map'];
+		$name = preg_replace('/^[a-z0-9\-_.]/i', '', $_POST['name']);
+		$data = $_POST['map'];
 
 		$res = @file_put_contents("levels/$name", $data);
 
-		echo $res ? "File [$name] saved" : "Cant save file [$name]";
+        $to_print = $res ? "File [$name] saved" : "Cant save file [$name]"
+        echo htmlspecialchars( $to_print );
+
+		//echo $res ? "File [$name] saved" : "Cant save file [$name]";
 		break;
 
 	default:
@@ -33,6 +40,9 @@ switch (strtolower($mode))
 		natsort($res);
 		$res = array_values($res);
 
-		echo json_encode($res);
+		$to_print = htmlspecialchars( json_encode($res) );
+		echo $to_print;
+
+		//echo json_encode($res);
 		break;
 }

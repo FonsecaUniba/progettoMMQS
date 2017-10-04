@@ -23,11 +23,11 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
 
     private static long updateInterval;
     private static long startTime;
-    private static long lastTime;
-    @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static boolean isPaused;
+    private static long lastTime=0;
+    @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static boolean isPaused=false;
 
     public static boolean callResumeAfterSurfaceCreated = true;
-    public static long elapsedTime;
+    public static long elapsedTime=0;
     public static int width = 1;
     public static int height = 1;
     public static Resources resources;

@@ -86,7 +86,7 @@ public final class TextureLoader {
             R.drawable.texmap_mon_5,
             R.drawable.texmap_mon_6, };
 
-    private static boolean texturesInitialized;
+    private static boolean texturesInitialized=true;
     public static int[] textures = new int[TEXTURE_LAST];
 
     private static volatile BitmapFactory.Options tOpts;

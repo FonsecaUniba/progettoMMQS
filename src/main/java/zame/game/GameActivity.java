@@ -92,6 +92,7 @@ public class GameActivity extends Activity implements SensorEventListener {
                         GameActivity.self.gameViewData.game.initialize();
                         // gameViewData.noClearRenderBlackScreenOnce = true;
                         break;
+                    default: break;
                 }
 
                 GameActivity.self.setZameView(_viewId);
@@ -177,6 +178,7 @@ public class GameActivity extends Activity implements SensorEventListener {
                 instantMusicPause = false;
                 finish();
                 return true;
+            default: break;
         }
 
         //noinspection SimplifiableIfStatement
@@ -308,6 +310,7 @@ public class GameActivity extends Activity implements SensorEventListener {
                         })
                         .create();
             }
+            default: break;
         }
 
         return null;

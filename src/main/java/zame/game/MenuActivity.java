@@ -12,8 +12,8 @@ import zame.game.engine.Game;
 import zame.game.views.MenuView;
 
 public class MenuActivity extends Activity {
-    public static boolean justLoaded; // or just saved, or just new game started
-    public static MenuActivity self;
+    public static boolean justLoaded=true; // or just saved, or just new game started
+    public static MenuActivity self = new MenuActivity();
 
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean justAfterPause;
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean soundAlreadyStopped; // fix multi-activity issues
@@ -105,7 +105,9 @@ public class MenuActivity extends Activity {
             case R.id.menu_options:
                 startActivity(new Intent(this, GamePreferencesActivity.class));
                 return true;
+            default : break;
         }
+
 
         return MenuView.onOptionsItemSelected(this, item);
     }

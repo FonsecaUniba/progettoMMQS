@@ -324,6 +324,7 @@ public class Monster implements Externalizable {
                         case 3:
                             cellY++;
                             break;
+                        default : break;
                     }
 
                     if ((State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_MONSTER) == 0) {

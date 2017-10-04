@@ -89,7 +89,7 @@ public final class Level {
     public static ArrayList<ArrayList<Mark>> marksHash;
 
     private static volatile boolean[] wasAlreadyInWall;
-    public static boolean quickReturnFromFillInitialInWall; // set to false before using fillInitialInWallMap
+    public static boolean quickReturnFromFillInitialInWall = true; // set to false before using fillInitialInWallMap
 
     private Level() {
     }
@@ -458,6 +458,7 @@ public final class Level {
                     State.marksCount = idx;
                 }
                 break;
+                default : break;
 
                 case ACTION_WALL: {
                     for (Mark mark : marks) {

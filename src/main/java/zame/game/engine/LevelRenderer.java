@@ -35,11 +35,11 @@ public final class LevelRenderer {
     public static PortalTracer tracer;
 
     public static VisibleObject[] visibleObjects = new VisibleObject[MAX_VISIBLE_OBJECTS];
-    public static int visibleObjectsCount;
+    public static int visibleObjectsCount=0;
     public static VisibleObject currVis;
 
-    private static float flatObjDx;
-    private static float flatObjDy;
+    private static float flatObjDx=0;
+    private static float flatObjDy=0;
 
     public static boolean showMonstersOnMap;
 

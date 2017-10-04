@@ -875,6 +875,8 @@ public class Game extends ZameGame {
                 }
 
                 break;
+
+            default: break;
         }
 
         // play sounds
@@ -1012,6 +1014,7 @@ public class Game extends ZameGame {
 
                 break;
 
+
             case TextureLoader.OBJ_DBLSHOTGUN:
                 State.heroHasWeapon[Weapons.WEAPON_DBLSHOTGUN] = true;
 
@@ -1023,6 +1026,7 @@ public class Game extends ZameGame {
                 }
 
                 break;
+            default: break;
         }
 
         // don't count objects leaved by monsters

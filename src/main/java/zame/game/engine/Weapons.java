@@ -71,10 +71,10 @@ public final class Weapons {
 
     public static WeaponParams currentParams;
     public static int[] currentCycle;
-    public static int shootCycle;
-    public static int changeWeaponDir;
-    public static int changeWeaponNext;
-    public static long changeWeaponTime;
+    public static int shootCycle=0;
+    public static int changeWeaponDir=0;
+    public static int changeWeaponNext=0;
+    public static long changeWeaponTime=0;
 
     private Weapons() {
     }

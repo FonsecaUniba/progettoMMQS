@@ -95,6 +95,7 @@ public class MenuViewHelper {
 
                 return resDialog.create();
             }
+            default : break;
         }
 
         return null;

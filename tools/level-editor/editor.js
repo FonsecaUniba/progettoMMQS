@@ -26,7 +26,7 @@ function st(id)
 function log(message)
 {
 	el_log.innerHTML += message + "\n";
-	el_log.scrollTop = el_log.scrollHeight
+	el_log.scrollTop = el_log.scrollHeight;
 }
 
 function get_cells_html()
@@ -87,14 +87,30 @@ function get_items_html()
 	items_row += 1;
 
 	for (var i = 1; i <= conf.walls; i++) {
-		append_item('graphics/set-' + conf.set + '/walls/wall_' + (i < 10 ? '0' : '') + i, i + 0x10 - 1);
+		var operand = '';
+		
+		if(i < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		append_item('graphics/set-' + conf.set + '/walls/wall_' + operand + i, i + 0x10 - 1);
 	}
 
 	items_col = -1;
 	items_row += 1;
 
 	for (var i = 1; i <= conf.trans_a; i++) {
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + (i < 10 ? '0' : '') + i, i + 0x30 - 1);
+		var operand = '';
+		
+		if(i < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + i, i + 0x30 - 1);
 	}
 
 	items_col = -1;
@@ -102,7 +118,17 @@ function get_items_html()
 
 	for (var i = 1; i <= conf.trans_b; i++) {
 		var n = i + 8;
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + (n < 10 ? '0' : '') + n, n + 0x30 - 1);
+		
+		var operand = '';
+		
+		if(n < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		
+		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
 	}
 
 	items_col = -1;
@@ -110,7 +136,17 @@ function get_items_html()
 
 	for (var i = 1; i <= conf.trans_c; i++) {
 		var n = i + 16;
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + (n < 10 ? '0' : '') + n, n + 0x30 - 1);
+		
+		var operand = '';
+		
+		if(n < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		
+		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
 	}
 
 	items_col = -1;
@@ -124,14 +160,32 @@ function get_items_html()
 	items_row += 1;
 
 	for (var i = 1; i <= conf.objects; i++) {
-		append_item('graphics/common-' + conf.set + '/objects/obj_' + (i < 10 ? '0' : '') + i, i + 0x70 - 1);
+		var operand = '';
+		
+		if(i < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		
+		append_item('graphics/common-' + conf.set + '/objects/obj_' + operand + i, i + 0x70 - 1);
 	}
 
 	items_col = -1;
 	items_row += 1;
 
 	for (var i = 1; i <= conf.decor_a; i++) {
-		append_item('graphics/set-' + conf.set + '/decor/decor_' + (i < 10 ? '0' : '') + i, i + 0x80 - 1);
+		var operand = '';
+		
+		if(i < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		
+		append_item('graphics/set-' + conf.set + '/decor/decor_' + operand + i, i + 0x80 - 1);
 	}
 
 	items_col = -1;
@@ -139,7 +193,17 @@ function get_items_html()
 
 	for (var i = 1; i <= conf.decor_b; i++) {
 		var n = i + 12;
-		append_item('graphics/set-' + conf.set + '/decor/decor_' + (n < 10 ? '0' : '') + n, n + 0x80 - 1);
+		
+		var operand = '';
+		
+		if(n < 10){
+			operand = '0';
+		} else {
+			operand = '';
+		}
+		
+		
+		append_item('graphics/set-' + conf.set + '/decor/decor_' + operand + n, n + 0x80 - 1);
 	}
 
 	items_col = -1;
@@ -171,7 +235,12 @@ function item_clicked(el)
 function getImage(idx)
 {
 	var el = document.getElementById('item_' + idx);
-	return (el ? el.style.backgroundImage : '');
+	
+	if(el){
+		return el.style.backgroundImage;
+	} else {
+		return '';
+	}
 }
 
 function set_cell_value(el, x, y, idx)
@@ -285,13 +354,15 @@ function from_list(list)
 
 	for (var i = 0; i < 64; i++) {
 		for (var j = 0; j <  64; j++) {
-			level_data[i][j] = list[pos++];
+			level_data[i][j] = list[pos];
+			pos++;
 		}
 	}
 
 	for (var i = 0; i < 64; i++) {
 		for (var j = 0; j <  64; j++) {
-			mark_data[i][j] = list[pos++];
+			mark_data[i][j] = list[pos];
+			pos++;
 		}
 	}
 
@@ -523,7 +594,13 @@ function next_mode(x, y)
 	else if (mode == 'select_to')
 	{
 		sel = { fx: Math.min(sel.fx, x), fy: Math.min(sel.fy, y), tx: Math.max(sel.fx, x), ty: Math.max(sel.fy, y) };
-		set_sel_class((sel.fx==0 && sel.fy==0 && sel.tx==63 && sel.ty==63) ? 'cell' : 'cell cell-selected');
+		
+		if(sel.fx==0 && sel.fy==0 && sel.tx==63 && sel.ty==63){
+			set_sel_class('cell');
+		} else {
+			set_sel_class('cell cell-selected');
+		}
+		
 		mode = '';
 		log('[I] Area selected (w=' + (sel.tx-sel.fx+1) + ', h=' + (sel.ty-sel.fy+1) + ')');
 	}
@@ -876,7 +953,11 @@ function clear_log()
 
 function toggle_data_text()
 {
-	st('data-text').display = (st('data-text').display == '' ? 'none' : '');
+	if(st('data-text').display == ''){
+		st('data-text').display = 'none';
+	} else {
+		st('data-text').display = '';
+	}
 }
 
 function do_convert()

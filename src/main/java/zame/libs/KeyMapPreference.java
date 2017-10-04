@@ -399,6 +399,7 @@ public class KeyMapPreference extends DialogPreference {
 
             case KeyEvent.KEYCODE_MENU:
                 return "MENU";
+            default : break;
         }
 
         return "<UNKNOWN>";

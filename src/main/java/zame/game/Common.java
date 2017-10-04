@@ -29,10 +29,10 @@ public final class Common {
     public static final float G2RAD_F = (float)(Math.PI / 180.0);
     public static final float RAD2G_F = (float)(180.0 / Math.PI);
 
-    public static float heroAr; // angle in radians
-    public static float heroCs; // cos of angle
-    public static float heroSn; // sin of angle
-    public static float ratio;
+    public static float heroAr=0; // angle in radians
+    public static float heroCs=0; // cos of angle
+    public static float heroSn=0; // sin of angle
+    public static float ratio=0;
 
     private static volatile Random random;
 

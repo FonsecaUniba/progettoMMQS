@@ -265,9 +265,11 @@ public class MenuView extends RelativeLayout {
                 }
 
                 return true;
+            default: break;
         }
 
         return false;
+
     }
 
     @SuppressWarnings("deprecation")
@@ -374,6 +376,7 @@ public class MenuView extends RelativeLayout {
 
                 return data.saveSlotsDialog;
             }
+            default : break;
         }
 
         return MenuViewHelper.onCreateDialog(activity, data, id);
