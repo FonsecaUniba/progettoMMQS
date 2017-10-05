@@ -127,7 +127,7 @@ public final class Level {
             Game.assetManager.open("levels/level-" + String.valueOf(idx) + ".map").close();
             return true;
         } catch (IOException ex) {
-            // ignored
+            System.err.println();
         }
 
         return false;

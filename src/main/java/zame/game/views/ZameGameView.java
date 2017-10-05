@@ -68,7 +68,7 @@ public class ZameGameView extends zame.libs.GLSurfaceView21 {
         try {
             Thread.sleep(16);
         } catch (InterruptedException e) {
-            // ignored
+            System.err.println();
         }
 
         return true;

@@ -167,11 +167,11 @@ public class Game extends ZameGame {
                 FileOutputStream out = new FileOutputStream(noMediaPath);
                 out.close();
             } catch (FileNotFoundException ex) {
-                // ignored
+                System.err.println();
             } catch (SecurityException ex) {
-                // ignored
+                System.err.println();
             } catch (IOException ex) {
-                // ignored
+                System.err.println();
             }
         }
 
@@ -1347,7 +1347,7 @@ public class Game extends ZameGame {
             try {
                 Toast.makeText(ZameApplication.self, R.string.msg_cant_save_state, Toast.LENGTH_LONG).show();
             } catch (Exception ex) {
-                // something really bad happened
+                System.err.println();
             }
         }
 

@@ -272,7 +272,7 @@ public class PromoView extends FrameLayout {
                     try {
                         Toast.makeText(context, "Could not launch the browser application.", Toast.LENGTH_LONG).show();
                     } catch (Exception inner) {
-                        // ignored
+                        System.err.println();
                     }
                 }
             }
@@ -289,7 +289,7 @@ public class PromoView extends FrameLayout {
                     try {
                         Toast.makeText(context, "Could not start external intent.", Toast.LENGTH_LONG).show();
                     } catch (Exception inner) {
-                        // ignored
+                        System.err.println();
                     }
                 }
             }
@@ -346,7 +346,7 @@ public class PromoView extends FrameLayout {
                     InputStream stream = view.getContext().getAssets().open(uri.getPath());
                     return new WebResourceResponse("text/html", "UTF-8", stream);
                 } catch (Exception ex) {
-                    // ignored
+                    System.err.println();
                 }
             }
 
