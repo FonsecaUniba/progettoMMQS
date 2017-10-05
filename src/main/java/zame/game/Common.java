@@ -25,7 +25,7 @@ import zame.game.engine.State;
 // http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3_r1/android/os/FileUtils.java#FileUtils
 
 public final class Common {
-    public static final String LOG_KEY = "GloomyDungeons";
+    public static final String GAME_NAME = "GloomyDungeons";
     public static final float G2RAD_F = (float)(Math.PI / 180.0);
     public static final float RAD2G_F = (float)(180.0 / Math.PI);
 
@@ -225,7 +225,7 @@ public final class Common {
             try {
                 instance = (Externalizable)theClass.newInstance();
             } catch (Exception ex) {
-                Log.e(LOG_KEY, "Exception", ex);
+                Log.e(GAME_NAME, "Exception", ex);
                 throw new ClassNotFoundException("Couldn't create class instance");
             }
 
@@ -293,7 +293,7 @@ public final class Common {
 
             return true;
         } catch (Exception ex) {
-            Log.e(LOG_KEY, "Exception", ex);
+            Log.e(GAME_NAME, "Exception", ex);
             Toast.makeText(ZameApplication.self, "Could not launch the market application.", Toast.LENGTH_LONG).show();
         }
 
@@ -307,7 +307,7 @@ public final class Common {
 
             return true;
         } catch (Exception ex) {
-            Log.e(LOG_KEY, "Exception", ex);
+            Log.e(GAME_NAME, "Exception", ex);
             Toast.makeText(ZameApplication.self, "Could not launch the browser application.", Toast.LENGTH_LONG).show();
         }
 
@@ -332,7 +332,7 @@ public final class Common {
             in.close();
             out.close();
         } catch (Exception ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
         }
 

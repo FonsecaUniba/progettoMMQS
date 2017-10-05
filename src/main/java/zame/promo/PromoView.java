@@ -104,7 +104,7 @@ public class PromoView extends FrameLayout {
     @SuppressLint({ "AddJavascriptInterface", "SetJavaScriptEnabled" })
     protected WebView createWebView() {
         WebView webView = new WebView(context);
-        webView.addJavascriptInterface(new JsApi(), "promoApi");
+        //webView.addJavascriptInterface(new JsApi(), "promoApi");
         webView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         webView.setScrollbarFadingEnabled(true);
         webView.setWebViewClient(new PromoWebViewClient());
@@ -127,7 +127,7 @@ public class PromoView extends FrameLayout {
         WebSettings webSettings = webView.getSettings();
         webSettings.setBuiltInZoomControls(false);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptEnabled(false);
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         webSettings.setSupportZoom(false);
         webSettings.setUseWideViewPort(true);

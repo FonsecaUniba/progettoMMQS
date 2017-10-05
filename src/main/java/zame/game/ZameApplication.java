@@ -66,7 +66,7 @@ public class ZameApplication extends Application {
             try {
                 cachedVersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             } catch (Exception ex) {
-                Log.e(Common.LOG_KEY, "Exception", ex);
+                Log.e(Common.GAME_NAME, "Exception", ex);
             }
         }
 

@@ -33,7 +33,7 @@ public class ZameApplicationAnalyticsHelper {
                 try {
                     tracker.trackPageView(pageUrl);
                 } catch (Exception ex) {
-                    Log.e(Common.LOG_KEY, "Exception", ex);
+                    Log.e(Common.GAME_NAME, "Exception", ex);
                 }
             }
         });
@@ -56,7 +56,7 @@ public class ZameApplicationAnalyticsHelper {
                     try {
                         tracker.trackEvent(ev.category, ev.action, ev.label, ev.value);
                     } catch (Exception ex) {
-                        Log.e(Common.LOG_KEY, "Exception", ex);
+                        Log.e(Common.GAME_NAME, "Exception", ex);
                     }
                 }
 
@@ -76,7 +76,7 @@ public class ZameApplicationAnalyticsHelper {
             tracker.setCustomVar(1, "Version", app.getVersionName(), 2); // slot: 1, scope: session
             tracker.setCustomVar(2, "InitialControlsType", initialControlsType, 2); // slot: 2, scope: session
         } catch (Exception ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             tracker = null;
         }
     }

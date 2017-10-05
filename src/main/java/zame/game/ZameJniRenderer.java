@@ -9,11 +9,23 @@ public final class ZameJniRenderer {
     private ZameJniRenderer() {
     }
 
-    public static native void renderTriangles(float[] vertexBuffer,
+    public static void callRenderTriangles(float[] vertexBuffer,
+                                           float[] colorsBuffer,
+                                           float[] textureBuffer,
+                                           short[] indicesBuffer,
+                                           int indicesBufferPos){
+        renderTriangles(vertexBuffer, colorsBuffer, textureBuffer, indicesBuffer, indicesBufferPos);
+    }
+
+    public static void callRenderLines(float[] vertexBuffer, float[] colorsBuffer, int vertexCount){
+        renderLines(vertexBuffer, colorsBuffer, vertexCount);
+    }
+
+    private static native void renderTriangles(float[] vertexBuffer,
             float[] colorsBuffer,
             float[] textureBuffer,
             short[] indicesBuffer,
             int indicesBufferPos);
 
-    public static native void renderLines(float[] vertexBuffer, float[] colorsBuffer, int vertexCount);
+    private static native void renderLines(float[] vertexBuffer, float[] colorsBuffer, int vertexCount);
 }

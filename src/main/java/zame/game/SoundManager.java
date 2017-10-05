@@ -103,7 +103,7 @@ public final class SoundManager {
             mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.e(Common.LOG_KEY,
+                    Log.e(Common.GAME_NAME,
                             "MediaPlayer error: what=" + String.valueOf(what) + ", extra=" + String.valueOf(extra));
 
                     return false;
@@ -153,7 +153,7 @@ public final class SoundManager {
             soundIds[idx] = soundId;
             soundVolumes[idx] = volume;
         } catch (IOException ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             soundIds[idx] = -1;
         }
     }
@@ -200,14 +200,14 @@ public final class SoundManager {
                 mediaPlayer.prepare();
                 musicLoaded = true;
             } catch (IllegalStateException ex) {
-                Log.e(Common.LOG_KEY, "Exception", ex);
+                Log.e(Common.GAME_NAME, "Exception", ex);
             } catch (IOException ex) {
-                Log.e(Common.LOG_KEY, "Exception", ex);
+                Log.e(Common.GAME_NAME, "Exception", ex);
             }
 
             afd.close();
         } catch (IOException ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
         }
 
         if (pauseTask != null) {

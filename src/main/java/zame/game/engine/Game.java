@@ -116,14 +116,14 @@ public class Game extends ZameGame {
         String result = "";
 
         if (appContext == null) {
-            Log.e(Common.LOG_KEY, "Game.getInternalStoragePath : appContext == null");
+            Log.e(Common.GAME_NAME, "Game.getInternalStoragePath : appContext == null");
         } else if (appContext.getFilesDir() == null) {
-            Log.e(Common.LOG_KEY, "Game.getInternalStoragePath : appContext.getFilesDir() == null");
+            Log.e(Common.GAME_NAME, "Game.getInternalStoragePath : appContext.getFilesDir() == null");
         } else {
             try {
                 result = appContext.getFilesDir().getCanonicalPath();
             } catch (IOException ex) {
-                Log.e(Common.LOG_KEY, "Can't open internal storage", ex);
+                Log.e(Common.GAME_NAME, "Can't open internal storage", ex);
             }
         }
 
@@ -1339,7 +1339,7 @@ public class Game extends ZameGame {
 
             safeRename(tmpName, saveName);
         } catch (Exception ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
         }
 
@@ -1372,11 +1372,11 @@ public class Game extends ZameGame {
         } catch (FileNotFoundException ex) {
             return false;
         } catch (ClassNotFoundException ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
             errorMessage = ex.toString();
         } catch (Exception ex) {
-            Log.e(Common.LOG_KEY, "Exception", ex);
+            Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
         }
 

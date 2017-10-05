@@ -64,7 +64,7 @@ public final class Renderer {
                 gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
             }
 
-            ZameJniRenderer.renderTriangles(vertexBuffer,
+            ZameJniRenderer.callRenderTriangles(vertexBuffer,
                     colorsBuffer,
                     (useTextures ? textureBuffer : null),
                     indicesBuffer,
@@ -75,7 +75,7 @@ public final class Renderer {
             gl.glDisable(GL10.GL_TEXTURE_2D);
             gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
-            ZameJniRenderer.renderLines(lineVertexBuffer, lineColorsBuffer, lineVertexCount);
+            ZameJniRenderer.callRenderLines(lineVertexBuffer, lineColorsBuffer, lineVertexCount);
         }
     }
 

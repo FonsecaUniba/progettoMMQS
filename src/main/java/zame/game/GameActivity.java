@@ -139,7 +139,7 @@ public class GameActivity extends Activity implements SensorEventListener {
         if (currentView instanceof IZameView) {
             ((IZameView)currentView).onResume();
         } else {
-            Log.w(Common.LOG_KEY, "GameActivity.setZameView: non-IZameView view");
+            Log.w(Common.GAME_NAME, "GameActivity.setZameView: non-IZameView view");
         }
     }
 
