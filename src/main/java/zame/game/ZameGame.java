@@ -74,11 +74,11 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        gl.glViewport(0, 0, width, height);
+    public void onSurfaceChanged(GL10 gl, int larghezza, int altezza) {
+        gl.glViewport(0, 0, larghezza, altezza);
 
-        ZameGame.width = ((width < 1) ? 1 : width);        // just for case
-        ZameGame.height = ((height < 1) ? 1 : height);    // just for case
+        ZameGame.width = ((larghezza < 1) ? 1 : larghezza);        // just for case
+        ZameGame.height = ((altezza < 1) ? 1 : altezza);    // just for case
 
         surfaceSizeChanged(gl);
     }

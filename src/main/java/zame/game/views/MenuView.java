@@ -67,8 +67,8 @@ public class MenuView extends RelativeLayout {
         data = activity.menuViewData;
     }
 
-    public static void onActivityCreate(MenuActivity activity) {
-        PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
+    public static void onActivityCreate(MenuActivity window) {
+        PreferenceManager.getDefaultSharedPreferences(window.getApplicationContext());
     }
 
     @Override
@@ -240,18 +240,18 @@ public class MenuView extends RelativeLayout {
     }
 
     @SuppressWarnings({ "deprecation", "MagicNumber" })
-    public static boolean onOptionsItemSelected(final MenuActivity activity, MenuItem item) {
+    public static boolean onOptionsItemSelected(final MenuActivity window, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_about:
-                activity.showDialog(DIALOG_ABOUT);
+                window.showDialog(DIALOG_ABOUT);
 
-                TextView dlgText = (TextView)activity.menuViewData.aboutDialog.findViewById(android.R.id.message);
+                TextView dlgText = (TextView)window.menuViewData.aboutDialog.findViewById(android.R.id.message);
                 dlgText.setMovementMethod(LinkMovementMethod.getInstance());
                 dlgText.setTextColor(0xFFFFFFFF);
                 return true;
 
             case R.id.menu_site_help:
-                Common.openBrowser(activity,
+                Common.openBrowser(window,
                         "http://mobile.zame-dev.org/gloomy/help.php?hl=" + Locale.getDefault()
                                 .getLanguage()
                                 .toLowerCase(Locale.US));
@@ -260,8 +260,8 @@ public class MenuView extends RelativeLayout {
 
             case R.id.menu_exit:
                 //noinspection ConstantConditions
-                if (MenuViewHelper.canExit(activity)) {
-                    activity.finish();
+                if (MenuViewHelper.canExit(window)) {
+                    window.finish();
                 }
 
                 return true;
@@ -382,15 +382,15 @@ public class MenuView extends RelativeLayout {
         return MenuViewHelper.onCreateDialog(activity, data, id);
     }
 
-    private static void startGame(MenuActivity activity, String saveName) {
+    private static void startGame(MenuActivity window, String saveName) {
         if (!saveName.equals(Game.INSTANT_NAME)) {
             // new game started or loaded non-instant state
             MenuActivity.justLoaded = true;
         }
 
         Game.savedGameParam = saveName;
-        activity.instantMusicPause = false;
-        activity.startActivity(new Intent(activity, GameActivity.class));
+        window.instantMusicPause = false;
+        window.startActivity(new Intent(window, GameActivity.class));
     }
 
     private static boolean hasInstantSave() {

@@ -189,7 +189,8 @@ public class Monster implements Externalizable {
                     State.objectsMap[cellY][cellX] = ammoType;
                     State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_OBJECT;
                 } else {
-                    outer:
+                    //outer:
+                    boolean keepGoing = true;
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
                             if (((dy != 0) || (dx != 0)) && ((State.passableMap[cellY + dy][cellX + dx]
@@ -197,9 +198,12 @@ public class Monster implements Externalizable {
 
                                 State.objectsMap[cellY + dy][cellX + dx] = ammoType;
                                 State.passableMap[cellY + dy][cellX + dx] |= Level.PASSABLE_IS_OBJECT;
-                                break outer;
+                                //break outer;
+                                keepGoing = false;
                             }
+                            if (!keepGoing) break;
                         }
+                        if (!keepGoing) break;
                     }
                 }
             }

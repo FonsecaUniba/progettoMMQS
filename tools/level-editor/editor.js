@@ -73,81 +73,88 @@ function append_item(name, idx)
 		'.png)" onmousedown="return item_clicked(this,event)"></div>';
 }
 
+function get_items_html_part()
+{
+    append_item('graphics/set-' + conf.set + '/floor/' + conf.floor, 0);
+
+    	for (var i = 1; i <= 4; i++) {
+    		append_item('graphics/common-' + conf.set + '/hero/hero_a' + i, i);
+    	}
+
+    	append_item('graphics/common-' + conf.set + '/trans/no-trans', 5);
+
+    	items_col = -1;
+    	items_row += 1;
+
+    	for (var i = 1; i <= conf.walls; i++) {
+    		var operand = '';
+
+    		if(i < 10){
+    			operand = '0';
+    		} else {
+    			operand = '';
+    		}
+
+    		append_item('graphics/set-' + conf.set + '/walls/wall_' + operand + i, i + 0x10 - 1);
+    	}
+
+    	items_col = -1;
+    	items_row += 1;
+
+    	for (var i = 1; i <= conf.trans_a; i++) {
+    		var operand = '';
+
+    		if(i < 10){
+    			operand = '0';
+    		} else {
+    			operand = '';
+    		}
+
+    		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + i, i + 0x30 - 1);
+    	}
+
+    	items_col = -1;
+    	items_row += 1;
+
+    	for (var i = 1; i <= conf.trans_b; i++) {
+    		var n = i + 8;
+
+    		var operand = '';
+
+    		if(n < 10){
+    			operand = '0';
+    		} else {
+    			operand = '';
+    		}
+
+
+    		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
+    	}
+
+    	items_col = -1;
+    	items_row += 1;
+
+    	for (var i = 1; i <= conf.trans_c; i++) {
+    		var n = i + 16;
+
+    		var operand = '';
+
+    		if(n < 10){
+    			operand = '0';
+    		} else {
+    			operand = '';
+    		}
+
+
+    		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
+    	}
+
+    	return items_res;
+}
+
 function get_items_html()
 {
-	append_item('graphics/set-' + conf.set + '/floor/' + conf.floor, 0);
-
-	for (var i = 1; i <= 4; i++) {
-		append_item('graphics/common-' + conf.set + '/hero/hero_a' + i, i);
-	}
-
-	append_item('graphics/common-' + conf.set + '/trans/no-trans', 5);
-
-	items_col = -1;
-	items_row += 1;
-
-	for (var i = 1; i <= conf.walls; i++) {
-		var operand = '';
-		
-		if(i < 10){
-			operand = '0';
-		} else {
-			operand = '';
-		}
-		
-		append_item('graphics/set-' + conf.set + '/walls/wall_' + operand + i, i + 0x10 - 1);
-	}
-
-	items_col = -1;
-	items_row += 1;
-
-	for (var i = 1; i <= conf.trans_a; i++) {
-		var operand = '';
-		
-		if(i < 10){
-			operand = '0';
-		} else {
-			operand = '';
-		}
-		
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + i, i + 0x30 - 1);
-	}
-
-	items_col = -1;
-	items_row += 1;
-
-	for (var i = 1; i <= conf.trans_b; i++) {
-		var n = i + 8;
-		
-		var operand = '';
-		
-		if(n < 10){
-			operand = '0';
-		} else {
-			operand = '';
-		}
-		
-		
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
-	}
-
-	items_col = -1;
-	items_row += 1;
-
-	for (var i = 1; i <= conf.trans_c; i++) {
-		var n = i + 16;
-		
-		var operand = '';
-		
-		if(n < 10){
-			operand = '0';
-		} else {
-			operand = '';
-		}
-		
-		
-		append_item('graphics/set-' + conf.set + '/trans/trans_' + operand + n, n + 0x30 - 1);
-	}
+    get('items').innerHTML = get_items_html_part();
 
 	items_col = -1;
 	items_row += 1;

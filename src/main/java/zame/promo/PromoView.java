@@ -92,8 +92,8 @@ public class PromoView extends FrameLayout {
         initialize(context);
     }
 
-    protected void initialize(Context context) {
-        this.context = context;
+    protected void initialize(Context cont) {
+        this.context = cont;
 
         prevWebView = createWebView();
         currentWebView = createWebView();
