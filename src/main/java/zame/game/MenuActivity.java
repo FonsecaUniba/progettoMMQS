@@ -66,7 +66,6 @@ public class MenuActivity extends Activity {
 
     @Override
     public void onPause() {
-        super.onPause();
         justAfterPause = true;
 
         if (!soundAlreadyStopped) {
@@ -75,12 +74,15 @@ public class MenuActivity extends Activity {
         }
 
         instantMusicPause = true;
+        super.onPause();
+
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         self = null;
+        super.onDestroy();
+
     }
 
     @Override

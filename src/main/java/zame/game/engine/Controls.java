@@ -70,7 +70,7 @@ public final class Controls {
             updateIcon();
         }
 
-        public void updateIcon() {
+        private void updateIcon() {
             switch (type) {
                 case FORWARD:
                     icon = 0;

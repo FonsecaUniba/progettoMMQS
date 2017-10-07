@@ -77,19 +77,24 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    private void init(Context c)
+    {
+        initialize(c);
+    }
+
     public PromoView(Context context) {
         super(context);
-        initialize(context);
+        init(context);
     }
 
     public PromoView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(context);
+        init(context);
     }
 
     public PromoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        initialize(context);
+        init(context);
     }
 
     protected void initialize(Context cont) {

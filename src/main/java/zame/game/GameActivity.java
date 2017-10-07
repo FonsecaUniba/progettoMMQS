@@ -259,7 +259,6 @@ public class GameActivity extends Activity implements SensorEventListener {
 
     @Override
     protected void onPause() {
-        super.onPause();
         justAfterPause = true;
 
         if (zeemoteHelper != null) {
@@ -282,6 +281,8 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
 
         ZameApplication.flushEvents();
+        super.onPause();
+
     }
 
     @SuppressWarnings("deprecation")

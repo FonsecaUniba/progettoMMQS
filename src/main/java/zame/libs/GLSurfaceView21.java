@@ -1067,10 +1067,13 @@ public class GLSurfaceView21 extends SurfaceView implements SurfaceHolder.Callba
                 guardedRun();
             } catch (InterruptedException e) {
                 // fall thru and exit normally
+                System.err.print("Error");
             } catch (IllegalArgumentException e) {
+                System.err.print("Error");
                 // @restorer: just ignore
                 // java.lang.IllegalArgumentException: Make sure the SurfaceView or associated SurfaceHolder has a valid Surface
             } catch (RuntimeException e) {
+                System.err.print("Error");
                 // @restorer: just ignore
                 // java.lang.RuntimeException: createWindowSurface failed
                 // java.lang.RuntimeException: eglMakeCurrent failed
@@ -1180,11 +1183,8 @@ public class GLSurfaceView21 extends SurfaceView implements SurfaceHolder.Callba
                                         wantRenderNotification = true;
 
                                         //noinspection StatementWithEmptyBody
-                                        if (DRAW_TWICE_AFTER_SIZE_CHANGED) {
-                                            // We keep mRequestRender true so that we draw twice after the size changes.
-                                            // (Once because of mSizeChanged, the second time because of mRequestRender.)
-                                            // This forces the updated graphics onto the screen.
-                                        } else {
+                                        if (!DRAW_TWICE_AFTER_SIZE_CHANGED) {
+
                                             mRequestRender = false;
                                         }
 

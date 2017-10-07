@@ -80,12 +80,16 @@ public class Game extends ZameGame {
     private int[] fpsList = new int[FPS_AVG_LEN];
     private int currFpsPtr;
 
+    private void init()
+    {
+        initialize();
+    }
     public Game(Resources res, AssetManager assets) {
         super(res, assets);
 
         //noinspection MagicNumber
         setUpdateInterval(25); // updates per second - 40
-        initialize();
+        init();
     }
 
     public void initialize() {
@@ -138,17 +142,19 @@ public class Game extends ZameGame {
 
     @SuppressLint("SdCardPath")
     @SuppressWarnings("WeakerAccess")
+
     public static String getExternalStoragePath() {
+        String sd = "/sdcard";
         try {
             if (Environment.getExternalStorageDirectory() == null) {
                 // mystical error? return default value
-                return "/sdcard";
+                return sd;
             } else {
                 return Environment.getExternalStorageDirectory().getCanonicalPath();
             }
         } catch (IOException ex) {
             // sdcard missing or mounted. it is not essential for the game, so let's assume it is sdcard
-            return "/sdcard";
+            return sd;
         }
     }
 
@@ -163,6 +169,7 @@ public class Game extends ZameGame {
         String noMediaPath = String.format(Locale.US, "%1$s%2$s.nomedia", externalStoragePath, File.separator);
 
         if (!(new File(noMediaPath)).exists()) {
+
             try {
                 FileOutputStream out = new FileOutputStream(noMediaPath);
                 out.close();
@@ -530,12 +537,9 @@ public class Game extends ZameGame {
             State.monsters[i].update();
         }
 
-        for (int i = 0; i < State.monstersCount; ) {
+        for (int i = 0; i < State.monstersCount; i++ ) {
             if (State.monsters[i].removeTimeout <= 0) {
                 State.monsters[i].remove();
-            } else {
-                //noinspection AssignmentToForLoopParameter
-                i++;
             }
         }
     }
