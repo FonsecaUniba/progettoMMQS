@@ -30,6 +30,25 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
     private boolean showMoreTextTaskActive;
     private TimerTask showMoreTextTask;
 
+    private void setImage(String imgId){
+        ImageView imgImage = (ImageView)findViewById(R.id.ImgImage);
+        imgImage.setVisibility(View.VISIBLE);
+
+        if ("ep_1".equals(imgId)) {
+            imgImage.setImageResource(R.drawable.pre_ep_1);
+        } else if ("ep_2".equals(imgId)) {
+            imgImage.setImageResource(R.drawable.pre_ep_2);
+        } else if ("ep_3".equals(imgId)) {
+            imgImage.setImageResource(R.drawable.pre_ep_3);
+        } else if ("ep_4".equals(imgId)) {
+            imgImage.setImageResource(R.drawable.pre_ep_4);
+        } else if ("ep_5".equals(imgId)) {
+            imgImage.setImageResource(R.drawable.pre_ep_5);
+        } else {
+            imgImage.setVisibility(View.GONE);
+        }
+    }
+
     private final Runnable updateText = new Runnable() {
         @Override
         public void run() {
@@ -90,7 +109,7 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
             StringBuilder sb = new StringBuilder();
             boolean appendNewline = false;
 
-            for (; ; ) {
+            while(true) {
                 String line = br.readLine();
 
                 if (line == null) {
@@ -111,22 +130,7 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
             throw new RuntimeException(ex);
         }
 
-        ImageView imgImage = (ImageView)findViewById(R.id.ImgImage);
-        imgImage.setVisibility(View.VISIBLE);
-
-        if ("ep_1".equals(imgId)) {
-            imgImage.setImageResource(R.drawable.pre_ep_1);
-        } else if ("ep_2".equals(imgId)) {
-            imgImage.setImageResource(R.drawable.pre_ep_2);
-        } else if ("ep_3".equals(imgId)) {
-            imgImage.setImageResource(R.drawable.pre_ep_3);
-        } else if ("ep_4".equals(imgId)) {
-            imgImage.setImageResource(R.drawable.pre_ep_4);
-        } else if ("ep_5".equals(imgId)) {
-            imgImage.setImageResource(R.drawable.pre_ep_5);
-        } else {
-            imgImage.setVisibility(View.GONE);
-        }
+        setImage(imgId);
 
         findViewById(R.id.BtnStartLevel).setOnClickListener(new View.OnClickListener() {
             @Override

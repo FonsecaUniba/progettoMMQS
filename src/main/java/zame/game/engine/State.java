@@ -199,11 +199,7 @@ public final class State {
         os.writeBoolean(false); // changeControlsDialog
     }
 
-    @SuppressWarnings("MagicNumber")
-    public static void readFrom(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        int saveFileVersion = 0;
-        String ver = is.readUTF();
-
+    private static int getSaveFileVersion(int saveFileVersion, String ver){
         if ("GloomyDungeons.1".equals(ver)) {
             saveFileVersion = 1;
         } else if ("GloomyDungeons.2".equals(ver)) {
@@ -219,6 +215,65 @@ public final class State {
         } else if ("GloomyDungeons.7".equals(ver)) {
             saveFileVersion = 7;
         }
+
+        return saveFileVersion;
+    }
+
+    private static void setLevel(int saveFileVersion){
+        tmpReloadLevel = false;
+
+        if (saveFileVersion < 6) {
+            if (levelNum < 9) {
+                levelNum = 1;
+                tmpReloadLevel = true;
+            } else if (levelNum < 14) {
+                levelNum -= 7;
+            } else if (levelNum == 14) {
+                levelNum = 7;
+                tmpReloadLevel = true;
+            } else {
+                levelNum -= 8;
+            }
+        }
+    }
+
+    private static void setWeapons(){
+        if (heroHasWeapon.length < Weapons.WEAPON_LAST) {
+            boolean[] newHeroHasWeapon = new boolean[Weapons.WEAPON_LAST];
+
+            //noinspection ManualArrayCopy
+            for (int i = 0; i < heroHasWeapon.length; i++) {
+                newHeroHasWeapon[i] = heroHasWeapon[i];
+            }
+
+            for (int i = heroHasWeapon.length; i < Weapons.WEAPON_LAST; i++) {
+                newHeroHasWeapon[i] = false;
+            }
+
+            heroHasWeapon = newHeroHasWeapon;
+        }
+    }
+
+    private static void setMonsterTextures(int saveFileVersion){
+        if (saveFileVersion == 1) {
+            for (int i = 0; i < monstersCount; i++) {
+                monsters[i].texture -= 0xA0;
+            }
+        }
+    }
+
+    private static void setActions(){
+        for (int i = 0; i < Level.MAX_ACTIONS; i++) {
+            actions.add(new ArrayList<Action>());
+        }
+    }
+
+    @SuppressWarnings("MagicNumber")
+    public static void readFrom(ObjectInputStream is) throws IOException, ClassNotFoundException {
+        int saveFileVersion = 0;
+        String ver = is.readUTF();
+
+        saveFileVersion = getSaveFileVersion(saveFileVersion, ver);
 
         if (saveFileVersion < 1) {
             throw new ClassNotFoundException(String.format(Locale.US, "Save from newer game version (%s)", ver));
@@ -255,19 +310,13 @@ public final class State {
         doorsCount = Common.readObjectArray(is, doors, Door.class);
         monstersCount = Common.readObjectArray(is, monsters, Monster.class);
 
-        if (saveFileVersion == 1) {
-            for (int i = 0; i < monstersCount; i++) {
-                monsters[i].texture -= 0xA0;
-            }
-        }
+        setMonsterTextures(saveFileVersion);
 
         marksCount = Common.readObjectArray(is, marks, Mark.class);
 
         actions = new ArrayList<ArrayList<Action>>();
 
-        for (int i = 0; i < Level.MAX_ACTIONS; i++) {
-            actions.add(new ArrayList<Action>());
-        }
+        setActions();
 
         int actionsCount = is.readInt();
 
@@ -312,39 +361,12 @@ public final class State {
 
         // post-load updates
 
-        if (heroHasWeapon.length < Weapons.WEAPON_LAST) {
-            boolean[] newHeroHasWeapon = new boolean[Weapons.WEAPON_LAST];
-
-            //noinspection ManualArrayCopy
-            for (int i = 0; i < heroHasWeapon.length; i++) {
-                newHeroHasWeapon[i] = heroHasWeapon[i];
-            }
-
-            for (int i = heroHasWeapon.length; i < Weapons.WEAPON_LAST; i++) {
-                newHeroHasWeapon[i] = false;
-            }
-
-            heroHasWeapon = newHeroHasWeapon;
-        }
+        setWeapons();
 
         Level.updateMaps();
         LevelRenderer.updateAutoWalls();
         Weapons.updateWeapon();
 
-        tmpReloadLevel = false;
-
-        if (saveFileVersion < 6) {
-            if (levelNum < 9) {
-                levelNum = 1;
-                tmpReloadLevel = true;
-            } else if (levelNum < 14) {
-                levelNum -= 7;
-            } else if (levelNum == 14) {
-                levelNum = 7;
-                tmpReloadLevel = true;
-            } else {
-                levelNum -= 8;
-            }
-        }
+        setLevel(saveFileVersion);
     }
 }

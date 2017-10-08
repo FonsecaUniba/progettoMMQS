@@ -160,6 +160,33 @@ public final class TextureLoader {
         return texMap[((texNum < 1) || (texNum > texMap.length)) ? 0 : (texNum - 1)];
     }
 
+    private static synchronized void bindTextures(GL10 gl, int createdTexturesCount){
+        TextureToLoad texToLoad = TEXTURES_TO_LOAD[createdTexturesCount];
+
+        switch (texToLoad.type) {
+            case TextureToLoad.TYPE_MONSTERS:
+                loadAndBindMonTexture(gl,
+                        texToLoad.tex,
+                        getTexNum(monTexMap, levelConf.monsters[0].texture),
+                        getTexNum(monTexMap, levelConf.monsters[1].texture),
+                        getTexNum(monTexMap, levelConf.monsters[2].texture),
+                        getTexNum(monTexMap, levelConf.monsters[3].texture));
+                break;
+
+            case TextureToLoad.TYPE_FLOOR:
+                loadAndBindTexture(gl, texToLoad.tex, getTexNum(floorTexMap, levelConf.floorTexture));
+                break;
+
+            case TextureToLoad.TYPE_CEIL:
+                loadAndBindTexture(gl, texToLoad.tex, getTexNum(ceilTexMap, levelConf.ceilTexture));
+                break;
+
+            default:
+                loadAndBindTexture(gl, texToLoad.tex, texToLoad.resId);
+                break;
+        }
+    }
+
     public static synchronized boolean loadTexture(GL10 gl, int createdTexturesCount) {
         if (createdTexturesCount >= TEXTURES_TO_LOAD.length) {
             return false;
@@ -194,30 +221,7 @@ public final class TextureLoader {
             tOpts.inInputShareable = true;
         }
 
-        TextureToLoad texToLoad = TEXTURES_TO_LOAD[createdTexturesCount];
-
-        switch (texToLoad.type) {
-            case TextureToLoad.TYPE_MONSTERS:
-                loadAndBindMonTexture(gl,
-                        texToLoad.tex,
-                        getTexNum(monTexMap, levelConf.monsters[0].texture),
-                        getTexNum(monTexMap, levelConf.monsters[1].texture),
-                        getTexNum(monTexMap, levelConf.monsters[2].texture),
-                        getTexNum(monTexMap, levelConf.monsters[3].texture));
-                break;
-
-            case TextureToLoad.TYPE_FLOOR:
-                loadAndBindTexture(gl, texToLoad.tex, getTexNum(floorTexMap, levelConf.floorTexture));
-                break;
-
-            case TextureToLoad.TYPE_CEIL:
-                loadAndBindTexture(gl, texToLoad.tex, getTexNum(ceilTexMap, levelConf.ceilTexture));
-                break;
-
-            default:
-                loadAndBindTexture(gl, texToLoad.tex, texToLoad.resId);
-                break;
-        }
+         bindTextures(gl, createdTexturesCount);
 
         return true;
     }
