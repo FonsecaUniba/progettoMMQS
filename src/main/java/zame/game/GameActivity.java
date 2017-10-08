@@ -33,7 +33,7 @@ public class GameActivity extends Activity implements SensorEventListener {
     public static final int ACTION_REINITIALIZE = 2;
     public static final int ACTION_LOAD_AUTOSAVE = 3;
 
-    @SuppressLint("StaticFieldLeak") public static GameActivity self;
+    @SuppressLint("StaticFieldLeak") public static GameActivity self = new GameActivity();
 
     private View currentView;
     private int currentLayoutResId;

@@ -34,7 +34,7 @@ public final class Common {
     public static float heroSn=0; // sin of angle
     public static float ratio=0;
 
-    private static volatile Random random;
+    private static volatile Random random = new Random();
 
     private Common() {
     }

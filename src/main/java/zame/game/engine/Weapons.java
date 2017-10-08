@@ -69,8 +69,8 @@ public final class Weapons {
 
     public static final WeaponParams[] WEAPONS = AppConfig.WEAPONS;
 
-    public static WeaponParams currentParams;
-    public static int[] currentCycle;
+    public static WeaponParams currentParams = new WeaponParams(new int[10],10,10,10,10,10,10,10,10,10,true,10);
+    public static int[] currentCycle = new int[100];
     public static int shootCycle=0;
     public static int changeWeaponDir=0;
     public static int changeWeaponNext=0;

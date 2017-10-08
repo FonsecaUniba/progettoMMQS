@@ -18,8 +18,8 @@ public final class State {
     public static int heroWeapon=0;
     public static int heroHealth=0;
     public static int heroArmor=0;
-    public static boolean[] heroHasWeapon ;
-    public static int[] heroAmmo;
+    public static boolean[] heroHasWeapon = new boolean[8]; //File: Weapons - Row:61
+    public static int[] heroAmmo = new int[3]; //File Weapons - Row: 57
 
     public static int totalItems=0;
     public static int totalMonsters=0;
@@ -35,26 +35,26 @@ public final class State {
     public static int levelWidth=0;
     public static int levelHeight=0;
 
-    public static int[][] wallsMap;
-    public static int[][] transpMap;
-    public static int[][] objectsMap;
-    public static int[][] decorationsMap;
-    public static int[][] passableMap;
+    public static int[][] wallsMap = new int[20][20]; //Random
+    public static int[][] transpMap = new int[20][20];
+    public static int[][] objectsMap = new int[20][20];
+    public static int[][] decorationsMap = new int[20][20];
+    public static int[][] passableMap = new int[20][20];
 
     public static int doorsCount=0;
-    public static Door[] doors;
+    public static Door[] doors = new Door[100];
 
     public static int monstersCount=0;
-    public static Monster[] monsters;
+    public static Monster[] monsters = new Monster[200];
 
     public static int marksCount=0;
-    public static Mark[] marks;
+    public static Mark[] marks = new Mark[200];
 
-    public static ArrayList<ArrayList<Action>> actions;
+    public static ArrayList<ArrayList<Action>> actions = new ArrayList<ArrayList<Action>>();
 
-    public static int[][] drawedAutoWalls;
+    public static int[][] drawedAutoWalls = new int[150][150];
     public static int autoWallsCount=0;
-    public static AutoWall[] autoWalls;
+    public static AutoWall[] autoWalls = new AutoWall[100];
 
     public static boolean showAutoMap=true;
     public static long tempElapsedTime=0;

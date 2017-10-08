@@ -26,8 +26,8 @@ public final class SoundManager {
 
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static Context appContext;
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static AssetManager assetManager;
-    private static volatile MediaPlayer mediaPlayer;
-    private static volatile SoundPool soundPool;
+    private static volatile MediaPlayer mediaPlayer = new MediaPlayer();
+    private static volatile SoundPool soundPool = new SoundPool(300,1,128);
 
     public static final PlayList LIST_MAIN = new PlayList(new String[] { "l1.mid", "l2.mid", "l3.mid", "l4.mid", });
 
@@ -58,10 +58,15 @@ public final class SoundManager {
     private static final int[] soundIds = new int[SOUND_LAST];
     private static final float[] soundVolumes = new float[SOUND_LAST];
 
-    private static PlayList current;
+    private static PlayList current = new PlayList(new String[] { "l1.mid", "l2.mid", "l3.mid", "l4.mid", } ) ;
     private static boolean musicLoaded=true;
-    private static volatile Timer pauseTimer;
-    private static volatile TimerTask pauseTask;
+    private static volatile Timer pauseTimer =new Timer();//////
+    private static volatile TimerTask pauseTask = new TimerTask() {
+        @Override
+        public void run() {
+
+        }
+    };//////
 
     private static boolean soundEnabled=true;
     private static float musicVolume = 1.0f;

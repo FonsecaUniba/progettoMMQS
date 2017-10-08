@@ -49,16 +49,17 @@ public final class Labels {
             R.string.lblm_press_end_level_switch, // MSG_PRESS_END_LEVEL_SWITCH
             R.string.lblm_go_to_door, // MSG_GO_TO_DOOR
     };
-    //INIZIALIZZAZIONE DI QUESTE VARIABILI PERICOLOSA PER L'ESECUZIONE DEL PROGRAMMA
-    public static volatile LabelMaker maker;
-    public static volatile LabelMaker msgMaker;
-    public static volatile NumericSprite numeric;
-    public static volatile NumericSprite statsNumeric;
 
-    private static Paint labelPaint;
-    private static Paint msgPaint;
-    private static Paint statsPaint;
+    public static volatile LabelMaker maker = new LabelMaker(true,1000,1000);
+    public static volatile LabelMaker msgMaker = new LabelMaker(true,1000,1000);
+    //INIZIALIZZAZIONE DI QUESTE VARIABILI PERICOLOSA PER L'ESECUZIONE DEL PROGRAMMA
+    public static volatile NumericSprite numeric; //inizializzazione = black screen dopo new game
+    public static volatile NumericSprite statsNumeric;
     //FINE VARIABILI PERICOLOSE
+    private static Paint labelPaint  = new Paint();
+    private static Paint msgPaint = new Paint();
+    private static Paint statsPaint = new Paint();
+
     private static int currentMessageId=0;
     private static int currentMessageLabelId=0;
     private static String currentMessageString ="";

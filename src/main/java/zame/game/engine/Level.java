@@ -84,11 +84,11 @@ public final class Level {
             | PASSABLE_IS_DOOR
             | PASSABLE_IS_OBJECT;
 
-    public static Door[][] doorsMap;
-    public static Mark[][] marksMap;
-    public static ArrayList<ArrayList<Mark>> marksHash;
+    public static Door[][] doorsMap = new Door[199][199];
+    public static Mark[][] marksMap = new Mark[200][200];
+    public static ArrayList<ArrayList<Mark>> marksHash = new ArrayList<ArrayList<Mark>>();
 
-    private static volatile boolean[] wasAlreadyInWall;
+    private static volatile boolean[] wasAlreadyInWall = new boolean[100];
     public static boolean quickReturnFromFillInitialInWall = true; // set to false before using fillInitialInWallMap
 
     private Level() {

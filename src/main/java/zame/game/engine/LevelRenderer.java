@@ -32,16 +32,16 @@ public final class LevelRenderer {
     public static final int MAX_AUTO_WALLS = Level.MAX_WIDTH * Level.MAX_HEIGHT * 2;
     public static final float HALF_WALL = 1.0f / 2.5f;
 
-    public static PortalTracer tracer;
+    public static PortalTracer tracer = new PortalTracer();
 
     public static VisibleObject[] visibleObjects = new VisibleObject[MAX_VISIBLE_OBJECTS];
     public static int visibleObjectsCount=0;
-    public static VisibleObject currVis;
+    public static VisibleObject currVis = new VisibleObject();
 
     private static float flatObjDx=0;
     private static float flatObjDy=0;
 
-    public static boolean showMonstersOnMap;
+    public static boolean showMonstersOnMap = true;
 
     private LevelRenderer() {
     }

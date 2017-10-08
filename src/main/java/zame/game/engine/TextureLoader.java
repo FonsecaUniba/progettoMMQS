@@ -89,8 +89,8 @@ public final class TextureLoader {
     private static boolean texturesInitialized=true;
     public static int[] textures = new int[TEXTURE_LAST];
 
-    private static volatile BitmapFactory.Options tOpts;
-    private static volatile LevelConfig levelConf;
+    private static volatile BitmapFactory.Options tOpts = new BitmapFactory.Options();
+    private static volatile LevelConfig levelConf = new LevelConfig(1);
 
     private TextureLoader() {
     }

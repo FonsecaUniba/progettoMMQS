@@ -391,7 +391,28 @@ public final class Controls {
     private static float padCenterX=0;
     private static float padCenterY=0;
 
-    @SuppressWarnings("WeakerAccess") public static ControlVariant currentVariant;
+    @SuppressWarnings("WeakerAccess") public static ControlVariant currentVariant = new ControlVariant(false,0.8125f, 0.7f,0.0f, new ControlItem[] {
+        new ControlItem(12, 1, OPEN_MENU),
+                new ControlItem(15, 1, TOGGLE_MAP),
+                new ControlItem(18, 1, NEXT_WEAPON),
+                new ControlItem(18, 5, ACTION),
+                new ControlItem(1, 12, ROTATE_LEFT, true),
+                new ControlItem(5, 12, ROTATE_RIGHT, true),
+                new ControlItem(3, 10, FORWARD, true),
+                new ControlItem(3, 14, BACKWARD, true),
+                new ControlItem(15, 12, STRAFE_LEFT),
+                new ControlItem(18, 12, STRAFE_RIGHT) },
+            0,
+            8,
+            new int[][] {
+        new int[] { FORWARD | ROTATE_LEFT, FORWARD | ROTATE_LEFT, FORWARD, FORWARD, FORWARD, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT },
+                new int[] { FORWARD | ROTATE_LEFT, FORWARD | ROTATE_LEFT, FORWARD, FORWARD, FORWARD, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT },
+                new int[] { FORWARD | ROTATE_LEFT, FORWARD | ROTATE_LEFT, FORWARD, FORWARD, FORWARD, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT, FORWARD | ROTATE_RIGHT },
+                new int[] { ROTATE_LEFT, ROTATE_LEFT, 0, FORWARD, 0, ROTATE_RIGHT, ROTATE_RIGHT, ROTATE_RIGHT },
+                new int[] { ROTATE_LEFT, ROTATE_LEFT, 0, 0, 0, ROTATE_RIGHT, ROTATE_RIGHT, ROTATE_RIGHT },
+                new int[] { ROTATE_LEFT, ROTATE_LEFT, 0, BACKWARD, 0, ROTATE_RIGHT, ROTATE_RIGHT, ROTATE_RIGHT },
+                new int[] { BACKWARD | ROTATE_LEFT, BACKWARD | ROTATE_LEFT, BACKWARD, BACKWARD, BACKWARD, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT },
+                new int[] { BACKWARD | ROTATE_LEFT, BACKWARD | ROTATE_LEFT, BACKWARD, BACKWARD, BACKWARD, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT } });
     @SuppressWarnings("WeakerAccess") public static float rotatedAngle=0;
     @SuppressWarnings("WeakerAccess") public static float joyX=0;
     @SuppressWarnings("WeakerAccess") public static float joyY=0;

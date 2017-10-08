@@ -17,7 +17,7 @@ public final class Config {
     public static float gamma=0;
     @SuppressWarnings("WeakerAccess") public static int levelTextureFilter=0;
     @SuppressWarnings("WeakerAccess") public static int weaponsTextureFilter=0;
-    public static int[] keyMappings;
+    public static int[] keyMappings = new int[15];
     public static float mapPosition=0;
     public static boolean showCrosshair=true;
     public static boolean rotateScreen=true;

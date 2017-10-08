@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class ZameApplication extends Application {
-    public static ZameApplication self;
+    public static ZameApplication self = new ZameApplication();
 
     private String cachedVersionName;
 

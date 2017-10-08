@@ -1447,7 +1447,7 @@ public class GLSurfaceView21 extends SurfaceView implements SurfaceHolder.Callba
          * @return true if the right to use an EGL surface was acquired.
          */
         @SuppressWarnings("WeakerAccess")
-        public boolean tryAcquireEglSurfaceLocked(GLThread thread) {
+        public synchronized boolean tryAcquireEglSurfaceLocked(GLThread thread) {
             if ((mEglOwner == thread) || (mEglOwner == null)) {
                 mEglOwner = thread;
 
@@ -1464,7 +1464,7 @@ public class GLSurfaceView21 extends SurfaceView implements SurfaceHolder.Callba
          * sGLThreadManager monitor when this is called.
          */
         @SuppressWarnings("WeakerAccess")
-        public void releaseEglSurfaceLocked(GLThread thread) {
+        public synchronized void releaseEglSurfaceLocked(GLThread thread) {
             if (mEglOwner == thread) {
                 mEglOwner = null;
             }
