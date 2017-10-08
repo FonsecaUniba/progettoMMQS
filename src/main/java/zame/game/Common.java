@@ -56,6 +56,17 @@ public final class Common {
         heroSn = (float)Math.sin(heroAr);
     }
 
+    public static boolean isCheckLineInvalid(int cx1, int cx2, int cy1, int cy2){
+        return (cx1 < 0)
+                || (cx1 >= State.levelWidth)
+                || (cx2 < 0)
+                || (cx2 >= State.levelWidth)
+                || (cy1 < 0)
+                || (cy1 >= State.levelHeight)
+                || (cy2 < 0)
+                || (cy2 >= State.levelHeight);
+    }
+
     // modified Level_CheckLine from wolf3d for iphone by Carmack
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
         int cx1 = (int)x1;
@@ -63,9 +74,7 @@ public final class Common {
         int cx2 = (int)x2;
         int cy2 = (int)y2;
 
-        if ((cx1 < 0) || (cx1 >= State.levelWidth) || (cx2 < 0) || (cx2 >= State.levelWidth) || (cy1 < 0) || (cy1
-                >= State.levelHeight) || (cy2 < 0) || (cy2 >= State.levelHeight)) {
-
+        if (isCheckLineInvalid(cx1, cx2, cy1, cy2)) {
             return false;
         }
 

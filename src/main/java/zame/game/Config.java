@@ -74,19 +74,26 @@ public final class Config {
         }
     }
 
-    @SuppressWarnings("MagicNumber")
-    public static void initialize() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ZameApplication.self);
-        String controlsTypeStr = sp.getString("ControlsType", "PadL");
+    private static boolean isZeemote(String controlsTypeStr){
+        return BuildConfig.WITH_ZEEMOTE && "Zeemote".equals(controlsTypeStr);
+    }
 
-        if (BuildConfig.WITH_ZEEMOTE && "Zeemote".equals(controlsTypeStr)) {
-            controlsType = Controls.TYPE_ZEEMOTE;
-        } else if ("Classic".equals(controlsTypeStr) || "TypeA".equals(controlsTypeStr)) {
-            controlsType = Controls.TYPE_CLASSIC;
-        } else if ("ExperimentalA".equals(controlsTypeStr)
+    private static boolean isClassic(String controlsTypeStr){
+        return "Classic".equals(controlsTypeStr) || "TypeA".equals(controlsTypeStr);
+    }
+
+    private static boolean isExperimental(String controlsTypeStr){
+        return "ExperimentalA".equals(controlsTypeStr)
                 || "Experimental".equals(controlsTypeStr)
-                || "TypeC".equals(controlsTypeStr)) {
+                || "TypeC".equals(controlsTypeStr);
+    }
 
+    private static void checkControls(String controlsTypeStr){
+        if (isZeemote(controlsTypeStr)) {
+            controlsType = Controls.TYPE_ZEEMOTE;
+        } else if (isClassic(controlsTypeStr)) {
+            controlsType = Controls.TYPE_CLASSIC;
+        } else if (isExperimental(controlsTypeStr)) {
             controlsType = Controls.TYPE_EXPERIMENTAL_A;
         } else if ("ExperimentalB".equals(controlsTypeStr)) {
             controlsType = Controls.TYPE_EXPERIMENTAL_B;
@@ -97,6 +104,14 @@ public final class Config {
         } else {
             controlsType = Controls.TYPE_IMPROVED;
         }
+    }
+
+    @SuppressWarnings("MagicNumber")
+    public static void initialize() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ZameApplication.self);
+        String controlsTypeStr = sp.getString("ControlsType", "PadL");
+
+        checkControls(controlsTypeStr);
 
         maxRotateAngle = (float)sp.getInt("MaxRotateAngle", 100);
         trackballAcceleration = (float)sp.getInt("TrackballAcceleration", 40);

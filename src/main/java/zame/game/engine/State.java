@@ -268,6 +268,26 @@ public final class State {
         }
     }
 
+    private static void checkReadException(int saveFileVersion, String ver) throws ClassNotFoundException{
+        if (saveFileVersion < 1) {
+            throw new ClassNotFoundException(String.format(Locale.US, "Save from newer game version (%s)", ver));
+        }
+    }
+
+    private static void readActions(ObjectInputStream is, int actionsCount) throws IOException{
+        for (int i = 0; i < actionsCount; i++) {
+            ArrayList<Action> items = actions.get(i);
+            int itemsCount = is.readInt();
+
+            for (int j = 0; j < itemsCount; j++) {
+                Action act = new Action();
+                act.readExternal(is);
+
+                items.add(act);
+            }
+        }
+    }
+
     @SuppressWarnings("MagicNumber")
     public static void readFrom(ObjectInputStream is) throws IOException, ClassNotFoundException {
         int saveFileVersion = 0;
@@ -275,9 +295,7 @@ public final class State {
 
         saveFileVersion = getSaveFileVersion(saveFileVersion, ver);
 
-        if (saveFileVersion < 1) {
-            throw new ClassNotFoundException(String.format(Locale.US, "Save from newer game version (%s)", ver));
-        }
+        checkReadException(saveFileVersion, ver);
 
         if (saveFileVersion >= 2) {
             is.readUTF();
@@ -320,17 +338,7 @@ public final class State {
 
         int actionsCount = is.readInt();
 
-        for (int i = 0; i < actionsCount; i++) {
-            ArrayList<Action> items = actions.get(i);
-            int itemsCount = is.readInt();
-
-            for (int j = 0; j < itemsCount; j++) {
-                Action act = new Action();
-                act.readExternal(is);
-
-                items.add(act);
-            }
-        }
+        readActions(is, actionsCount);
 
         drawedAutoWalls = Common.readInt2dArray(is);
         autoWallsCount = Common.readObjectArray(is, autoWalls, AutoWall.class);

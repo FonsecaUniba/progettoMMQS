@@ -104,34 +104,42 @@ public class Door implements Externalizable {
         dir = -1;
     }
 
+    private void passableDoor(){
+        if (openPos >= OPEN_POS_PASSABLE) {
+            State.passableMap[y][x] &= ~Level.PASSABLE_IS_DOOR;
+
+            if (openPos >= OPEN_POS_MAX) {
+                openPos = OPEN_POS_MAX;
+                dir = 0;
+            }
+        }
+    }
+
+    private void notPassableDoor(long elapsedTime){
+        if (openPos < OPEN_POS_PASSABLE) {
+            if ((dir == -1) && ((State.passableMap[y][x] & Level.PASSABLE_MASK_DOOR) != 0)) {
+                dir = 1;
+                lastTime = elapsedTime;
+            } else {
+                dir = -2;
+                State.passableMap[y][x] |= Level.PASSABLE_IS_DOOR;
+            }
+
+            if (openPos <= 0.0f) {
+                State.wallsMap[y][x] = -1; // mark door for PortalTracer
+                openPos = 0.0f;
+                dir = 0;
+            }
+        }
+    }
+
     public void update(long elapsedTime) {
         if (dir > 0) {
             State.wallsMap[y][x] = 0; // clear door mark for PortalTracer
 
-            if (openPos >= OPEN_POS_PASSABLE) {
-                State.passableMap[y][x] &= ~Level.PASSABLE_IS_DOOR;
-
-                if (openPos >= OPEN_POS_MAX) {
-                    openPos = OPEN_POS_MAX;
-                    dir = 0;
-                }
-            }
+            passableDoor();
         } else if (dir < 0) {
-            if (openPos < OPEN_POS_PASSABLE) {
-                if ((dir == -1) && ((State.passableMap[y][x] & Level.PASSABLE_MASK_DOOR) != 0)) {
-                    dir = 1;
-                    lastTime = elapsedTime;
-                } else {
-                    dir = -2;
-                    State.passableMap[y][x] |= Level.PASSABLE_IS_DOOR;
-                }
-
-                if (openPos <= 0.0f) {
-                    State.wallsMap[y][x] = -1; // mark door for PortalTracer
-                    openPos = 0.0f;
-                    dir = 0;
-                }
-            }
+            notPassableDoor(elapsedTime);
         }
     }
 }

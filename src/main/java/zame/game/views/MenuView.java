@@ -182,21 +182,7 @@ public class MenuView extends RelativeLayout {
         findViewById(R.id.BtnLoad).setEnabled(fillSlots(data.slotStringsForLoad, data.slotFileNamesForLoad, true) > 0);
     }
 
-    private int fillSlots(ArrayList<String> slotStrings, ArrayList<String> slotFileNames, boolean hideUnused) {
-        slotStrings.clear();
-        slotFileNames.clear();
-
-        String[] files = (new File(Game.SAVES_FOLDER)).list();
-
-        if (files == null) {
-            return 0;
-        }
-
-        Pattern pat = Pattern.compile("^slot-(\\d)\\.(\\d{4}-\\d{2}-\\d{2})-(\\d{2})-(\\d{2})\\.save$");
-
-        @SuppressLint("UseSparseArrays")
-        HashMap<Integer, Pair<String, String>> saves = new HashMap<Integer, Pair<String, String>>();
-
+    private HashMap<Integer, Pair<String, String>>  saveSlots(HashMap<Integer, Pair<String, String>>  saves, String[] files, Pattern pat){
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < files.length; i++) {
             Matcher mt = pat.matcher(files[i]);
@@ -215,6 +201,26 @@ public class MenuView extends RelativeLayout {
                 }
             }
         }
+
+        return saves;
+    }
+
+    private int fillSlots(ArrayList<String> slotStrings, ArrayList<String> slotFileNames, boolean hideUnused) {
+        slotStrings.clear();
+        slotFileNames.clear();
+
+        String[] files = (new File(Game.SAVES_FOLDER)).list();
+
+        if (files == null) {
+            return 0;
+        }
+
+        Pattern pat = Pattern.compile("^slot-(\\d)\\.(\\d{4}-\\d{2}-\\d{2})-(\\d{2})-(\\d{2})\\.save$");
+
+        @SuppressLint("UseSparseArrays")
+        HashMap<Integer, Pair<String, String>> saves = new HashMap<Integer, Pair<String, String>>();
+
+        saves = saveSlots(saves, files, pat);
 
         for (int i = 0; i < MAX_SLOTS; i++) {
             Pair<String, String> pair = saves.get(i);
@@ -273,6 +279,42 @@ public class MenuView extends RelativeLayout {
     }
 
     @SuppressWarnings("deprecation")
+    private static void checkInstantSave(MenuActivity activity, Data data){
+        if (hasInstantSave() && !MenuActivity.justLoaded) {
+            activity.showDialog(DIALOG_LOAD_WARN);
+        } else {
+            startGame(activity, data.slotFileNamesForLoad.get(data.currentIndex));
+        }
+    }
+
+    private static void saveToSlot(Data data){
+        String newSaveName = String.format(Locale.US,
+                "%sslot-%d.%s.save",
+                Game.SAVES_ROOT,
+                data.currentIndex + 1,
+                (new SimpleDateFormat("yyyy-MM-dd-HH-mm",
+                        Locale.US)).format(Calendar.getInstance().getTime()));
+
+        if (Common.copyFile(Game.INSTANT_PATH, newSaveName + ".new")) {
+            //noinspection SizeReplaceableByIsEmpty
+            if (data.slotFileNamesForSave.get(data.currentIndex).length() != 0) {
+                //noinspection ResultOfMethodCallIgnored
+                (new File(Game.SAVES_ROOT
+                        + data.slotFileNamesForSave.get(data.currentIndex)
+                        + ".save")).delete();
+            }
+
+            //noinspection ResultOfMethodCallIgnored
+            (new File(newSaveName + ".new")).renameTo(new File(newSaveName));
+
+            Toast.makeText(ZameApplication.self, R.string.msg_game_saved, Toast.LENGTH_LONG)
+                    .show();
+
+            MenuActivity.justLoaded = true; // just saved
+        }
+    }
+
+    @SuppressWarnings("deprecation")
     public static Dialog onCreateDialog(MenuActivity ownerActivity, int id) {
         final MenuActivity activity = ownerActivity;
         final Data data = activity.menuViewData;
@@ -320,12 +362,7 @@ public class MenuView extends RelativeLayout {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 data.currentIndex = which;
-
-                                if (hasInstantSave() && !MenuActivity.justLoaded) {
-                                    activity.showDialog(DIALOG_LOAD_WARN);
-                                } else {
-                                    startGame(activity, data.slotFileNamesForLoad.get(data.currentIndex));
-                                }
+                                checkInstantSave(activity, data);
                             }
                         })
                         .create();
@@ -342,30 +379,7 @@ public class MenuView extends RelativeLayout {
                         .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                String newSaveName = String.format(Locale.US,
-                                        "%sslot-%d.%s.save",
-                                        Game.SAVES_ROOT,
-                                        data.currentIndex + 1,
-                                        (new SimpleDateFormat("yyyy-MM-dd-HH-mm",
-                                                Locale.US)).format(Calendar.getInstance().getTime()));
-
-                                if (Common.copyFile(Game.INSTANT_PATH, newSaveName + ".new")) {
-                                    //noinspection SizeReplaceableByIsEmpty
-                                    if (data.slotFileNamesForSave.get(data.currentIndex).length() != 0) {
-                                        //noinspection ResultOfMethodCallIgnored
-                                        (new File(Game.SAVES_ROOT
-                                                + data.slotFileNamesForSave.get(data.currentIndex)
-                                                + ".save")).delete();
-                                    }
-
-                                    //noinspection ResultOfMethodCallIgnored
-                                    (new File(newSaveName + ".new")).renameTo(new File(newSaveName));
-
-                                    Toast.makeText(ZameApplication.self, R.string.msg_game_saved, Toast.LENGTH_LONG)
-                                            .show();
-
-                                    MenuActivity.justLoaded = true; // just saved
-                                }
+                                saveToSlot(data);
                             }
                         })
                         .setNegativeButton(R.string.dlg_cancel, null)
