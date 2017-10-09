@@ -574,8 +574,8 @@ public final class Controls {
             y = (float)Game.height - y;
         }
 
-        int ctlX = ((int)x * 20) / (Game.width + 1);
-        int ctlY = ((int)y * 16) / (Game.height + 1);
+        int ctlX = (Math.round(x) * 20) / (Game.width + 1);
+        int ctlY = (Math.round(y) * 16) / (Game.height + 1);
 
         if (ctlX < 0) {
             ctlX = 0;
@@ -722,7 +722,19 @@ public final class Controls {
             pointerIsClick[pid] = false;
         }
     }
-
+    private static int floatToInt(float a) {
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
+    private static float intToFloat(int a)
+    {
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
+    }
     @SuppressWarnings("WeakerAccess")
     @TargetApi(Build.VERSION_CODES.FROYO)
     public static void touchEvent(MotionEvent event) {

@@ -138,7 +138,15 @@ public class Monster implements Externalizable {
     public void setAttackDist(boolean longAttackDist) {
         attackDistSq = (longAttackDist ? (10.0f * 10.0f) : (1.8f * 1.8f));
     }
+    private static boolean isEquals(int a, int b)
+    {
+        boolean truth = true;
 
+        if (a<b) truth =  false;
+        if (a>b) truth = false;
+
+        return truth;
+    }
     public void copyFrom(Monster mon) {
         cellX = mon.cellX;
         cellY = mon.cellY;
@@ -193,8 +201,8 @@ public class Monster implements Externalizable {
                     boolean keepGoing = true;
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
-                            if (((dy != 0) || (dx != 0)) && ((State.passableMap[cellY + dy][cellX + dx]
-                                    & Level.PASSABLE_MASK_OBJECT_DROP) == 0)) {
+                            if (((!isEquals(dy,0)) || (!isEquals(dx,0))) && (isEquals((State.passableMap[cellY + dy][cellX + dx]
+                                    & Level.PASSABLE_MASK_OBJECT_DROP),0))) {
 
                                 State.objectsMap[cellY + dy][cellX + dx] = ammoType;
                                 State.passableMap[cellY + dy][cellX + dx] |= Level.PASSABLE_IS_OBJECT;

@@ -101,6 +101,15 @@ public class PortalTracer {
     private int tToSide = -1;
     private int tFromSide = -1;
 
+    private boolean isEquals(int a, int b)
+    {
+        boolean truth = true;
+
+        if (a<b) truth =  false;
+        if (a>b) truth = false;
+
+        return truth;
+    }
     @SuppressWarnings("MagicNumber")
     private void addWallBlock(int x, int y, boolean includeDoors) {
         tToSide = -1;
@@ -120,10 +129,10 @@ public class PortalTracer {
             vis_2 = (dy < 0) && (y < (levelHeight - 1)) && (level[y + 1][x] <= 0);
             vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (level[y][x + 1] <= 0);
         } else {
-            vis_0 = (dy > 0) && (y > 0) && (level[y - 1][x] == 0);
-            vis_1 = (dx > 0) && (x > 0) && (level[y][x - 1] == 0);
-            vis_2 = (dy < 0) && (y < (levelHeight - 1)) && (level[y + 1][x] == 0);
-            vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (level[y][x + 1] == 0);
+            vis_0 = (dy > 0) && (y > 0) && (isEquals(level[y - 1][x],0));
+            vis_1 = (dx > 0) && (x > 0) && (isEquals(level[y][x - 1],0));
+            vis_2 = (dy < 0) && (y < (levelHeight - 1)) && (isEquals(level[y + 1][x],0));
+            vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (isEquals(level[y][x + 1],0));
         }
 
         if (vis_0 && vis_1) {
@@ -338,7 +347,7 @@ public class PortalTracer {
                     }
                 }
 
-                if (level[y][x] == 0) {
+                if (isEquals(level[y][x],0)) {
                     if (wall) {
                         if (portal) {
                             float innerToAngle = ((portToX >= 0)
@@ -367,7 +376,7 @@ public class PortalTracer {
                         lastX = prevX;
                         lastY = prevY;
                         wall = true;
-                        portal = ((x != fromX) || (y != fromY));
+                        portal = (((!isEquals(x,fromX))) || (!isEquals(y,fromY)));
 
                         if (tToSide >= 0) {
                             portToX = (float)x + X_ADD[(tFromSide + 1) % 4];
@@ -381,7 +390,7 @@ public class PortalTracer {
                     }
                 }
 
-                if ((x == toX) && (y == toY)) {
+                if ((isEquals(x,toX)) && (isEquals(y,toY))) {
                     if (portal) {
                         toX = lastX;
                         toY = lastY;
@@ -410,7 +419,7 @@ public class PortalTracer {
                     } else {
                         x++;
                     }
-                } else if (y == toY) {
+                } else if (isEquals(y,toY)) {
                     if (x > toX) {
                         x--;
                     } else {
@@ -461,13 +470,13 @@ public class PortalTracer {
         wallsCount = 0;
         touchedCellsCount = 0;
 
-        touchedCellsMap[(int)y][(int)x] = true;
-        touchedCells[touchedCellsCount].x = (int)x;
-        touchedCells[touchedCellsCount].y = (int)y;
+        touchedCellsMap[floatToInt(y)][floatToInt(x)] = true;
+        touchedCells[touchedCellsCount].x = floatToInt(x);
+        touchedCells[touchedCellsCount].y = floatToInt(y);
         touchedCellsCount++;
 
-        int tx = (int)x;
-        int ty = (int)y;
+        int tx = floatToInt(x);
+        int ty = floatToInt(y);
 
         if (fromAngle < (0.25 * Math.PI)) {
             tx++;
@@ -534,6 +543,19 @@ public class PortalTracer {
             touchedCellsCount++;
         }
 
-        traceCell((int)x, (int)y, fromAngle, (int)x, (int)y, toAngle);
+        traceCell(floatToInt(x), floatToInt(y), fromAngle, floatToInt(x), floatToInt(y), toAngle);
+    }
+    private static int floatToInt(float a) {
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
+    private static float intToFloat(int a)
+    {
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
     }
 }

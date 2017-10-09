@@ -66,13 +66,35 @@ public final class Common {
                 || (cy2 < 0)
                 || (cy2 >= State.levelHeight);
     }
+    private static int floatToInt(float a) {
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
+        private static float intToFloat(int a)
+    {
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
+    }
+    private static boolean isEquals(int a, int b)
+    {
+        boolean truth = true;
 
+        if (a<b) truth =  false;
+        if (a>b) truth = false;
+
+        return truth;
+    }
     // modified Level_CheckLine from wolf3d for iphone by Carmack
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
-        int cx1 = (int)x1;
-        int cy1 = (int)y1;
-        int cx2 = (int)x2;
-        int cy2 = (int)y2;
+        float add = 0.5f;
+        int cx1 = Math.round(x1+add);
+        int cy1 = Math.round(y1+add);
+        int cx2 = Math.round(x2+add);
+        int cy2 = Math.round(y2+add);
 
         if (isCheckLineInvalid(cx1, cx2, cy1, cy2)) {
             return false;
@@ -83,10 +105,10 @@ public final class Common {
             float partial;
 
             if (cx2 > cx1) {
-                partial = 1.0f - (x1 - (float)((int)x1));
+                partial = 1.0f - (x1 - intToFloat(floatToInt(x1)));
                 stepX = 1;
             } else {
-                partial = x1 - (float)((int)x1);
+                partial = x1 - intToFloat(floatToInt(x1));
                 stepX = -1;
             }
 
@@ -98,7 +120,7 @@ public final class Common {
             cx2 += stepX;
 
             do {
-                if ((State.passableMap[(int)y][cx1] & mask) != 0) {
+                if ((!isEquals((State.passableMap[(int)y][cx1] & mask),0))) {
                     return false;
                 }
 
@@ -112,10 +134,10 @@ public final class Common {
             float partial;
 
             if (cy2 > cy1) {
-                partial = 1.0f - (y1 - (float)((int)y1));
+                partial = 1.0f - (y1 - intToFloat(floatToInt(y1)));
                 stepY = 1;
             } else {
-                partial = y1 - (float)((int)y1);
+                partial = y1 - intToFloat(floatToInt(y1));
                 stepY = -1;
             }
 
@@ -127,7 +149,7 @@ public final class Common {
             cy2 += stepY;
 
             do {
-                if ((State.passableMap[cy1][(int)x] & mask) != 0) {
+                if (!isEquals((State.passableMap[cy1][floatToInt(x)] & mask),0)) {
                     return false;
                 }
 

@@ -25,7 +25,7 @@ public final class SoundManager {
     }
 
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static Context appContext;
-    @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static AssetManager assetManager;
+    @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static AssetManager assetManager ;
     private static volatile MediaPlayer mediaPlayer = new MediaPlayer();
     private static volatile SoundPool soundPool = new SoundPool(300,1,128);
 

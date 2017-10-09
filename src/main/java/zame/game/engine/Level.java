@@ -88,7 +88,7 @@ public final class Level {
     public static Mark[][] marksMap = new Mark[200][200];
     public static ArrayList<ArrayList<Mark>> marksHash = new ArrayList<ArrayList<Mark>>();
 
-    private static volatile boolean[] wasAlreadyInWall = new boolean[100];
+    private static boolean[] wasAlreadyInWall = new boolean[100];
     public static boolean quickReturnFromFillInitialInWall = true; // set to false before using fillInitialInWallMap
 
     private Level() {
@@ -458,7 +458,7 @@ public final class Level {
                     State.marksCount = idx;
                 }
                 break;
-                default : break;
+
 
                 case ACTION_WALL: {
                     for (Mark mark : marks) {
@@ -505,7 +505,6 @@ public final class Level {
                     }
                 }
                 break;
-
                 case ACTION_NEXT_LEVEL:
                     Game.nextLevel(false);
                     break;
@@ -578,6 +577,7 @@ public final class Level {
                 case ACTION_MSG_OFF:
                     State.shownMessageId = 0;
                     break;
+                default : break;
             }
         }
 

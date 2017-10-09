@@ -69,9 +69,9 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
     };
 
     private void updateTxtValues() {
-        txtKills.setText(String.format(activity.getString(R.string.endl_kills), (int)currentKills));
-        txtItems.setText(String.format(activity.getString(R.string.endl_items), (int)currentItems));
-        txtSecrets.setText(String.format(activity.getString(R.string.endl_secrets), (int)currentSecrets));
+        txtKills.setText(String.format(activity.getString(R.string.endl_kills), floatToInt(currentKills)));
+        txtItems.setText(String.format(activity.getString(R.string.endl_items), floatToInt(currentItems)));
+        txtSecrets.setText(String.format(activity.getString(R.string.endl_secrets), floatToInt(currentSecrets)));
     }
 
     public EndLevelView(Context context, AttributeSet attrs) {
@@ -111,7 +111,19 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         updateTxtValues();
         startTask();
     }
-
+    private static int floatToInt(float a) {
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
+    private static float intToFloat(int a)
+    {
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
+    }
     private void startTask() {
         if (!increaseValuesTaskActive) {
             increaseValuesTask = new TimerTask() {

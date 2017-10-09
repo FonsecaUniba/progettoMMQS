@@ -525,7 +525,15 @@ public class Game extends ZameGame {
             }
         }
     }
+    private static boolean isEquals(float a, float b)
+    {
+        boolean truth = true;
 
+        if (a<b) truth =  false;
+        if (a>b) truth = false;
+
+        return truth;
+    }
     private void updateOpenedDoors() {
         for (int i = 0; i < State.doorsCount; i++) {
             State.doors[i].tryClose();
@@ -611,7 +619,7 @@ public class Game extends ZameGame {
         }
 
         //noinspection FloatingPointEquality
-        hasMoved |= ((State.heroX != prevX) || (State.heroY != prevY));
+        hasMoved |= ((!isEquals(State.heroX,prevX)) || (!isEquals(State.heroY,prevY)));
     }
 
     @SuppressWarnings("unused")

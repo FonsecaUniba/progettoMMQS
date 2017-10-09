@@ -176,7 +176,27 @@ public final class LevelRenderer {
         Renderer.g4 = l2;
         Renderer.b4 = l2;
     }
+    private static boolean isEquals(int a, int b)
+    {
+        boolean truth = true;
 
+        if (a<b) truth =  false;
+        if (a>b) truth = false;
+
+        return truth;
+    }
+    private static int floatToInt(float a){
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
+    private static float intToFloat(int a){
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE){
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
+    }
     // This method:
     // did *not* check for available space (MAX_AUTO_WALLS),
     // did *not* check if wall already exists,
@@ -184,7 +204,7 @@ public final class LevelRenderer {
     // did *not* add doors
     public static void appendAutoWall(int fromX, int fromY, int toX, int toY, int type) {
         int index = -1;
-        boolean vert = (fromX == toX);
+        boolean vert = (isEquals(fromX,toX));
 
         for (int i = 0; i < State.autoWallsCount; i++) {
             AutoWall aw = State.autoWalls[i];
@@ -198,17 +218,17 @@ public final class LevelRenderer {
                 aw.fromY = (float)toY;
                 index = i;
                 break;
-            } else if (((int)aw.toX == fromX) && ((int)aw.toY == fromY)) {
+            } else if ((isEquals(floatToInt(aw.toX),fromX)) && (isEquals(floatToInt(aw.toY),fromY))) {
                 aw.toX = (float)toX;
                 aw.toY = (float)toY;
                 index = i;
                 break;
-            } else if (((int)aw.fromX == toX) && ((int)aw.fromY == toY)) {
+            } else if ((isEquals(floatToInt(aw.fromX),fromX)) && (isEquals(floatToInt(aw.fromY),fromY))) {
                 aw.fromX = (float)fromX;
                 aw.fromY = (float)fromY;
                 index = i;
                 break;
-            } else if (((int)aw.toX == toX) && ((int)aw.toY == toY)) {
+            } else if ((isEquals(floatToInt(aw.toX),toX)) && (isEquals(floatToInt(aw.toY),toY))) {
                 aw.toX = (float)fromX;
                 aw.toY = (float)fromY;
                 index = i;
@@ -309,7 +329,7 @@ public final class LevelRenderer {
             int mx = ((wall.fromX < wall.toX) ? wall.fromX : wall.toX);
             int my = ((wall.fromY < wall.toY) ? wall.fromY : wall.toY);
 
-            if (((State.drawedAutoWalls[my][mx] & autoWallMask) == 0) && (State.autoWallsCount < MAX_AUTO_WALLS)) {
+            if ((isEquals((State.drawedAutoWalls[my][mx] & autoWallMask),0)) && (State.autoWallsCount < MAX_AUTO_WALLS)) {
                 State.drawedAutoWalls[my][mx] |= autoWallMask;
                 appendAutoWall(wall.fromX, wall.fromY, wall.toX, wall.toY, AUTO_WALL_TYPE_WALL);
             }
@@ -573,7 +593,7 @@ public final class LevelRenderer {
                                     ? AUTO_WALL_MASK_VERTICAL
                                     : AUTO_WALL_MASK_HORIZONTAL);
 
-                            if (((State.drawedAutoWalls[my][mx] & autoWallMask) == 0) && (State.autoWallsCount
+                            if ((isEquals(((State.drawedAutoWalls[my][mx] & autoWallMask)),0)) && (State.autoWallsCount
                                     < MAX_AUTO_WALLS)) {
 
                                 State.drawedAutoWalls[my][mx] |= autoWallMask;
