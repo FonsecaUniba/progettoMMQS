@@ -10,7 +10,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import zame.game.engine.State;
 
-// TODO: look at System.nanoTime()
 // http://www.droidnova.com/android-3d-game-tutorial-part-i,312.html
 // http://iphonedevelopment.blogspot.com/2009/05/opengl-es-from-ground-up-table-of.html
 // http://insanitydesign.com/wp/projects/nehe-android-ports/

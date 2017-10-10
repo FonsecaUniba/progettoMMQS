@@ -160,7 +160,7 @@ public final class TextureLoader {
         return texMap[((texNum < 1) || (texNum > texMap.length)) ? 0 : (texNum - 1)];
     }
 
-    private static synchronized void bindTextures(GL10 gl, int createdTexturesCount){
+    private static void bindTextures(GL10 gl, int createdTexturesCount){
         TextureToLoad texToLoad = TEXTURES_TO_LOAD[createdTexturesCount];
 
         switch (texToLoad.type) {

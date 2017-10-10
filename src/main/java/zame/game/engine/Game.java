@@ -40,9 +40,6 @@ public class Game extends ZameGame {
 
     private static final int FPS_AVG_LEN = 2;
 
-    // paths initialized in MenuActivity (which started first)
-    // TODO: initialize paths in some common place, and re-initialize in necessary
-    // but I'm think this is already fixed. anyway, check it.
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_FOLDER="";
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_ROOT="";
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String INSTANT_PATH="";

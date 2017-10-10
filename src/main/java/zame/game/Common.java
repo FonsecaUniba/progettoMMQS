@@ -79,14 +79,10 @@ public final class Common {
         }
         return (float) a;
     }
+
     private static boolean isEquals(int a, int b)
     {
-        boolean truth = true;
-
-        if (a<b) truth =  false;
-        if (a>b) truth = false;
-
-        return truth;
+        return Math.abs(a-b) < 1e-6;
     }
 
     // modified Level_CheckLine from wolf3d for iphone by Carmack

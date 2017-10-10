@@ -137,15 +137,12 @@ public class Monster implements Externalizable {
     public void setAttackDist(boolean longAttackDist) {
         attackDistSq = (longAttackDist ? (10.0f * 10.0f) : (1.8f * 1.8f));
     }
+
     private static boolean isEquals(int a, int b)
     {
-        boolean truth = true;
-
-        if (a<b) truth =  false;
-        if (a>b) truth = false;
-
-        return truth;
+        return Math.abs(a-b) < 1e-6;
     }
+
     public void copyFrom(Monster mon) {
         cellX = mon.cellX;
         cellY = mon.cellY;
@@ -181,6 +178,27 @@ public class Monster implements Externalizable {
         isAimedOnHero = mon.isAimedOnHero;
     }
 
+    private boolean checkPassable(int dx, int dy){
+        return ((!isEquals(dy,0)) || (!isEquals(dx,0)))
+                && (isEquals((State.passableMap[cellY + dy][cellX + dx]
+                & Level.PASSABLE_MASK_OBJECT_DROP),0));
+    }
+
+    private boolean checkMask(){
+        return (State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_OBJECT_DROP) == 0;
+    }
+
+    private boolean setKeepGoing(int dx, int dy){
+        boolean result = true;
+        if (checkPassable(dx, dy)) {
+
+            State.objectsMap[cellY + dy][cellX + dx] = ammoType;
+            State.passableMap[cellY + dy][cellX + dx] |= Level.PASSABLE_IS_OBJECT;
+            result = false;
+        }
+        return result;
+    }
+
     public void hit(int amt, int hitTm) {
         hitTimeout = hitTm;
         health -= amt;
@@ -192,22 +210,14 @@ public class Monster implements Externalizable {
             State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_DEAD_CORPSE;
 
             if (ammoType > 0) {
-                if ((State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_OBJECT_DROP) == 0) {
+                if (checkMask()) {
                     State.objectsMap[cellY][cellX] = ammoType;
                     State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_OBJECT;
                 } else {
-                    //outer:
                     boolean keepGoing = true;
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
-                            if (((!isEquals(dy,0)) || (!isEquals(dx,0))) && (isEquals((State.passableMap[cellY + dy][cellX + dx]
-                                    & Level.PASSABLE_MASK_OBJECT_DROP),0))) {
-
-                                State.objectsMap[cellY + dy][cellX + dx] = ammoType;
-                                State.passableMap[cellY + dy][cellX + dx] |= Level.PASSABLE_IS_OBJECT;
-                                //break outer;
-                                keepGoing = false;
-                            }
+                            keepGoing = setKeepGoing(dx, dy);
                             if (!keepGoing) break;
                         }
                         if (!keepGoing) break;
@@ -232,13 +242,7 @@ public class Monster implements Externalizable {
         }
     }
 
-    @SuppressWarnings("MagicNumber")
-    public void update() {
-        if (health <= 0) {
-            // removeTimeout--;	// do not remove dead corpses
-            return;
-        }
-
+    private void heroTimeout(){
         if (hitHeroTimeout > 0) {
             hitHeroTimeout--;
 
@@ -246,10 +250,180 @@ public class Monster implements Externalizable {
                 Game.hitHero(hitHeroHits, shootSoundIdx, this);
             }
         }
+    }
+
+    private boolean setDir(float dx, float dy, float distSq){
+        boolean result = false;
+
+        if (aroundReqDir >= 0) {
+            if (!waitForDoor) {
+                dir = (dir + (inverseRotation ? 3 : 1)) % 4;
+            }
+        } else if (distSq <= visibleDistSq) {
+            if (Math.abs(dy) <= 1.0f) {
+                dir = ((dx < 0) ? 2 : 0);
+            } else {
+                dir = ((dy < 0) ? 1 : 3);
+            }
+
+            result = true;
+        }
+
+        return result;
+    }
+
+    private int updateAngleDiff(int angleDiff){
+        if (angleDiff > 180) {
+            angleDiff -= 360;
+        } else if (angleDiff < -180) {
+            angleDiff += 360;
+        }
+
+        return angleDiff;
+    }
+
+    private boolean checkVisible(float distSq){
+        boolean result = false;
+        if ((distSq <= visibleDistSq) && Common.traceLine((float)cellX + 0.5f,
+                (float)cellY + 0.5f,
+                State.heroX,
+                State.heroY,
+                Level.PASSABLE_MASK_SHOOT_WM)) {
+
+            chaseMode = true;
+            result = true;
+        }
+        return result;
+    }
+
+    private void setValues(int angleDiff, int minAngle, float dist){
+        if (angleDiff <= minAngle) {
+            isAimedOnHero = true;
+            hitHeroHits = Common.getRealHits(hits, dist);
+            hitHeroTimeout = 2;
+            attackTimeout = 15;
+            step = 50;
+        } else {
+            step = 8 + (angleDiff / 5);
+        }
+    }
+
+    private void updateCells(){
+        switch (dir) {
+            case 0:
+                cellX++;
+                break;
+
+            case 1:
+                cellY--;
+                break;
+
+            case 2:
+                cellX--;
+                break;
+
+            case 3:
+                cellY++;
+                break;
+            default : break;
+        }
+    }
+
+    private boolean checkRotation(boolean tryAround){
+        if (tryAround) {
+            if ((prevAroundX == cellX) && (prevAroundY == cellY)) {
+                inverseRotation = !inverseRotation;
+            }
+
+            aroundReqDir = dir;
+            prevAroundX = cellX;
+            prevAroundY = cellY;
+        }
+
+        return false;
+    }
+
+    private void finalUpdate(){
+        if (attackTimeout > 0) {
+            attackTimeout--;
+        }
+
+        if (hitTimeout > 0) {
+            hitTimeout--;
+        } else if (step > 0) {
+            step--;
+        }
+    }
+
+    private void updateStep(){
+        if (step == 0) {
+            step = maxStep / 2;
+        }
+    }
+
+    private boolean checkChaseDoor(){
+        return chaseMode
+                && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR) != 0)
+                && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR_OPENED_BY_HERO) != 0);
+    }
+
+    private boolean checkMonsterMask(){
+        boolean result = true;
+
+        if ((State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_MONSTER) == 0) {
+            if (dir == aroundReqDir) {
+                aroundReqDir = -1;
+            }
+
+            step = maxStep;
+            result = false;
+        }
+
+        return result;
+    }
+
+    private boolean checkDoorInteraction(){
+        boolean result = true;
+        if (checkChaseDoor()) {
+
+            Door door = Level.doorsMap[cellY][cellX];
+
+            if (!door.sticked) {
+                door.open();
+
+                waitForDoor = true;
+                cellX = prevX;
+                cellY = prevY;
+                step = 10;
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
+    private int getAngleDiff(int angleDiff){
+        return ((angleDiff < 0) ? -angleDiff : angleDiff);
+    }
+
+    private boolean isVisible(boolean vis, float distSq){
+        return vis && (distSq <= attackDistSq);
+    }
+
+    private int getDir(int dir){
+        return (dir + (inverseRotation ? 1 : 3)) % 4;
+    }
+
+    @SuppressWarnings("MagicNumber")
+    public void update() {
+        if (health <= 0) {
+            // removeTimeout--;	// do not remove dead corpses
+            return;
+        }
+
+        heroTimeout();
 
         if (step == 0) {
-            boolean tryAround = false;
-
             isInAttackState = false;
             isAimedOnHero = false;
             prevX = cellX;
@@ -259,58 +433,24 @@ public class Monster implements Externalizable {
             float dy = State.heroY - ((float)cellY + 0.5f);
             float distSq = (dx * dx) + (dy * dy);
 
-            if (aroundReqDir >= 0) {
-                if (!waitForDoor) {
-                    dir = (dir + (inverseRotation ? 3 : 1)) % 4;
-                }
-            } else if (distSq <= visibleDistSq) {
-                if (Math.abs(dy) <= 1.0f) {
-                    dir = ((dx < 0) ? 2 : 0);
-                } else {
-                    dir = ((dy < 0) ? 1 : 3);
-                }
-
-                tryAround = true;
-            }
+            boolean tryAround = setDir(dx, dy, distSq);
 
             State.passableMap[cellY][cellX] &= ~Level.PASSABLE_IS_MONSTER;
-            boolean vis = false;
+            boolean vis = checkVisible(distSq);
 
-            if ((distSq <= visibleDistSq) && Common.traceLine((float)cellX + 0.5f,
-                    (float)cellY + 0.5f,
-                    State.heroX,
-                    State.heroY,
-                    Level.PASSABLE_MASK_SHOOT_WM)) {
-
-                chaseMode = true;
-                vis = true;
-            }
-
-            if (vis && (distSq <= attackDistSq)) {
+            if (isVisible(vis, distSq)) {
                 int angleToHero = (int)(PortalTracer.getAngle(dx, dy) * Common.RAD2G_F);
                 int angleDiff = angleToHero - shootAngle;
 
-                if (angleDiff > 180) {
-                    angleDiff -= 360;
-                } else if (angleDiff < -180) {
-                    angleDiff += 360;
-                }
+                angleDiff = updateAngleDiff(angleDiff);
 
-                angleDiff = ((angleDiff < 0) ? -angleDiff : angleDiff);
+                angleDiff = getAngleDiff(angleDiff);
                 shootAngle = angleToHero;
                 float dist = (float)Math.sqrt(distSq);
 
                 int minAngle = Math.max(1, 15 - (int)(dist * 3.0f));
 
-                if (angleDiff <= minAngle) {
-                    isAimedOnHero = true;
-                    hitHeroHits = Common.getRealHits(hits, dist);
-                    hitHeroTimeout = 2;
-                    attackTimeout = 15;
-                    step = 50;
-                } else {
-                    step = 8 + (angleDiff / 5);
-                }
+                setValues(angleDiff, minAngle, dist);
 
                 isInAttackState = true;
                 dir = ((shootAngle + 45) % 360) / 90;
@@ -319,71 +459,25 @@ public class Monster implements Externalizable {
                 waitForDoor = false;
 
                 for (int i = 0; i < 4; i++) {
-                    switch (dir) {
-                        case 0:
-                            cellX++;
-                            break;
+                    updateCells();
 
-                        case 1:
-                            cellY--;
-                            break;
+                    boolean keepGoing = checkMonsterMask();
 
-                        case 2:
-                            cellX--;
-                            break;
+                    if (!keepGoing) break;
 
-                        case 3:
-                            cellY++;
-                            break;
-                        default : break;
-                    }
+                    keepGoing = checkDoorInteraction();
 
-                    if ((State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_MONSTER) == 0) {
-                        if (dir == aroundReqDir) {
-                            aroundReqDir = -1;
-                        }
-
-                        step = maxStep;
-                        break;
-                    }
-
-                    if (chaseMode
-                            && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR) != 0)
-                            && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR_OPENED_BY_HERO) != 0)) {
-
-                        Door door = Level.doorsMap[cellY][cellX];
-
-                        if (!door.sticked) {
-                            door.open();
-
-                            waitForDoor = true;
-                            cellX = prevX;
-                            cellY = prevY;
-                            step = 10;
-                            break;
-                        }
-                    }
+                    if (!keepGoing) break;
 
                     cellX = prevX;
                     cellY = prevY;
 
-                    if (tryAround) {
-                        if ((prevAroundX == cellX) && (prevAroundY == cellY)) {
-                            inverseRotation = !inverseRotation;
-                        }
+                    tryAround = checkRotation(tryAround);
 
-                        aroundReqDir = dir;
-                        prevAroundX = cellX;
-                        prevAroundY = cellY;
-                        tryAround = false;
-                    }
-
-                    dir = (dir + (inverseRotation ? 1 : 3)) % 4;
+                    dir = getDir(dir);
                 }
 
-                if (step == 0) {
-                    step = maxStep / 2;
-                }
+                updateStep();
 
                 shootAngle = dir * 90;
             }
@@ -394,14 +488,6 @@ public class Monster implements Externalizable {
         x = (float)cellX + (((float)(prevX - cellX) * (float)step) / (float)maxStep) + 0.5f;
         y = (float)cellY + (((float)(prevY - cellY) * (float)step) / (float)maxStep) + 0.5f;
 
-        if (attackTimeout > 0) {
-            attackTimeout--;
-        }
-
-        if (hitTimeout > 0) {
-            hitTimeout--;
-        } else if (step > 0) {
-            step--;
-        }
+        finalUpdate();
     }
 }

@@ -176,27 +176,26 @@ public final class LevelRenderer {
         Renderer.g4 = l2;
         Renderer.b4 = l2;
     }
+
     private static boolean isEquals(int a, int b)
     {
-        boolean truth = true;
-
-        if (a<b) truth =  false;
-        if (a>b) truth = false;
-
-        return truth;
+        return Math.abs(a-b) < 1e-6;
     }
+
     private static int floatToInt(float a){
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
     }
+
     private static float intToFloat(int a){
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
         }
         return (float) a;
     }
+
     // This method:
     // did *not* check for available space (MAX_AUTO_WALLS),
     // did *not* check if wall already exists,

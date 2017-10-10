@@ -101,15 +101,45 @@ public class PortalTracer {
     private int tToSide = -1;
     private int tFromSide = -1;
 
-    private boolean isEquals(int a, int b)
+    private static boolean isEquals(int a, int b)
     {
-        boolean truth = true;
-
-        if (a<b) truth =  false;
-        if (a>b) truth = false;
-
-        return truth;
+        return Math.abs(a-b) < 1e-6;
     }
+
+    private void checkVis(boolean vis_0, boolean vis_1, boolean vis_2, boolean vis_3){
+        if (vis_0 && vis_1) {
+            tToSide = 0;
+            tFromSide = 1;
+        } else if (vis_1 && vis_2) {
+            tToSide = 1;
+            tFromSide = 2;
+        } else if (vis_2 && vis_3) {
+            tToSide = 2;
+            tFromSide = 3;
+        } else {
+            checkVis2(vis_0, vis_1, vis_2, vis_3);
+        }
+    }
+
+    private void checkVis2(boolean vis_0, boolean vis_1, boolean vis_2, boolean vis_3){
+        if (vis_3 && vis_0) {
+            tToSide = 3;
+            tFromSide = 0;
+        } else if (vis_0) {
+            tToSide = 0;
+            tFromSide = 0;
+        } else if (vis_1) {
+            tToSide = 1;
+            tFromSide = 1;
+        } else if (vis_2) {
+            tToSide = 2;
+            tFromSide = 2;
+        } else if (vis_3) {
+            tToSide = 3;
+            tFromSide = 3;
+        }
+    }
+
     @SuppressWarnings("MagicNumber")
     private void addWallBlock(int x, int y, boolean includeDoors) {
         tToSide = -1;
@@ -135,37 +165,65 @@ public class PortalTracer {
             vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (isEquals(level[y][x + 1],0));
         }
 
-        if (vis_0 && vis_1) {
-            tToSide = 0;
-            tFromSide = 1;
-        } else if (vis_1 && vis_2) {
-            tToSide = 1;
-            tFromSide = 2;
-        } else if (vis_2 && vis_3) {
-            tToSide = 2;
-            tFromSide = 3;
-        } else if (vis_3 && vis_0) {
-            tToSide = 3;
-            tFromSide = 0;
-        } else if (vis_0) {
-            tToSide = 0;
-            tFromSide = 0;
-        } else if (vis_1) {
-            tToSide = 1;
-            tFromSide = 1;
-        } else if (vis_2) {
-            tToSide = 2;
-            tFromSide = 2;
-        } else if (vis_3) {
-            tToSide = 3;
-            tFromSide = 3;
-        }
+        checkVis(vis_0, vis_1, vis_2, vis_3);
 
         if ((tToSide >= 0) && (level[y][x] > 0)) {
             for (int i = tFromSide; i != ((tToSide + 3) % 4); i = (i + 3) % 4) {
                 addWallToDraw(x, y, i, level[y][x]);
             }
         }
+    }
+
+    private int getFromX(int fromX, float fromAngle){
+        if (fromAngle < (0.5 * Math.PI)) {
+            fromX++;
+        } else if (fromAngle >= (0.75 * Math.PI)) {
+            if (fromAngle < (1.5 * Math.PI)) {
+                fromX--;
+            } else if (fromAngle >= (1.75 * Math.PI)) {
+                fromX++;
+            }
+        }
+
+        return fromX;
+    }
+
+    private int getFromY(int fromY, float fromAngle){
+        if (fromAngle >= (0.25 * Math.PI)) {
+            if (fromAngle < Math.PI) {
+                fromY--;
+            } else if (fromAngle >= (1.25 * Math.PI)) {
+                fromY++;
+            }
+        }
+
+        return fromY;
+    }
+
+    private int getToX(int toX, float toAngle){
+        if (toAngle > (1.5 * Math.PI)) {
+            toX++;
+        } else if (toAngle <= (1.25 * Math.PI)) {
+            if (toAngle > (0.5 * Math.PI)) {
+                toX--;
+            } else if (toAngle <= (0.25 * Math.PI)) {
+                toX++;
+            }
+        }
+
+        return toX;
+    }
+
+    private int getToY(int toY, float toAngle){
+        if (toAngle <= (1.75 * Math.PI)) {
+            if (toAngle > Math.PI) {
+                toY++;
+            } else if (toAngle <= (0.75 * Math.PI)) {
+                toY--;
+            }
+        }
+
+        return toY;
     }
 
     @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
@@ -178,43 +236,15 @@ public class PortalTracer {
             float toDx = (float)Math.cos(toAngle);
             float toDy = (float)Math.sin(toAngle);
 
-            if (fromAngle < (0.5 * Math.PI)) {
-                fromX++;
-            } else if (fromAngle >= (0.75 * Math.PI)) {
-                if (fromAngle < (1.5 * Math.PI)) {
-                    fromX--;
-                } else if (fromAngle >= (1.75 * Math.PI)) {
-                    fromX++;
-                }
-            }
+            fromX = getFromX(fromX, fromAngle);
 
-            if (fromAngle >= (0.25 * Math.PI)) {
-                if (fromAngle < Math.PI) {
-                    fromY--;
-                } else if (fromAngle >= (1.25 * Math.PI)) {
-                    fromY++;
-                }
-            }
+            fromY = getFromY(fromY, fromAngle);
 
-            if (toAngle > (1.5 * Math.PI)) {
-                toX++;
-            } else if (toAngle <= (1.25 * Math.PI)) {
-                if (toAngle > (0.5 * Math.PI)) {
-                    toX--;
-                } else if (toAngle <= (0.25 * Math.PI)) {
-                    toX++;
-                }
-            }
+            toX = getToX(toX, toAngle);
 
-            if (toAngle <= (1.75 * Math.PI)) {
-                if (toAngle > Math.PI) {
-                    toY++;
-                } else if (toAngle <= (0.75 * Math.PI)) {
-                    toY--;
-                }
-            }
+            toY = getToY(toY, toAngle);
 
-            for (; ; ) {
+            while (true){
                 boolean visible = false;
                 int oa = 0;
                 int ob = 0;
@@ -268,7 +298,7 @@ public class PortalTracer {
                 }
             }
 
-            for (; ; ) {
+            while (true){
                 boolean visible = false;
                 int oa = 0;
                 int ob = 0;
@@ -335,7 +365,7 @@ public class PortalTracer {
             boolean wall = false;
             boolean portal = false;
 
-            for (; ; ) {
+            while (true){
                 if (!touchedCellsMap[y][x])    // just for case
                 {
                     touchedCellsMap[y][x] = true;

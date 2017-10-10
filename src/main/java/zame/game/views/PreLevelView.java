@@ -13,6 +13,9 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import zame.game.Common;
 import zame.game.GameActivity;
 import zame.game.R;
@@ -127,7 +130,8 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
             preLevelText = sb.toString();
             br.close();
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            //throw new RuntimeException(ex);
+            Logger.getAnonymousLogger().log(Level.SEVERE, "Error reading file", ex);
         }
 
         setImage(imgId);

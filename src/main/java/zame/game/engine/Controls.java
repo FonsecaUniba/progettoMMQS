@@ -432,7 +432,6 @@ public final class Controls {
         int maskUp=0;
         int maskDown=0;
 
-        // TODO: test it
         if (Config.rotateScreen) {
             trackballX = -trackballX;
             trackballY = -trackballY;

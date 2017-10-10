@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 public class LevelConfig {
@@ -84,9 +85,11 @@ public class LevelConfig {
 
             br.close();
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            //throw new RuntimeException(ex);
+            Logger.getAnonymousLogger().log(java.util.logging.Level.SEVERE, "Error reading file", ex);
         } catch (NumberFormatException ex) {
-            throw new RuntimeException(ex);
+            //throw new RuntimeException(ex);
+            Logger.getAnonymousLogger().log(java.util.logging.Level.SEVERE, "Wrong Number Format", ex);
         }
 
         return res;
