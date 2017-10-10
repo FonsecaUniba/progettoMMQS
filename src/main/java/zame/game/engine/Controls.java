@@ -427,10 +427,10 @@ public final class Controls {
 
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static int getActionsMask() {
-        int maskLeft;
-        int maskRight;
-        int maskUp;
-        int maskDown;
+        int maskLeft=0;
+        int maskRight=0;
+        int maskUp=0;
+        int maskDown=0;
 
         // TODO: test it
         if (Config.rotateScreen) {
@@ -741,8 +741,8 @@ public final class Controls {
         int action = event.getAction();
         int actionCode = action & MotionEvent.ACTION_MASK;
         int points = event.getPointerCount();
-        int i;
-        int aidx;
+        int i=0;
+        int aidx=0;
 
         switch (actionCode) {
             case MotionEvent.ACTION_DOWN:

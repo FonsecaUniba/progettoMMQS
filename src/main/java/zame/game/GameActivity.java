@@ -323,8 +323,8 @@ public class GameActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent e) {
-        float sensorX;
-        float sensorY;
+        float sensorX=0;
+        float sensorY=0;
 
         if (Config.accelerometerEnabled && (e.sensor.getType() == Sensor.TYPE_ACCELEROMETER)) {
             switch (deviceRotation) {

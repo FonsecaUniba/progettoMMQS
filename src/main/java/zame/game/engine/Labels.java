@@ -112,7 +112,7 @@ public final class Labels {
             return currentMessageLabelId;
         }
 
-        String message;
+        String message="";
 
         if (((Config.controlsType == Controls.TYPE_EXPERIMENTAL_A) || (Config.controlsType
                 == Controls.TYPE_EXPERIMENTAL_B)) && (messageId == MSG_PRESS_ROTATE)) {

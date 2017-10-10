@@ -7,7 +7,6 @@ import java.io.ObjectOutput;
 
 @SuppressWarnings("WeakerAccess")
 public class Action implements Externalizable {
-    private static final long serialVersionUID = 0L;
     public Action(){}
 
     public int type;

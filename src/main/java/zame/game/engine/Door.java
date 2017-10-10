@@ -8,7 +8,6 @@ import zame.game.SoundManager;
 
 @SuppressWarnings("WeakerAccess")
 public class Door implements Externalizable {
-    private static final long serialVersionUID = 0L;
     public Door(){}
     public static final float OPEN_POS_MAX = 0.9f;
     public static final float OPEN_POS_PASSABLE = 0.7f;

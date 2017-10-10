@@ -45,9 +45,7 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
     }
 
     public static byte[] readBytes(InputStream is) throws IOException {
-        byte[] buffer;
-
-        buffer = new byte[is.available()];
+        byte[] buffer = new byte[is.available()];
 
         //noinspection ResultOfMethodCallIgnored
         is.read(buffer);
@@ -178,7 +176,7 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
     }
 
     public boolean handleKeyUp(int keyCode) {
-        boolean ret;
+        boolean ret=true;
 
         synchronized (lockControls) {
             ret = keyUp(keyCode);
@@ -188,7 +186,7 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
     }
 
     public boolean handleKeyDown(int keyCode) {
-        boolean ret;
+        boolean ret=true;
 
         synchronized (lockControls) {
             ret = keyDown(keyCode);

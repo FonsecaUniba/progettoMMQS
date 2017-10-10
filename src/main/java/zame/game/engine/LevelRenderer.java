@@ -307,8 +307,8 @@ public final class LevelRenderer {
         Renderer.z4 = -HALF_WALL;
 
         for (int i = 0; i < tracer.wallsCount; i++) {
-            int autoWallMask;
-            Door door;
+            int autoWallMask = 0;
+            Door door = new Door();
 
             PortalTracer.Wall wall = tracer.walls[i];
 
@@ -378,10 +378,10 @@ public final class LevelRenderer {
                 continue;
             }
 
-            float fromX;
-            float fromY;
-            float toX;
-            float toY;
+            float fromX=0;
+            float fromY=0;
+            float toX=0;
+            float toY=0;
 
             if (door.vert) {
                 fromX = (float)door.x + 0.5f;
@@ -513,10 +513,10 @@ public final class LevelRenderer {
                 tex = State.transpMap[tc.y][tc.x];
 
                 if (tex >= (TextureLoader.BASE_TRANSPARENTS + 0x10)) {
-                    float fromX;
-                    float fromY;
-                    float toX;
-                    float toY;
+                    float fromX=0;
+                    float fromY=0;
+                    float toX=0;
+                    float toY=0;
 
                     boolean vert = (tex >= (TextureLoader.BASE_TRANSPARENTS + 0x18));
 

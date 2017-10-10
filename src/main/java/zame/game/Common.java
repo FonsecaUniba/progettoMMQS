@@ -88,6 +88,7 @@ public final class Common {
 
         return truth;
     }
+
     // modified Level_CheckLine from wolf3d for iphone by Carmack
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
         float add = 0.5f;
@@ -101,8 +102,8 @@ public final class Common {
         }
 
         if (cx1 != cx2) {
-            int stepX;
-            float partial;
+            int stepX=0;
+            float partial=0;
 
             if (cx2 > cx1) {
                 partial = 1.0f - (x1 - intToFloat(floatToInt(x1)));
@@ -120,7 +121,7 @@ public final class Common {
             cx2 += stepX;
 
             do {
-                if ((!isEquals((State.passableMap[(int)y][cx1] & mask),0))) {
+                if ((!isEquals((State.passableMap[floatToInt(y)][cx1] & mask),0))) {
                     return false;
                 }
 
@@ -130,8 +131,8 @@ public final class Common {
         }
 
         if (cy1 != cy2) {
-            int stepY;
-            float partial;
+            int stepY=0;
+            float partial=0;
 
             if (cy2 > cy1) {
                 partial = 1.0f - (y1 - intToFloat(floatToInt(y1)));
@@ -354,7 +355,7 @@ public final class Common {
 
             //noinspection MagicNumber
             byte[] buf = new byte[1024];
-            int len;
+            int len=0;
 
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);

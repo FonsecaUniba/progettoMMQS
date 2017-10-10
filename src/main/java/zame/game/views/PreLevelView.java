@@ -97,7 +97,7 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         scrollWrap = (ScrollView)findViewById(R.id.ScrollWrap);
         txtText = (TextView)findViewById(R.id.TxtText);
 
-        String imgId;
+        String imgId="";
 
         try {
             InputStreamReader isr = new InputStreamReader(Common.openLocalizedAsset(activity.getAssets(),

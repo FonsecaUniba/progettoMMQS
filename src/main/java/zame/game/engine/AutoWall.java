@@ -7,7 +7,6 @@ import java.io.ObjectOutput;
 
 @SuppressWarnings("WeakerAccess")
 public class AutoWall implements Externalizable {
-    private static final long serialVersionUID = 0L;
     public AutoWall(){}
     public float fromX;
     public float fromY;

@@ -118,10 +118,10 @@ public class PortalTracer {
         float dy = ((float)y + 0.5f) - heroY;
         float dx = ((float)x + 0.5f) - heroX;
 
-        boolean vis_0;
-        boolean vis_1;
-        boolean vis_2;
-        boolean vis_3;
+        boolean vis_0=true;
+        boolean vis_1=true;
+        boolean vis_2=true;
+        boolean vis_3=true;
 
         if (includeDoors) {
             vis_0 = (dy > 0) && (y > 0) && (level[y - 1][x] <= 0);
@@ -509,8 +509,8 @@ public class PortalTracer {
             touchedCellsCount++;
         }
 
-        tx = (int)x;
-        ty = (int)y;
+        tx = floatToInt(x);
+        ty = floatToInt(y);
 
         if (toAngle > (1.75 * Math.PI)) {
             tx++;

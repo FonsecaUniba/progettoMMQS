@@ -139,7 +139,7 @@ public final class Level {
                     "levels/level-%d.map",
                     idx))), LevelConfig.read(Game.assetManager, idx));
 
-            String levelUri;
+            String levelUri="";
 
             if (idx < FIRST_REAL_LEVEL) {
                 levelUri = "/level/ep0-lv" + String.valueOf(idx);

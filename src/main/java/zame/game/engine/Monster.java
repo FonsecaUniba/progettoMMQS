@@ -9,7 +9,6 @@ import zame.game.SoundManager;
 
 @SuppressWarnings("WeakerAccess")
 public class Monster implements Externalizable {
-    private static final long serialVersionUID = 0L;
     public Monster(){}
     public int index;
     public int cellX;
