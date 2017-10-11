@@ -197,6 +197,41 @@ public class Game extends ZameGame {
         }
     }
 
+    private boolean isLevelReload(String code){
+        return (code.length() == 4)
+                && (code.charAt(0) == 't')
+                && (code.charAt(1) == 'l')
+                && ((code.charAt(2) >= '0')
+                && (code.charAt(2) <= '9'))
+                && ((code.charAt(3) >= '0') && (code.charAt(3) <= '9'));
+    }
+
+    private static void reloadLevel(int newLevelNum){
+        if (Level.exists(newLevelNum)) {
+            State.levelNum = newLevelNum;
+            loadLevel(LOAD_LEVEL_RELOAD);
+        }
+    }
+
+    private void processGameCode2(String code){
+        if ("tfps".equals(code)) {
+            showFps = !showFps;
+        } else if ("tmon".equals(code)) {
+            LevelRenderer.showMonstersOnMap = !LevelRenderer.showMonstersOnMap;
+        } else if ("gmgm".equals(code)) {
+            State.godMode = !State.godMode;
+        } else if (isLevelReload(code)) {
+
+            int newLevelNum = ((code.charAt(2) - '0') * 10) + (code.charAt(3) - '0');
+
+            reloadLevel(newLevelNum);
+        } else if ("iddqd".equals(code)) {
+            State.godMode = false;
+            State.heroHealth = 1;
+            State.heroArmor = 0;
+        }
+    }
+
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public void processGameCode(String codes) {
         String[] codeList = codes.toLowerCase(Locale.US).split(" ");
@@ -224,25 +259,8 @@ public class Game extends ZameGame {
             } else if ("tmnl".equals(code)) {
                 skipEndLevelActivityOnce = true;
                 loadLevel(LOAD_LEVEL_NEXT);
-            } else if ("tfps".equals(code)) {
-                showFps = !showFps;
-            } else if ("tmon".equals(code)) {
-                LevelRenderer.showMonstersOnMap = !LevelRenderer.showMonstersOnMap;
-            } else if ("gmgm".equals(code)) {
-                State.godMode = !State.godMode;
-            } else if ((code.length() == 4) && (code.charAt(0) == 't') && (code.charAt(1) == 'l') && ((code.charAt(2)
-                    >= '0') && (code.charAt(2) <= '9')) && ((code.charAt(3) >= '0') && (code.charAt(3) <= '9'))) {
-
-                int newLevelNum = ((code.charAt(2) - '0') * 10) + (code.charAt(3) - '0');
-
-                if (Level.exists(newLevelNum)) {
-                    State.levelNum = newLevelNum;
-                    loadLevel(LOAD_LEVEL_RELOAD);
-                }
-            } else if ("iddqd".equals(code)) {
-                State.godMode = false;
-                State.heroHealth = 1;
-                State.heroArmor = 0;
+            } else {
+                processGameCode2(code);
             }
         }
     }
@@ -391,53 +409,72 @@ public class Game extends ZameGame {
         }
     }
 
+    private boolean isNotReachable(){
+        return (LevelRenderer.currVis == null) || (LevelRenderer.currVis.dist > 1.8);
+    }
+
+    private void printKeyRequired(Door door){
+        if (door.requiredKey == 4) {
+            Overlay.showLabel(Labels.LABEL_NEED_GREEN_KEY);
+        } else if (door.requiredKey == 2) {
+            Overlay.showLabel(Labels.LABEL_NEED_RED_KEY);
+        } else {
+            Overlay.showLabel(Labels.LABEL_NEED_BLUE_KEY);
+        }
+    }
+
+    private void markDoor(Door door){
+        if (door.mark != null) {
+            if (door.sticked) {
+                processOneMark(100 + door.mark.id);
+            } else {
+                processOneMark(door.mark.id);
+            }
+        }
+    }
+
+    private boolean checkStickedDoor(Door door){
+        if (door.sticked) {
+            if (door.requiredKey == 0) {
+                Overlay.showLabel(Labels.LABEL_CANT_OPEN);
+                SoundManager.playSound(SoundManager.SOUND_NOWAY);
+
+                markDoor(door);
+
+                return true;
+            }
+
+            if ((State.heroKeysMask & door.requiredKey) == 0) {
+                printKeyRequired(door);
+
+                markDoor(door);
+
+                SoundManager.playSound(SoundManager.SOUND_NOWAY);
+                return true;
+            }
+
+            door.sticked = false;
+        }
+
+        return false;
+    }
+
     @SuppressWarnings("MagicNumber")
     private boolean processUse() {
-        if ((LevelRenderer.currVis == null) || (LevelRenderer.currVis.dist > 1.8)) {
+
+        if (isNotReachable()) {
             return false;
         }
 
         if (LevelRenderer.currVis.obj instanceof Door) {
             Door door = (Door)LevelRenderer.currVis.obj;
 
-            if (door.sticked) {
-                if (door.requiredKey == 0) {
-                    Overlay.showLabel(Labels.LABEL_CANT_OPEN);
-                    SoundManager.playSound(SoundManager.SOUND_NOWAY);
-
-                    if (door.mark != null) {
-                        processOneMark(100 + door.mark.id);
-                    }
-
-                    return true;
-                }
-
-                if ((State.heroKeysMask & door.requiredKey) == 0) {
-                    if (door.requiredKey == 4) {
-                        Overlay.showLabel(Labels.LABEL_NEED_GREEN_KEY);
-                    } else if (door.requiredKey == 2) {
-                        Overlay.showLabel(Labels.LABEL_NEED_RED_KEY);
-                    } else {
-                        Overlay.showLabel(Labels.LABEL_NEED_BLUE_KEY);
-                    }
-
-                    if (door.mark != null) {
-                        processOneMark(100 + door.mark.id);
-                    }
-
-                    SoundManager.playSound(SoundManager.SOUND_NOWAY);
-                    return true;
-                }
-
-                door.sticked = false;
-            }
+            if(checkStickedDoor(door)) return true;
 
             if (door.open()) {
                 State.passableMap[door.y][door.x] |= Level.PASSABLE_IS_DOOR_OPENED_BY_HERO;
 
-                if (door.mark != null) {
-                    processOneMark(door.mark.id);
-                }
+                markDoor(door);
 
                 return true;
             } else {
@@ -484,12 +521,16 @@ public class Game extends ZameGame {
         return false;
     }
 
-    @SuppressWarnings("MagicNumber")
-    private void processShoot() {
+    private void getBestWeapon(){
         // just for case
         if (Weapons.hasNoAmmo(State.heroWeapon)) {
             Weapons.selectBestWeapon();
         }
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void processShoot() {
+        getBestWeapon();
 
         @SuppressWarnings("BooleanVariableAlwaysNegated")
         boolean hit = false;
@@ -522,15 +563,12 @@ public class Game extends ZameGame {
             }
         }
     }
+
     private static boolean isEquals(float a, float b)
     {
-        boolean truth = true;
-
-        if (a<b) truth =  false;
-        if (a>b) truth = false;
-
-        return truth;
+        return Math.abs(a - b) < 1e-6;
     }
+
     private void updateOpenedDoors() {
         for (int i = 0; i < State.doorsCount; i++) {
             State.doors[i].tryClose();
@@ -549,13 +587,7 @@ public class Game extends ZameGame {
         }
     }
 
-    @SuppressWarnings("MagicNumber")
-    private void updateHeroPosition(float dx, float dy, float accel) {
-        Level.quickReturnFromFillInitialInWall = false;
-
-        float acc = accel;
-        float prevX = State.heroX;
-
+    private void updateHeroPhase1(float acc, float dx, float prevX){
         while (Math.abs(acc) >= 0.02f) {
             float add = acc * dx;
 
@@ -583,10 +615,9 @@ public class Game extends ZameGame {
             State.heroX = prevX;
             acc += ((acc > 0) ? -0.01f : 0.01f);
         }
+    }
 
-        acc = accel;
-        float prevY = State.heroY;
-
+    private void updateHeroPhase2(float acc, float dy, float prevY){
         while (Math.abs(acc) >= 0.02f) {
             float add = acc * dy;
 
@@ -614,6 +645,21 @@ public class Game extends ZameGame {
             State.heroY = prevY;
             acc += ((acc > 0) ? -0.01f : 0.01f);
         }
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void updateHeroPosition(float dx, float dy, float accel) {
+        Level.quickReturnFromFillInitialInWall = false;
+
+        float acc = accel;
+        float prevX = State.heroX;
+
+        updateHeroPhase1(acc, dx, prevX);
+
+        acc = accel;
+        float prevY = State.heroY;
+
+        updateHeroPhase2(acc, dy, prevY);
 
         //noinspection FloatingPointEquality
         hasMoved |= ((!isEquals(State.heroX,prevX)) || (!isEquals(State.heroY,prevY)));
@@ -628,17 +674,14 @@ public class Game extends ZameGame {
         Overlay.showOverlay(Overlay.MARK);
     }
 
-    @SuppressWarnings("MagicNumber")
-    @Override
-    protected void update() {
-        //noinspection SizeReplaceableByIsEmpty
+    private boolean renderLevelStart(){
         if ((unprocessedGameCode != null) && (unprocessedGameCode.length() != 0)) {
             processGameCode(unprocessedGameCode);
             unprocessedGameCode = "";
         }
 
         if (renderBlackScreen || (createdTexturesCount < totalTexturesCount)) {
-            return;
+            return false;
         }
 
         if (playStartLevelSound) {
@@ -646,21 +689,10 @@ public class Game extends ZameGame {
             playStartLevelSound = false;
         }
 
-        // Debug.startMethodTracing("GloomyDungeons.update");
+        return true;
+    }
 
-        hasMoved = false;
-
-        updateOpenedDoors();
-        updateMonsters();
-
-        if ((nextLevelTime > 0) || (killedTime > 0)) {
-            if (Weapons.shootCycle > 0) {
-                Weapons.shootCycle = (Weapons.shootCycle + 1) % Weapons.currentCycle.length;
-            }
-
-            return;
-        }
-
+    private void updateCycles(){
         if (((actionsMask & (~processedMask) & Controls.ACTION) != 0) || (Weapons.currentCycle[Weapons.shootCycle]
                 < 0)) {
 
@@ -678,10 +710,17 @@ public class Game extends ZameGame {
                 processedMask &= ~Controls.ACTION;
             }
         }
+    }
 
+    private boolean isAmmoEmpty(){
+        return (Weapons.shootCycle == 0)
+                && ((processedMask & Controls.NEXT_WEAPON) == 0)
+                && (Weapons.changeWeaponDir == 0);
+    }
+
+    private void updateNext(){
         if ((actionsMask & Controls.NEXT_WEAPON) != 0) {
-            if ((Weapons.shootCycle == 0) && ((processedMask & Controls.NEXT_WEAPON) == 0) && (Weapons.changeWeaponDir
-                    == 0)) {
+            if (isAmmoEmpty()) {
 
                 Weapons.nextWeapon();
                 processedMask |= Controls.NEXT_WEAPON;
@@ -703,7 +742,9 @@ public class Game extends ZameGame {
         } else {
             processedMask &= ~Controls.ACTION;
         }
+    }
 
+    private void updateMenu(){
         if ((actionsMask & Controls.TOGGLE_MAP) != 0) {
             if ((processedMask & Controls.TOGGLE_MAP) == 0) {
                 toggleAutoMap();
@@ -721,24 +762,34 @@ public class Game extends ZameGame {
         } else {
             processedMask &= ~Controls.OPEN_MENU;
         }
+    }
 
-        Controls.updateAccelerations(actionsMask);
-        Level.clearPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_IS_HERO);
+    private boolean hasTimePassed(){
+        return (nextLevelTime > 0) || (killedTime > 0);
+    }
 
-        if (Math.abs(Controls.accelerometerX) >= 0.1f) {
-            if (Config.invertRotation) {
-                State.setHeroA(State.heroA + (Controls.accelerometerX * Config.accelerometerAcceleration));
-            } else {
-                State.setHeroA(State.heroA - (Controls.accelerometerX * Config.accelerometerAcceleration));
-            }
-
-            // if hero has moved or rotated, reset "justLoaded" flag
-            MenuActivity.justLoaded = false;
+    private void checkAcceleration(){
+        if (Controls.ACCELERATIONS[Controls.ACCELERATION_MOVE].active()) {
+            updateHeroPosition(Common.heroCs,
+                    -Common.heroSn,
+                    Controls.ACCELERATIONS[Controls.ACCELERATION_MOVE].value / Config.moveSpeed);
         }
 
-        float joyY = Controls.joyY - (Controls.padY * Config.padYAccel);
-        float joyX = Controls.joyX + (Controls.padX * Config.padXAccel);
+        if (Controls.ACCELERATIONS[Controls.ACCELERATION_STRAFE].active()) {
+            updateHeroPosition(Common.heroSn,
+                    Common.heroCs,
+                    Controls.ACCELERATIONS[Controls.ACCELERATION_STRAFE].value / Config.strafeSpeed);
+        }
 
+        Level.setPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_IS_HERO);
+
+        if (Controls.ACCELERATIONS[Controls.ACCELERATION_ROTATE].active()) {
+            State.setHeroA(State.heroA - (Controls.ACCELERATIONS[Controls.ACCELERATION_ROTATE].value
+                    * Config.rotateSpeed));
+        }
+    }
+
+    private void checkJoystick(float joyX, float joyY){
         if (Math.abs(joyY) >= 0.05f) {
             updateHeroPosition(Common.heroCs, -Common.heroSn, joyY / 7.0f);
 
@@ -758,25 +809,55 @@ public class Game extends ZameGame {
             // if hero has moved or rotated, reset "justLoaded" flag
             MenuActivity.justLoaded = false;
         }
+    }
 
-        if (Controls.ACCELERATIONS[Controls.ACCELERATION_MOVE].active()) {
-            updateHeroPosition(Common.heroCs,
-                    -Common.heroSn,
-                    Controls.ACCELERATIONS[Controls.ACCELERATION_MOVE].value / Config.moveSpeed);
+    @SuppressWarnings("MagicNumber")
+    @Override
+    protected void update() {
+        //noinspection SizeReplaceableByIsEmpty
+        if(!renderLevelStart()) return;
+
+        // Debug.startMethodTracing("GloomyDungeons.update");
+
+        hasMoved = false;
+
+        updateOpenedDoors();
+        updateMonsters();
+
+        if (hasTimePassed()) {
+            if (Weapons.shootCycle > 0) {
+                Weapons.shootCycle = (Weapons.shootCycle + 1) % Weapons.currentCycle.length;
+            }
+
+            return;
         }
 
-        if (Controls.ACCELERATIONS[Controls.ACCELERATION_STRAFE].active()) {
-            updateHeroPosition(Common.heroSn,
-                    Common.heroCs,
-                    Controls.ACCELERATIONS[Controls.ACCELERATION_STRAFE].value / Config.strafeSpeed);
+        updateCycles();
+
+        updateNext();
+
+        updateMenu();
+
+        Controls.updateAccelerations(actionsMask);
+        Level.clearPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_IS_HERO);
+
+        if (Math.abs(Controls.accelerometerX) >= 0.1f) {
+            if (Config.invertRotation) {
+                State.setHeroA(State.heroA + (Controls.accelerometerX * Config.accelerometerAcceleration));
+            } else {
+                State.setHeroA(State.heroA - (Controls.accelerometerX * Config.accelerometerAcceleration));
+            }
+
+            // if hero has moved or rotated, reset "justLoaded" flag
+            MenuActivity.justLoaded = false;
         }
 
-        Level.setPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_IS_HERO);
+        float joyY = Controls.joyY - (Controls.padY * Config.padYAccel);
+        float joyX = Controls.joyX + (Controls.padX * Config.padXAccel);
 
-        if (Controls.ACCELERATIONS[Controls.ACCELERATION_ROTATE].active()) {
-            State.setHeroA(State.heroA - (Controls.ACCELERATIONS[Controls.ACCELERATION_ROTATE].value
-                    * Config.rotateSpeed));
-        }
+        checkJoystick(joyX, joyY);
+
+        checkAcceleration();
 
         if (((int)State.heroX != heroCellX) || ((int)State.heroY != heroCellY)) {
             heroCellX = (int)State.heroX;
@@ -807,89 +888,7 @@ public class Game extends ZameGame {
         }
     }
 
-    @SuppressWarnings("MagicNumber")
-    private void pickObjects() {
-        if ((State.passableMap[(int)State.heroY][(int)State.heroX] & Level.PASSABLE_IS_OBJECT) == 0) {
-            return;
-        }
-
-        // decide shall we pick object or not
-
-        switch (State.objectsMap[(int)State.heroY][(int)State.heroX]) {
-            case TextureLoader.OBJ_ARMOR_GREEN:
-            case TextureLoader.OBJ_ARMOR_RED:
-                if (State.heroArmor >= 200) {
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_STIM:
-            case TextureLoader.OBJ_MEDI:
-                if (State.heroHealth >= 100) {
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_CLIP:
-            case TextureLoader.OBJ_AMMO:
-                if (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO) {
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_SHELL:
-            case TextureLoader.OBJ_SBOX:
-                if (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO) {
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_BPACK:
-                if ((State.heroHealth >= 100) && (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO) && (
-                        State.heroAmmo[Weapons.AMMO_SHOTGUN]
-                                >= Weapons.MAX_SHOTGUN_AMMO)) {
-
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_SHOTGUN:
-                if (State.heroHasWeapon[Weapons.WEAPON_SHOTGUN] && (State.heroAmmo[Weapons.AMMO_SHOTGUN]
-                        >= Weapons.MAX_SHOTGUN_AMMO)) {
-
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_CHAINGUN:
-                if (State.heroHasWeapon[Weapons.WEAPON_CHAINGUN] && (State.heroAmmo[Weapons.AMMO_PISTOL]
-                        >= Weapons.MAX_PISTOL_AMMO)) {
-
-                    return;
-                }
-
-                break;
-
-            case TextureLoader.OBJ_DBLSHOTGUN:
-                if (State.heroHasWeapon[Weapons.WEAPON_DBLSHOTGUN] && (State.heroAmmo[Weapons.AMMO_SHOTGUN]
-                        >= Weapons.MAX_SHOTGUN_AMMO)) {
-
-                    return;
-                }
-
-                break;
-
-            default: break;
-        }
-
-        // play sounds
-
+    private void playPickSound(){
         switch (State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
             case TextureLoader.OBJ_CLIP:
             case TextureLoader.OBJ_AMMO:
@@ -909,9 +908,21 @@ public class Game extends ZameGame {
                 SoundManager.playSound(SoundManager.SOUND_PICK_ITEM);
                 break;
         }
+    }
 
-        // add healh/armor/wepons/bullets
+    private void getBetter(int bestWeapon, int toCheck, boolean normal){
+        if(normal){
+            if (bestWeapon < toCheck) {
+                Weapons.selectBestWeapon();
+            }
+        } else{
+            if ((bestWeapon < toCheck) && State.heroHasWeapon[toCheck]) {
+                Weapons.selectBestWeapon();
+            }
+        }
+    }
 
+    private void pickPassive(){
         int bestWeapon = Weapons.getBestWeapon();
 
         switch (State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
@@ -942,14 +953,19 @@ public class Game extends ZameGame {
             case TextureLoader.OBJ_MEDI:
                 State.heroHealth = Math.min(State.heroHealth + 50, 100);
                 break;
+            default:
+                pickPassive2(bestWeapon);
+                break;
+        }
+    }
 
+    private void pickPassive2(int bestWeapon){
+        switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_CLIP:
                 State.heroAmmo[Weapons.AMMO_PISTOL] = Math.min(State.heroAmmo[Weapons.AMMO_PISTOL] + 5,
                         Weapons.MAX_PISTOL_AMMO);
 
-                if (bestWeapon < Weapons.WEAPON_PISTOL) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_PISTOL, true);
 
                 break;
 
@@ -957,9 +973,7 @@ public class Game extends ZameGame {
                 State.heroAmmo[Weapons.AMMO_PISTOL] = Math.min(State.heroAmmo[Weapons.AMMO_PISTOL] + 20,
                         Weapons.MAX_PISTOL_AMMO);
 
-                if (bestWeapon < Weapons.WEAPON_PISTOL) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_PISTOL, true);
 
                 break;
 
@@ -967,9 +981,7 @@ public class Game extends ZameGame {
                 State.heroAmmo[Weapons.AMMO_SHOTGUN] = Math.min(State.heroAmmo[Weapons.AMMO_SHOTGUN] + 5,
                         Weapons.MAX_SHOTGUN_AMMO);
 
-                if ((bestWeapon < Weapons.WEAPON_SHOTGUN) && State.heroHasWeapon[Weapons.WEAPON_SHOTGUN]) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_SHOTGUN, false);
 
                 break;
 
@@ -977,9 +989,7 @@ public class Game extends ZameGame {
                 State.heroAmmo[Weapons.AMMO_SHOTGUN] = Math.min(State.heroAmmo[Weapons.AMMO_SHOTGUN] + 15,
                         Weapons.MAX_SHOTGUN_AMMO);
 
-                if ((bestWeapon < Weapons.WEAPON_SHOTGUN) && State.heroHasWeapon[Weapons.WEAPON_SHOTGUN]) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_SHOTGUN, false);
 
                 break;
 
@@ -993,21 +1003,25 @@ public class Game extends ZameGame {
                         Weapons.MAX_SHOTGUN_AMMO);
 
                 // do not check shotgun existing (than, if it didn't exists, pistol will be selected)
-                if (bestWeapon < Weapons.WEAPON_SHOTGUN) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_SHOTGUN, true);
 
                 break;
 
+            default:
+                pickPassive3(bestWeapon);
+                break;
+        }
+    }
+
+    private void pickPassive3(int bestWeapon){
+        switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_SHOTGUN:
                 State.heroHasWeapon[Weapons.WEAPON_SHOTGUN] = true;
 
                 State.heroAmmo[Weapons.AMMO_SHOTGUN] = Math.min(State.heroAmmo[Weapons.AMMO_SHOTGUN] + 3,
                         Weapons.MAX_SHOTGUN_AMMO);
 
-                if (bestWeapon < Weapons.WEAPON_SHOTGUN) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_SHOTGUN, true);
 
                 break;
 
@@ -1017,9 +1031,7 @@ public class Game extends ZameGame {
                 State.heroAmmo[Weapons.AMMO_PISTOL] = Math.min(State.heroAmmo[Weapons.AMMO_PISTOL] + 20,
                         Weapons.MAX_PISTOL_AMMO);
 
-                if (bestWeapon < Weapons.WEAPON_CHAINGUN) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_CHAINGUN, true);
 
                 break;
 
@@ -1030,18 +1042,157 @@ public class Game extends ZameGame {
                 State.heroAmmo[Weapons.AMMO_SHOTGUN] = Math.min(State.heroAmmo[Weapons.AMMO_SHOTGUN] + 6,
                         Weapons.MAX_SHOTGUN_AMMO);
 
-                if (bestWeapon < Weapons.WEAPON_DBLSHOTGUN) {
-                    Weapons.selectBestWeapon();
-                }
+                getBetter(bestWeapon, Weapons.WEAPON_DBLSHOTGUN, true);
 
                 break;
-            default: break;
+            default:
+                break;
         }
+    }
 
-        // don't count objects leaved by monsters
+    private void ignoreMonsters(){
         if ((State.passableMap[floatToInt(State.heroY)][floatToInt(State.heroX)] & Level.PASSABLE_IS_OBJECT_ORIG) != 0) {
             State.pickedItems++;
         }
+    }
+
+    private boolean isPickable(){
+        // decide shall we pick object or not
+        switch (State.objectsMap[(int)State.heroY][(int)State.heroX]) {
+            case TextureLoader.OBJ_ARMOR_GREEN:
+            case TextureLoader.OBJ_ARMOR_RED:
+                if (State.heroArmor >= 200) {
+                    return false;
+                }
+
+                break;
+
+            case TextureLoader.OBJ_STIM:
+            case TextureLoader.OBJ_MEDI:
+                if (State.heroHealth >= 100) {
+                    return false;
+                }
+
+                break;
+
+            default:
+                return isPickable2();
+        }
+
+        return true;
+    }
+
+    private boolean isPickable2(){
+        switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
+            case TextureLoader.OBJ_CLIP:
+            case TextureLoader.OBJ_AMMO:
+                if (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO) {
+                    return false;
+                }
+
+                break;
+
+            case TextureLoader.OBJ_SHELL:
+            case TextureLoader.OBJ_SBOX:
+                if (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO) {
+                    return false;
+                }
+
+                break;
+
+            default:
+                return isPickable3();
+        }
+
+        return true;
+    }
+
+    private boolean isBJPickable(){
+        return (State.heroHealth >= 100)
+                && (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO)
+                && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
+    }
+
+    private boolean isShotgunPickable(){
+        return State.heroHasWeapon[Weapons.WEAPON_SHOTGUN]
+                && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
+    }
+
+    private boolean isPickable3(){
+        switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
+            case TextureLoader.OBJ_BPACK:
+                if (isBJPickable()) {
+
+                    return false;
+                }
+
+                break;
+
+            case TextureLoader.OBJ_SHOTGUN:
+                if (isShotgunPickable()) {
+
+                    return false;
+                }
+
+                break;
+            default:
+                return isPickable4();
+        }
+
+        return true;
+    }
+
+    private boolean isChaingunPickable(){
+        return State.heroHasWeapon[Weapons.WEAPON_CHAINGUN]
+                && (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO);
+    }
+
+    private boolean isDBLShotgunPickable(){
+        return State.heroHasWeapon[Weapons.WEAPON_DBLSHOTGUN]
+                && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
+    }
+
+    private boolean isPickable4(){
+        switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
+            case TextureLoader.OBJ_CHAINGUN:
+                if (isChaingunPickable()) {
+
+                    return false;
+                }
+
+                break;
+
+            case TextureLoader.OBJ_DBLSHOTGUN:
+                if (isDBLShotgunPickable()) {
+
+                    return false;
+                }
+
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void pickObjects() {
+        if ((State.passableMap[(int)State.heroY][(int)State.heroX] & Level.PASSABLE_IS_OBJECT) == 0) {
+            return;
+        }
+
+        if(!isPickable()) return;
+
+        // play sounds
+
+        playPickSound();
+
+        // add healh/armor/wepons/bullets
+
+        pickPassive();
+
+        // don't count objects leaved by monsters
+        ignoreMonsters();
 
         // remove picked objects from map
         State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)] = 0;
@@ -1219,12 +1370,63 @@ public class Game extends ZameGame {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glPopMatrix();
     }
+
     private static int floatToInt(float a){
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
     }
+
+    private void renderNextLevel(GL10 gl){
+        if (nextLevelTime > 0) {
+            renderEndLevelLayer(gl, (float)(elapsedTime - nextLevelTime) / 500.0f);
+        }
+
+        if (Config.gamma > 0.01f) {
+            renderGammaLayer(gl);
+        }
+
+        if (showFps) {
+            drawFps(gl);
+        }
+
+        if (nextLevelTime > 0) {
+            if ((elapsedTime - nextLevelTime) > 1000) {
+                if (isGameOverFlag) {
+                    showGameOverScreen();
+                } else {
+                    showEndLevelScreen();
+                }
+            }
+        } else if ((killedTime > 0) && ((elapsedTime - killedTime) > 3500)) {
+            isGameOverFlag = true;
+            nextLevelTime = elapsedTime;
+        }
+    }
+
+    private long renderMoved(long walkTime){
+        if (hasMoved) {
+            if (prevMovedTime != 0) {
+                walkTime = elapsedTime - prevMovedTime;
+            } else {
+                prevMovedTime = elapsedTime;
+            }
+        } else {
+            prevMovedTime = 0;
+        }
+        return walkTime;
+    }
+
+    private void loadTextures(GL10 gl){
+        if (createdTexturesCount == 0) {
+            Labels.createLabels(gl);
+            gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
+        } else {
+            TextureLoader.loadTexture(gl, createdTexturesCount - 1);
+        }
+    }
+
     @SuppressWarnings("MagicNumber")
     @Override
     protected void render(GL10 gl) {
@@ -1239,28 +1441,13 @@ public class Game extends ZameGame {
         if (createdTexturesCount < totalTexturesCount) {
             drawPreloader(gl);
 
-            if (createdTexturesCount == 0) {
-                Labels.createLabels(gl);
-                gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
-            } else {
-                TextureLoader.loadTexture(gl, createdTexturesCount - 1);
-            }
+            loadTextures(gl);
 
             createdTexturesCount++;
             return;
         }
 
-        long walkTime = 0;
-
-        if (hasMoved) {
-            if (prevMovedTime != 0) {
-                walkTime = elapsedTime - prevMovedTime;
-            } else {
-                prevMovedTime = elapsedTime;
-            }
-        } else {
-            prevMovedTime = 0;
-        }
+        long walkTime = renderMoved(0);
 
         float yoff = (LevelRenderer.HALF_WALL / 8.0f) + (((float)Math.sin((double)walkTime / 100.0)
                 * LevelRenderer.HALF_WALL) / 16.0f);
@@ -1288,30 +1475,7 @@ public class Game extends ZameGame {
         Stats.render(gl);
         Controls.render(gl, elapsedTime);
 
-        if (nextLevelTime > 0) {
-            renderEndLevelLayer(gl, (float)(elapsedTime - nextLevelTime) / 500.0f);
-        }
-
-        if (Config.gamma > 0.01f) {
-            renderGammaLayer(gl);
-        }
-
-        if (showFps) {
-            drawFps(gl);
-        }
-
-        if (nextLevelTime > 0) {
-            if ((elapsedTime - nextLevelTime) > 1000) {
-                if (isGameOverFlag) {
-                    showGameOverScreen();
-                } else {
-                    showEndLevelScreen();
-                }
-            }
-        } else if ((killedTime > 0) && ((elapsedTime - killedTime) > 3500)) {
-            isGameOverFlag = true;
-            nextLevelTime = elapsedTime;
-        }
+        renderNextLevel(gl);
 
         // Debug.stopMethodTracing();
     }
@@ -1374,12 +1538,16 @@ public class Game extends ZameGame {
         return success;
     }
 
+    private static String getSaveName(String name){
+        return (name.equals(INSTANT_NAME)
+                ? INSTANT_PATH
+                : (name.equals(AUTOSAVE_NAME) ? AUTOSAVE_PATH : (SAVES_ROOT + name + ".save")));
+    }
+
     private static boolean loadGameState(String name) {
         initPaths(ZameApplication.self);
 
-        String saveName = (name.equals(INSTANT_NAME)
-                ? INSTANT_PATH
-                : (name.equals(AUTOSAVE_NAME) ? AUTOSAVE_PATH : (SAVES_ROOT + name + ".save")));
+        String saveName = getSaveName(name);
 
         boolean success = true;
         String errorMessage = ZameApplication.self.getString(R.string.msg_cant_load_state);

@@ -85,6 +85,32 @@ public final class Common {
         return Math.abs(a-b) < 1e-6;
     }
 
+    private static boolean checkXLine(int cx1, int cx2, int mask, float y, int stepX, float stepY){
+        do {
+            if ((!isEquals((State.passableMap[floatToInt(y)][cx1] & mask),0))) {
+                return false;
+            }
+
+            y += stepY;
+            cx1 += stepX;
+        } while (cx1 != cx2);
+
+        return true;
+    }
+
+    private static boolean checkYLine(int cy1, int cy2, int mask, float x, float stepX, int stepY){
+        do {
+            if (!isEquals((State.passableMap[cy1][floatToInt(x)] & mask),0)) {
+                return false;
+            }
+
+            x += stepX;
+            cy1 += stepY;
+        } while (cy1 != cy2);
+
+        return true;
+    }
+
     // modified Level_CheckLine from wolf3d for iphone by Carmack
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
         float add = 0.5f;
@@ -116,14 +142,7 @@ public final class Common {
             cx1 += stepX;
             cx2 += stepX;
 
-            do {
-                if ((!isEquals((State.passableMap[floatToInt(y)][cx1] & mask),0))) {
-                    return false;
-                }
-
-                y += stepY;
-                cx1 += stepX;
-            } while (cx1 != cx2);
+            if(!checkXLine(cx1, cx2, mask, y, stepX, stepY)) return false;
         }
 
         if (cy1 != cy2) {
@@ -145,14 +164,7 @@ public final class Common {
             cy1 += stepY;
             cy2 += stepY;
 
-            do {
-                if (!isEquals((State.passableMap[cy1][floatToInt(x)] & mask),0)) {
-                    return false;
-                }
-
-                x += stepX;
-                cy1 += stepY;
-            } while (cy1 != cy2);
+            if(!checkYLine(cy1, cy2, mask, x, stepX, stepY)) return false;
         }
 
         return true;

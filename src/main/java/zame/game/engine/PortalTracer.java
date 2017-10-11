@@ -140,6 +140,38 @@ public class PortalTracer {
         }
     }
 
+    private boolean getVis0(boolean includeDoors, float dy, int y, int x){
+        if(includeDoors){
+            return (dy > 0) && (y > 0) && (level[y - 1][x] <= 0);
+        } else {
+            return (dy > 0) && (y > 0) && (isEquals(level[y - 1][x],0));
+        }
+    }
+
+    private boolean getVis1(boolean includeDoors, float dx, int y, int x){
+        if(includeDoors){
+            return (dx > 0) && (x > 0) && (level[y][x - 1] <= 0);
+        } else {
+            return (dx > 0) && (x > 0) && (isEquals(level[y][x - 1],0));
+        }
+    }
+
+    private boolean getVis2(boolean includeDoors, float dy, int y, int x){
+        if(includeDoors){
+            return (dy < 0) && (y < (levelHeight - 1)) && (level[y + 1][x] <= 0);
+        } else {
+            return (dy < 0) && (y < (levelHeight - 1)) && (isEquals(level[y + 1][x],0));
+        }
+    }
+
+    private boolean getVis3(boolean includeDoors, float dx, int y, int x){
+        if(includeDoors){
+            return (dx < 0) && (x < (levelWidth - 1)) && (level[y][x + 1] <= 0);
+        } else {
+            return (dx < 0) && (x < (levelWidth - 1)) && (isEquals(level[y][x + 1],0));
+        }
+    }
+
     @SuppressWarnings("MagicNumber")
     private void addWallBlock(int x, int y, boolean includeDoors) {
         tToSide = -1;
@@ -148,22 +180,12 @@ public class PortalTracer {
         float dy = ((float)y + 0.5f) - heroY;
         float dx = ((float)x + 0.5f) - heroX;
 
-        boolean vis_0=true;
-        boolean vis_1=true;
-        boolean vis_2=true;
-        boolean vis_3=true;
+        boolean vis_0=getVis0(includeDoors, dy, y, x);
+        boolean vis_1=getVis1(includeDoors, dx, y, x);
+        boolean vis_2=getVis2(includeDoors, dy, y, x);
+        boolean vis_3=getVis3(includeDoors, dx, y, x);
 
-        if (includeDoors) {
-            vis_0 = (dy > 0) && (y > 0) && (level[y - 1][x] <= 0);
-            vis_1 = (dx > 0) && (x > 0) && (level[y][x - 1] <= 0);
-            vis_2 = (dy < 0) && (y < (levelHeight - 1)) && (level[y + 1][x] <= 0);
-            vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (level[y][x + 1] <= 0);
-        } else {
-            vis_0 = (dy > 0) && (y > 0) && (isEquals(level[y - 1][x],0));
-            vis_1 = (dx > 0) && (x > 0) && (isEquals(level[y][x - 1],0));
-            vis_2 = (dy < 0) && (y < (levelHeight - 1)) && (isEquals(level[y + 1][x],0));
-            vis_3 = (dx < 0) && (x < (levelWidth - 1)) && (isEquals(level[y][x + 1],0));
-        }
+
 
         checkVis(vis_0, vis_1, vis_2, vis_3);
 
@@ -226,6 +248,44 @@ public class PortalTracer {
         return toY;
     }
 
+    private boolean isInSight(boolean visible, int oa, int ob){
+        return visible || ((oa > 0) && (ob > 0));
+    }
+
+    private int[] updateFromValues(int fromX, int fromY, int toX, int toY){
+        if (fromY > toY) {
+            if (fromX >= toX) {
+                fromY--;
+            } else {
+                fromX++;
+            }
+        } else if (fromY == toY) {
+            if (fromX > toX) {
+                fromX--;
+            } else {
+                fromX++;
+            }
+        } else {
+            if (fromX <= toX) {
+                fromY++;
+            } else {
+                fromX--;
+            }
+        }
+
+        return new int[] {fromX, fromY};
+    }
+
+    private int[] getOAB(int oa, int ob, float tf, float tt){
+        if (tf >= 0) {
+            oa++;
+        } else if (tt <= 0) {
+            ob++;
+        }
+
+        return new int[] {oa, ob};
+    }
+
     @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
     private void traceCell(int fromX, int fromY, float fromAngle, int toX, int toY, float toAngle) {
         boolean repeat = true;
@@ -260,41 +320,27 @@ public class PortalTracer {
                         if ((tf <= 0) && (tt >= 0)) {
                             visible = true;
                             break;
-                        } else if (tf >= 0) {
-                            oa++;
-                        } else if (tt <= 0) {
-                            ob++;
+                        } else {
+                            int[] result = getOAB(oa, ob, tf, tt);
+                            oa = result[0];
+                            ob = result[1];
                         }
                     }
                 }
 
                 // if at least one point is between fromAngle and toAngle
                 // or fromAngle and toAngle is between cell points
-                if (visible || ((oa > 0) && (ob > 0))) {
+                if (isInSight(visible, oa, ob)) {
                     break;
                 }
 
                 if ((fromX == toX) && (fromY == toY)) {
                     repeat = false;
                     break;
-                } else if (fromY > toY) {
-                    if (fromX >= toX) {
-                        fromY--;
-                    } else {
-                        fromX++;
-                    }
-                } else if (fromY == toY) {
-                    if (fromX > toX) {
-                        fromX--;
-                    } else {
-                        fromX++;
-                    }
                 } else {
-                    if (fromX <= toX) {
-                        fromY++;
-                    } else {
-                        fromX--;
-                    }
+                    int[] result = updateFromValues(fromX, fromY, toX, toY);
+                    fromX = result[0];
+                    fromY = result[1];
                 }
             }
 
@@ -314,10 +360,10 @@ public class PortalTracer {
                         if ((tf <= 0) && (tt >= 0)) {
                             visible = true;
                             break;
-                        } else if (tf >= 0) {
-                            oa++;
-                        } else if (tt <= 0) {
-                            ob++;
+                        } else {
+                            int[] result = getOAB(oa, ob, tf, tt);
+                            oa = result[0];
+                            ob = result[1];
                         }
                     }
                 }
@@ -466,6 +512,58 @@ public class PortalTracer {
         } while (repeat);
     }
 
+    private int[] checkFromAngle(float fromAngle, int tx, int ty){
+        if (fromAngle < (0.25 * Math.PI)) {
+            tx++;
+            ty++;
+        } else if (fromAngle < (0.5 * Math.PI)) {
+            tx++;
+        } else if (fromAngle < (0.75 * Math.PI)) {
+            tx++;
+            ty--;
+        } else if (fromAngle < Math.PI) {
+            ty--;
+        } else if (fromAngle < (1.25 * Math.PI)) {
+            tx--;
+            ty--;
+        } else if (fromAngle < (1.5 * Math.PI)) {
+            tx--;
+        } else if (fromAngle < (1.75 * Math.PI)) {
+            tx--;
+            ty++;
+        } else {
+            ty++;
+        }
+
+        return new int[] {tx, ty};
+    }
+
+    private int[] checkToAngle(float toAngle, int tx, int ty){
+        if (toAngle > (1.75 * Math.PI)) {
+            tx++;
+            ty--;
+        } else if (toAngle > (1.5 * Math.PI)) {
+            tx++;
+        } else if (toAngle > (1.25 * Math.PI)) {
+            tx++;
+            ty++;
+        } else if (toAngle > Math.PI) {
+            ty++;
+        } else if (toAngle > (0.75 * Math.PI)) {
+            tx--;
+            ty++;
+        } else if (toAngle > (0.5 * Math.PI)) {
+            tx--;
+        } else if (toAngle > (0.25 * Math.PI)) {
+            tx--;
+            ty--;
+        } else {
+            ty--;
+        }
+
+        return new int[] {tx, ty};
+    }
+
     // halfFov must be between (10 * PI / 180) and (45 * PI / 180)
     @SuppressWarnings("MagicNumber")
     public void trace(float x, float y, float heroAngle, float halfFov) {
@@ -508,27 +606,9 @@ public class PortalTracer {
         int tx = floatToInt(x);
         int ty = floatToInt(y);
 
-        if (fromAngle < (0.25 * Math.PI)) {
-            tx++;
-            ty++;
-        } else if (fromAngle < (0.5 * Math.PI)) {
-            tx++;
-        } else if (fromAngle < (0.75 * Math.PI)) {
-            tx++;
-            ty--;
-        } else if (fromAngle < Math.PI) {
-            ty--;
-        } else if (fromAngle < (1.25 * Math.PI)) {
-            tx--;
-            ty--;
-        } else if (fromAngle < (1.5 * Math.PI)) {
-            tx--;
-        } else if (fromAngle < (1.75 * Math.PI)) {
-            tx--;
-            ty++;
-        } else {
-            ty++;
-        }
+        int[] result = checkFromAngle(fromAngle, tx, ty);
+        tx = result[0];
+        ty = result[1];
 
         if (level[ty][tx] > 0) {
             addWallBlock(tx, ty, true);
@@ -542,27 +622,9 @@ public class PortalTracer {
         tx = floatToInt(x);
         ty = floatToInt(y);
 
-        if (toAngle > (1.75 * Math.PI)) {
-            tx++;
-            ty--;
-        } else if (toAngle > (1.5 * Math.PI)) {
-            tx++;
-        } else if (toAngle > (1.25 * Math.PI)) {
-            tx++;
-            ty++;
-        } else if (toAngle > Math.PI) {
-            ty++;
-        } else if (toAngle > (0.75 * Math.PI)) {
-            tx--;
-            ty++;
-        } else if (toAngle > (0.5 * Math.PI)) {
-            tx--;
-        } else if (toAngle > (0.25 * Math.PI)) {
-            tx--;
-            ty--;
-        } else {
-            ty--;
-        }
+        result = checkToAngle(toAngle, tx, ty);
+        tx = result[0];
+        ty = result[1];
 
         if (level[ty][tx] > 0) {
             addWallBlock(tx, ty, true);
@@ -575,12 +637,14 @@ public class PortalTracer {
 
         traceCell(floatToInt(x), floatToInt(y), fromAngle, floatToInt(x), floatToInt(y), toAngle);
     }
+
     private static int floatToInt(float a) {
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
     }
+
     private static float intToFloat(int a)
     {
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
