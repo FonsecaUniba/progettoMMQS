@@ -141,7 +141,7 @@ public class Game extends ZameGame {
     @SuppressWarnings("WeakerAccess")
 
     public static String getExternalStoragePath() {
-        String sd = "/sdcard";
+        String sd = Environment.getExternalStorageDirectory().getPath();
         try {
             if (Environment.getExternalStorageDirectory() == null) {
                 // mystical error? return default value
@@ -803,7 +803,7 @@ public class Game extends ZameGame {
         if ((Level.marksMap[(int)State.heroY][(int)State.heroX] != null)
                 && (Level.doorsMap[(int)State.heroY][(int)State.heroX] == null)) {
 
-            processOneMark(Level.marksMap[(int)State.heroY][(int)State.heroX].id);
+            processOneMark(Level.marksMap[floatToInt(State.heroY)][floatToInt(State.heroX)].id);
         }
     }
 
@@ -890,7 +890,7 @@ public class Game extends ZameGame {
 
         // play sounds
 
-        switch (State.objectsMap[(int)State.heroY][(int)State.heroX]) {
+        switch (State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
             case TextureLoader.OBJ_CLIP:
             case TextureLoader.OBJ_AMMO:
             case TextureLoader.OBJ_SHELL:
@@ -914,7 +914,7 @@ public class Game extends ZameGame {
 
         int bestWeapon = Weapons.getBestWeapon();
 
-        switch (State.objectsMap[(int)State.heroY][(int)State.heroX]) {
+        switch (State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
             case TextureLoader.OBJ_ARMOR_GREEN:
                 State.heroArmor = Math.min(State.heroArmor + 100, 200);
                 break;
@@ -1039,13 +1039,13 @@ public class Game extends ZameGame {
         }
 
         // don't count objects leaved by monsters
-        if ((State.passableMap[(int)State.heroY][(int)State.heroX] & Level.PASSABLE_IS_OBJECT_ORIG) != 0) {
+        if ((State.passableMap[floatToInt(State.heroY)][floatToInt(State.heroX)] & Level.PASSABLE_IS_OBJECT_ORIG) != 0) {
             State.pickedItems++;
         }
 
         // remove picked objects from map
-        State.objectsMap[(int)State.heroY][(int)State.heroX] = 0;
-        State.passableMap[(int)State.heroY][(int)State.heroX] &= ~Level.PASSABLE_MASK_OBJECT;
+        State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)] = 0;
+        State.passableMap[floatToInt(State.heroY)][floatToInt(State.heroX)] &= ~Level.PASSABLE_MASK_OBJECT;
 
         Overlay.showOverlay(Overlay.ITEM);
     }
@@ -1071,7 +1071,7 @@ public class Game extends ZameGame {
         long diff = time - mPrevRenderTime;
 
         if (diff > 1000) {
-            int seconds = (int)(diff / 1000L);
+            int seconds = floatToInt(diff / 1000L);
             mPrevRenderTime += (long)seconds * 1000L;
 
             fpsList[currFpsPtr] = mFrames / seconds;
@@ -1088,14 +1088,20 @@ public class Game extends ZameGame {
 
         return (sum / FPS_AVG_LEN);
     }
-
+    private static float intToFloat(int a)
+    {
+        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (float) a;
+    }
     @SuppressWarnings("MagicNumber")
     private void drawFps(GL10 gl) {
         int fps = getAvgFps();
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        int xpos = (int)((0.02f * (float)Game.width) / Common.ratio);
-        int ypos = (int)((float)Game.height * Controls.currentVariant.debugLineBaseY);
+        int xpos = floatToInt(((0.02f * intToFloat(Game.width))) / Common.ratio);
+        int ypos = floatToInt(intToFloat(Game.height) * Controls.currentVariant.debugLineBaseY);
 
         Labels.maker.beginDrawing(gl, width, height);
         Labels.maker.draw(gl, xpos, ypos, Labels.map[Labels.LABEL_FPS]);
@@ -1213,7 +1219,12 @@ public class Game extends ZameGame {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glPopMatrix();
     }
-
+    private static int floatToInt(float a){
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
+    }
     @SuppressWarnings("MagicNumber")
     @Override
     protected void render(GL10 gl) {

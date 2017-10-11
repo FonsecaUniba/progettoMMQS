@@ -212,7 +212,7 @@ public final class LevelRenderer {
                 continue;
             }
 
-            if (((int)aw.fromX == fromX) && ((int)aw.fromY == fromY)) {
+            if ((floatToInt(aw.fromX) == fromX) && (floatToInt(aw.fromY) == fromY)) {
                 aw.fromX = (float)toX;
                 aw.fromY = (float)toY;
                 index = i;
@@ -238,10 +238,10 @@ public final class LevelRenderer {
         if (index < 0) {
             AutoWall aw = State.autoWalls[State.autoWallsCount++];
 
-            aw.fromX = (float)fromX;
-            aw.fromY = (float)fromY;
-            aw.toX = (float)toX;
-            aw.toY = (float)toY;
+            aw.fromX = intToFloat(fromX);
+            aw.fromY = intToFloat(fromY);
+            aw.toX = intToFloat(toX);
+            aw.toY = intToFloat(toY);
             aw.vert = vert;
             aw.type = type;
             aw.doorIndex = -1;
@@ -261,22 +261,22 @@ public final class LevelRenderer {
                     continue;
                 }
 
-                if (((int)aw.fromX == (int)awi.fromX) && ((int)aw.fromY == (int)awi.fromY)) {
+                if ((floatToInt(aw.fromX) == floatToInt(awi.fromX)) && (floatToInt(aw.fromY) == floatToInt(awi.fromY))) {
                     aw.fromX = awi.toX;
                     aw.fromY = awi.toY;
                     nextIndex = i;
                     break;
-                } else if (((int)aw.toX == (int)awi.fromX) && ((int)aw.toY == (int)awi.fromY)) {
+                } else if ((floatToInt(aw.toX) == floatToInt(awi.fromX)) && (floatToInt(aw.toY) == floatToInt(awi.fromY))) {
                     aw.toX = awi.toX;
                     aw.toY = awi.toY;
                     nextIndex = i;
                     break;
-                } else if (((int)aw.fromX == (int)awi.toX) && ((int)aw.fromY == (int)awi.toY)) {
+                } else if ((floatToInt(aw.fromX) == floatToInt(awi.toX)) && (floatToInt(aw.fromY) == floatToInt(awi.toY))) {
                     aw.fromX = awi.fromX;
                     aw.fromY = awi.fromY;
                     nextIndex = i;
                     break;
-                } else if (((int)aw.toX == (int)awi.toX) && ((int)aw.toY == (int)awi.toY)) {
+                } else if ((floatToInt(aw.toX) == floatToInt(awi.toX)) && (floatToInt(aw.toY) == floatToInt(awi.toY))) {
                     aw.toX = awi.fromX;
                     aw.toY = awi.fromY;
                     nextIndex = i;
@@ -357,10 +357,10 @@ public final class LevelRenderer {
             Renderer.x4 = (float)wall.toX;
             Renderer.y4 = -(float)wall.toY;
 
-            setWallLighting((float)wall.fromX,
-                    (float)wall.fromY,
-                    (float)wall.toX,
-                    (float)wall.toY,
+            setWallLighting(intToFloat(wall.fromX),
+                    intToFloat(wall.fromY),
+                    intToFloat(wall.toX),
+                    intToFloat(wall.toY),
                     (wall.fromX == wall.toX));
 
             Renderer.drawQuad((door != null) ? (door.texture + 0x10) : wall.texture);
@@ -414,8 +414,8 @@ public final class LevelRenderer {
             if (((door.openPos) < 0.7f) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS)) {
                 VisibleObject vo = visibleObjects[visibleObjectsCount++];
 
-                vo.midX = (float)door.x + 0.5f;
-                vo.midY = (float)door.y + 0.5f;
+                vo.midX =  intToFloat(door.x) + 0.5f;
+                vo.midY =  intToFloat(door.y) + 0.5f;
                 vo.fromX = fromX;
                 vo.fromY = fromY;
                 vo.toX = toX;
@@ -522,14 +522,14 @@ public final class LevelRenderer {
                     if (vert) {
                         tex -= 8;
 
-                        fromX = (float)tc.x + 0.5f;
+                        fromX =  intToFloat(tc.x) + 0.5f;
                         toX = fromX;
-                        fromY = (float)tc.y;
+                        fromY =  intToFloat(tc.y);
                         toY = fromY + 1.0f;
                     } else {
-                        fromX = (float)tc.x;
+                        fromX =  intToFloat(tc.x);
                         toX = fromX + 1.0f;
-                        fromY = (float)tc.y + 0.5f;
+                        fromY =  intToFloat(tc.y) + 0.5f;
                         toY = fromY;
                     }
 
@@ -599,7 +599,7 @@ public final class LevelRenderer {
                                 appendAutoWall(fromX, fromY, toX, toY, AUTO_WALL_TYPE_TRANSP);
                             }
 
-                            setWallLighting((float)fromX, (float)fromY, (float)toX, (float)toY, ((s == 1) || (s == 3)));
+                            setWallLighting( intToFloat(fromX),  intToFloat(fromY),  intToFloat(toX), intToFloat(toY), ((s == 1) || (s == 3)));
                             Renderer.drawQuad(tex);
                         }
                     }
@@ -613,8 +613,8 @@ public final class LevelRenderer {
         for (int i = 0; i < State.monstersCount; i++) {
             Monster mon = State.monsters[i];
 
-            int x = (int)mon.x;
-            int y = (int)mon.y;
+            int x = floatToInt(mon.x);
+            int y = floatToInt(mon.y);
 
             if ((!(tracer.touchedCellsMap[y][x] || tracer.touchedCellsMap[mon.cellX][mon.cellY])) || (deadCorpses && (
                     mon.health
@@ -733,8 +733,8 @@ public final class LevelRenderer {
         Renderer.z3 = HALF_WALL;
         Renderer.z4 = HALF_WALL;
 
-        Renderer.u2 = (float)State.levelWidth;
-        Renderer.v2 = (float)State.levelHeight;
+        Renderer.u2 =  intToFloat(State.levelWidth);
+        Renderer.v2 =  intToFloat(State.levelHeight);
 
         Renderer.u4 = 0.0f;
         Renderer.v4 = 0.0f;

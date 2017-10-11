@@ -253,18 +253,18 @@ public final class Level {
             act.type = (int)data[pos++] & 0x000000FF;
 
             if (act.type == ACTION_SECRET) {
-                act.param = (int)data[pos++] & 0x000000FF;
+                act.param = floatToInt(data[pos++]) & 0x000000FF;
 
                 addSecret(act, secretsMask);
             } else if (isLocked(act)) {
-                act.mark = (int)data[pos++] & 0x000000FF;
-                act.param = (int)data[pos++] & 0x000000FF;
+                act.mark = floatToInt(data[pos++]) & 0x000000FF;
+                act.param = floatToInt(data[pos++]) & 0x000000FF;
             } else if (isOpen(act)) {
-                act.mark = (int)data[pos++] & 0x000000FF;
+                act.mark = floatToInt(data[pos++]) & 0x000000FF;
             } else if (isEnsured(act)) {
-                act.param = (int)data[pos++] & 0x000000FF;
+                act.param = floatToInt(data[pos++]) & 0x000000FF;
             } else if (act.type == ACTION_BTN_ON) {
-                act.param = 1 << (((int)data[pos++] & 0x000000FF) - 1);
+                act.param = 1 << ((floatToInt(data[pos++]) & 0x000000FF) - 1);
             }
 
             actions.add(act);
@@ -422,8 +422,8 @@ public final class Level {
             Mark mark = State.marks[State.marksCount++];
 
             mark.id = (int)data[pos++] & 0x000000FF;
-            mark.y = (int)data[pos++] & 0x000000FF;
-            mark.x = (int)data[pos++] & 0x000000FF;
+            mark.y = floatToInt(data[pos++]) & 0x000000FF;
+            mark.x = floatToInt(data[pos++]) & 0x000000FF;
         }
 
         pos++;
@@ -830,5 +830,11 @@ public final class Level {
         }
 
         return true;
+    }
+    private static int floatToInt(float a){
+        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
+            throw new IllegalArgumentException("Value not castable");
+        }
+        return (int) a;
     }
 }

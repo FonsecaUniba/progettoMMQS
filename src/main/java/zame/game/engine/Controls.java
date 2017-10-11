@@ -659,7 +659,7 @@ public final class Controls {
                     padHeight = 1;
                 }
 
-                padX = (x - (padCenterX * (float)Game.width)) / (float)padWidth;
+                padX = (x - (padCenterX * intToFloat(Game.width))) / intToFloat(padWidth);
                 padY = (y - (padCenterY * (float)Game.height)) / (float)padHeight;
 
                 if (padX > 0.0f) {
