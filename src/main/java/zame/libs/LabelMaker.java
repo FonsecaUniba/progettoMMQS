@@ -295,7 +295,6 @@ public class LabelMaker {
         mCanvas = null;
         mBitmap.recycle();
         mBitmap = null;
-        System.gc();
     }
 
     /**

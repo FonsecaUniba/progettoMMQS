@@ -104,7 +104,6 @@ public final class TextureLoader {
 
         //noinspection UnusedAssignment
         img = null;
-        System.gc();
 
         // Runtime.getRuntime().gc();
     }
@@ -153,7 +152,6 @@ public final class TextureLoader {
         //noinspection UnusedAssignment
         img = null;
 
-        System.gc();
     }
 
     public static int getTexNum(int[] texMap, int texNum) {
