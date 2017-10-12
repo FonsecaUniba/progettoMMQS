@@ -111,6 +111,16 @@ public final class Common {
         return true;
     }
 
+    private static int getStep(int value1, int value2){
+        return (value2 > value1) ? 1 : -1;
+    }
+
+    private static float getPartial(int value1, int value2, float mod){
+        return (value2 > value1)
+                ? (1.0f - (mod - intToFloat(floatToInt(mod))))
+                : (mod - intToFloat(floatToInt(mod))) ;
+    }
+
     // modified Level_CheckLine from wolf3d for iphone by Carmack
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
         float add = 0.5f;
@@ -124,16 +134,8 @@ public final class Common {
         }
 
         if (cx1 != cx2) {
-            int stepX=0;
-            float partial=0;
-
-            if (cx2 > cx1) {
-                partial = 1.0f - (x1 - intToFloat(floatToInt(x1)));
-                stepX = 1;
-            } else {
-                partial = x1 - intToFloat(floatToInt(x1));
-                stepX = -1;
-            }
+            int stepX = getStep(cx1, cx2);
+            float partial=getPartial(cx1, cx2, x1);
 
             float dx = ((x2 >= x1) ? (x2 - x1) : (x1 - x2));
             float stepY = (y2 - y1) / dx;
@@ -146,16 +148,8 @@ public final class Common {
         }
 
         if (cy1 != cy2) {
-            int stepY=0;
-            float partial=0;
-
-            if (cy2 > cy1) {
-                partial = 1.0f - (y1 - intToFloat(floatToInt(y1)));
-                stepY = 1;
-            } else {
-                partial = y1 - intToFloat(floatToInt(y1));
-                stepY = -1;
-            }
+            int stepY=getStep(cy1, cy2);
+            float partial=getPartial(cy1, cy2, y1);
 
             float dy = ((y2 >= y1) ? (y2 - y1) : (y1 - y2));
             float stepX = (x2 - x1) / dy;

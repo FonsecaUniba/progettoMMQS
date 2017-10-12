@@ -66,6 +66,22 @@ public final class LevelRenderer {
         }
     }
 
+    public static int updateCI(float t, int ci){
+        if (t >= 0) {
+            ci++;
+        }
+
+        return ci;
+    }
+
+    public static int updateCO(float t, int co){
+        if (t <= 0) {
+            co++;
+        }
+
+        return co;
+    }
+
     public static void sortVisibleObjects() {
         currVis = null;
 
@@ -77,21 +93,13 @@ public final class LevelRenderer {
 
             float t = ((vo.fromX - State.heroX) * Common.heroSn) + ((vo.fromY - State.heroY) * Common.heroCs);
 
-            if (t >= 0) {
-                ci++;
-            }
-            if (t <= 0) {
-                co++;
-            }
+            ci = updateCI(t, ci);
+            co = updateCO(t, co);
 
             t = ((vo.toX - State.heroX) * Common.heroSn) + ((vo.toY - State.heroY) * Common.heroCs);
 
-            if (t >= 0) {
-                ci++;
-            }
-            if (t <= 0) {
-                co++;
-            }
+            ci = updateCI(t, ci);
+            co = updateCO(t, co);
 
             if ((ci > 0) && (co > 0)) {
                 float dx = vo.midX - State.heroX;
@@ -196,6 +204,86 @@ public final class LevelRenderer {
         return (float) a;
     }
 
+    private static int getIndex(int index, int nextIndex){
+        return ((nextIndex > index) ? (nextIndex - 1) : nextIndex);
+    }
+
+    private static boolean isValid(int value1, int value2, int value3, int value4) {
+        return ((value1 == value2) && (value3 == value4));
+    }
+
+    private static boolean isSkippable(AutoWall aw, AutoWall awi, int i, int index){
+        return (i == index) || (aw.door != null) || (aw.vert != awi.vert) || (aw.type != awi.type);
+    }
+
+    private static void copyAutoWalls(int index){
+        for (int i = index; i < State.autoWallsCount; i++) {
+            State.autoWalls[i].copyFrom(State.autoWalls[i + 1]);
+        }
+    }
+
+    private static int cycleWalls(int index, int nextIndex){
+        AutoWall awi = State.autoWalls[index];
+
+        for (int i = 0; i < State.autoWallsCount; i++) {
+            AutoWall aw = State.autoWalls[i];
+
+            if (isSkippable(aw, awi, i, index)) {
+                continue;
+            }
+
+            if( isValid((floatToInt(aw.fromX)), (floatToInt(awi.fromX)), (floatToInt(aw.fromY)), (floatToInt(awi.fromY))) ){
+                aw.fromX = awi.toX;
+                aw.fromY = awi.toY;
+                nextIndex = i;
+                break;
+            } else if( isValid((floatToInt(aw.toX)), (floatToInt(awi.fromX)), (floatToInt(aw.toY)), (floatToInt(awi.fromY))) ){
+                aw.toX = awi.toX;
+                aw.toY = awi.toY;
+                nextIndex = i;
+                break;
+            } else if( isValid((floatToInt(aw.fromX)), (floatToInt(awi.toX)), (floatToInt(aw.fromY)), (floatToInt(awi.toY))) ){
+                aw.fromX = awi.fromX;
+                aw.fromY = awi.fromY;
+                nextIndex = i;
+                break;
+            } else if( isValid((floatToInt(aw.toX)), (floatToInt(awi.toX)), (floatToInt(aw.toY)), (floatToInt(awi.toY))) ){
+                aw.toX = awi.fromX;
+                aw.toY = awi.fromY;
+                nextIndex = i;
+                break;
+            }
+        }
+
+        return nextIndex;
+    }
+
+    private static void swapAutoWall(int index){
+        while(true) {
+            int nextIndex = -1;
+
+            nextIndex = cycleWalls(index, nextIndex);
+
+            if (nextIndex < 0) {
+                break;
+            }
+
+            State.autoWallsCount--;
+
+            copyAutoWalls(index);
+
+            index = getIndex(index, nextIndex);
+        }
+    }
+
+    private static boolean isAwValid(AutoWall aw, boolean vert, int type){
+        return (aw.door != null) || (aw.vert != vert) || (aw.type != type);
+    }
+
+    private static boolean bothEquals(int value1, int value2, int value3, int value4){
+        return (isEquals(value1, value2)) && (isEquals(value3, value4));
+    }
+
     // This method:
     // did *not* check for available space (MAX_AUTO_WALLS),
     // did *not* check if wall already exists,
@@ -208,26 +296,26 @@ public final class LevelRenderer {
         for (int i = 0; i < State.autoWallsCount; i++) {
             AutoWall aw = State.autoWalls[i];
 
-            if ((aw.door != null) || (aw.vert != vert) || (aw.type != type)) {
+            if (isAwValid(aw, vert, type)) {
                 continue;
             }
 
-            if ((floatToInt(aw.fromX) == fromX) && (floatToInt(aw.fromY) == fromY)) {
+            if(bothEquals(floatToInt(aw.fromX), fromX, floatToInt(aw.fromY), fromY)){
                 aw.fromX = (float)toX;
                 aw.fromY = (float)toY;
                 index = i;
                 break;
-            } else if ((isEquals(floatToInt(aw.toX),fromX)) && (isEquals(floatToInt(aw.toY),fromY))) {
+            } else if(bothEquals(floatToInt(aw.toX), fromX, floatToInt(aw.toY), fromY)){
                 aw.toX = (float)toX;
                 aw.toY = (float)toY;
                 index = i;
                 break;
-            } else if ((isEquals(floatToInt(aw.fromX),fromX)) && (isEquals(floatToInt(aw.fromY),fromY))) {
+            } else if(bothEquals(floatToInt(aw.fromX), toX, floatToInt(aw.fromY), toY)){
                 aw.fromX = (float)fromX;
                 aw.fromY = (float)fromY;
                 index = i;
                 break;
-            } else if ((isEquals(floatToInt(aw.toX),toX)) && (isEquals(floatToInt(aw.toY),toY))) {
+            } else if(bothEquals(floatToInt(aw.toX), toX, floatToInt(aw.toY), toY)){
                 aw.toX = (float)fromX;
                 aw.toY = (float)fromY;
                 index = i;
@@ -250,51 +338,31 @@ public final class LevelRenderer {
             return;
         }
 
-        for (; ; ) {
-            int nextIndex = -1;
-            AutoWall awi = State.autoWalls[index];
+        swapAutoWall(index);
+    }
 
-            for (int i = 0; i < State.autoWallsCount; i++) {
-                AutoWall aw = State.autoWalls[i];
+    private static int isDoorOrWall(Door door, PortalTracer.Wall wall){
+        return (door != null) ? (door.texture + 0x10) : wall.texture;
+    }
 
-                if ((i == index) || (aw.door != null) || (aw.vert != awi.vert) || (aw.type != awi.type)) {
-                    continue;
-                }
+    private static void setVisibleObject(PortalTracer.Wall wall){
+        if ((Level.marksMap[wall.cellY][wall.cellX] != null) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS)) {
+            VisibleObject vo = visibleObjects[visibleObjectsCount++];
 
-                if ((floatToInt(aw.fromX) == floatToInt(awi.fromX)) && (floatToInt(aw.fromY) == floatToInt(awi.fromY))) {
-                    aw.fromX = awi.toX;
-                    aw.fromY = awi.toY;
-                    nextIndex = i;
-                    break;
-                } else if ((floatToInt(aw.toX) == floatToInt(awi.fromX)) && (floatToInt(aw.toY) == floatToInt(awi.fromY))) {
-                    aw.toX = awi.toX;
-                    aw.toY = awi.toY;
-                    nextIndex = i;
-                    break;
-                } else if ((floatToInt(aw.fromX) == floatToInt(awi.toX)) && (floatToInt(aw.fromY) == floatToInt(awi.toY))) {
-                    aw.fromX = awi.fromX;
-                    aw.fromY = awi.fromY;
-                    nextIndex = i;
-                    break;
-                } else if ((floatToInt(aw.toX) == floatToInt(awi.toX)) && (floatToInt(aw.toY) == floatToInt(awi.toY))) {
-                    aw.toX = awi.fromX;
-                    aw.toY = awi.fromY;
-                    nextIndex = i;
-                    break;
-                }
-            }
+            vo.midX = (wall.fromX + wall.toX) * 0.5f;
+            vo.midY = (wall.fromY + wall.toY) * 0.5f;
+            vo.fromX = wall.fromX;
+            vo.fromY = wall.fromY;
+            vo.toX = wall.toX;
+            vo.toY = wall.toY;
+            vo.obj = Level.marksMap[wall.cellY][wall.cellX];
+        }
+    }
 
-            if (nextIndex < 0) {
-                break;
-            }
-
-            State.autoWallsCount--;
-
-            for (int i = index; i < State.autoWallsCount; i++) {
-                State.autoWalls[i].copyFrom(State.autoWalls[i + 1]);
-            }
-
-            index = ((nextIndex > index) ? (nextIndex - 1) : nextIndex);
+    private static void toAppendWall(int mx, int my, PortalTracer.Wall wall, int autoWallMask){
+        if ((isEquals((State.drawedAutoWalls[my][mx] & autoWallMask),0)) && (State.autoWallsCount < MAX_AUTO_WALLS)) {
+            State.drawedAutoWalls[my][mx] |= autoWallMask;
+            appendAutoWall(wall.fromX, wall.fromY, wall.toX, wall.toY, AUTO_WALL_TYPE_WALL);
         }
     }
 
@@ -325,25 +393,12 @@ public final class LevelRenderer {
                 autoWallMask = AUTO_WALL_MASK_HORIZONTAL;
             }
 
-            int mx = ((wall.fromX < wall.toX) ? wall.fromX : wall.toX);
-            int my = ((wall.fromY < wall.toY) ? wall.fromY : wall.toY);
+            int mx = getMValue(wall.fromX, wall.toX);
+            int my = getMValue(wall.fromY, wall.toY);
 
-            if ((isEquals((State.drawedAutoWalls[my][mx] & autoWallMask),0)) && (State.autoWallsCount < MAX_AUTO_WALLS)) {
-                State.drawedAutoWalls[my][mx] |= autoWallMask;
-                appendAutoWall(wall.fromX, wall.fromY, wall.toX, wall.toY, AUTO_WALL_TYPE_WALL);
-            }
+            toAppendWall(mx, my, wall, autoWallMask);
 
-            if ((Level.marksMap[wall.cellY][wall.cellX] != null) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS)) {
-                VisibleObject vo = visibleObjects[visibleObjectsCount++];
-
-                vo.midX = (wall.fromX + wall.toX) * 0.5f;
-                vo.midY = (wall.fromY + wall.toY) * 0.5f;
-                vo.fromX = wall.fromX;
-                vo.fromY = wall.fromY;
-                vo.toX = wall.toX;
-                vo.toY = wall.toY;
-                vo.obj = Level.marksMap[wall.cellY][wall.cellX];
-            }
+            setVisibleObject(wall);
 
             Renderer.x1 = (float)wall.fromX;
             Renderer.y1 = -(float)wall.fromY;
@@ -363,8 +418,17 @@ public final class LevelRenderer {
                     intToFloat(wall.toY),
                     (wall.fromX == wall.toX));
 
-            Renderer.drawQuad((door != null) ? (door.texture + 0x10) : wall.texture);
+            Renderer.drawQuad(isDoorOrWall(door, wall));
         }
+    }
+
+    private static boolean isValidDoor(Door door){
+        return ((State.drawedAutoWalls[door.y][door.x] & AUTO_WALL_MASK_DOOR) == 0)
+                && (State.autoWallsCount < MAX_AUTO_WALLS);
+    }
+
+    private static boolean isDoorOpen(Door door){
+        return ((door.openPos) < 0.7f) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS);
     }
 
     @SuppressWarnings("MagicNumber")
@@ -394,8 +458,7 @@ public final class LevelRenderer {
                 toY = fromY;
             }
 
-            if (((State.drawedAutoWalls[door.y][door.x] & AUTO_WALL_MASK_DOOR) == 0) && (State.autoWallsCount
-                    < MAX_AUTO_WALLS)) {
+            if (isValidDoor(door)) {
 
                 State.drawedAutoWalls[door.y][door.x] |= AUTO_WALL_MASK_DOOR;
                 AutoWall aw = State.autoWalls[State.autoWallsCount++];
@@ -411,7 +474,7 @@ public final class LevelRenderer {
             }
 
             // do not add opened doors to visible objects, otherwise it is impossible to shoot monsters behind opened door
-            if (((door.openPos) < 0.7f) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS)) {
+            if (isDoorOpen(door)) {
                 VisibleObject vo = visibleObjects[visibleObjectsCount++];
 
                 vo.midX =  intToFloat(door.x) + 0.5f;
@@ -448,6 +511,105 @@ public final class LevelRenderer {
         }
     }
 
+    private static void drawTexPos(int tex, PortalTracer.TouchedCell tc){
+        if (tex > 0) {
+            float mx = (float)tc.x + 0.5f;
+            float my = (float)tc.y + 0.5f;
+
+            float fromX = mx + flatObjDy;
+            float toX = mx - flatObjDy;
+            float fromY = my - flatObjDx;
+            float toY = my + flatObjDx;
+
+            Renderer.x1 = fromX;
+            Renderer.y1 = -fromY;
+
+            Renderer.x2 = fromX;
+            Renderer.y2 = -fromY;
+
+            Renderer.x3 = toX;
+            Renderer.y3 = -toY;
+
+            Renderer.x4 = toX;
+            Renderer.y4 = -toY;
+
+            setObjLighting(mx, my);
+            Renderer.drawQuad(tex);
+        }
+    }
+
+    private static int getAutoWallMask(int s){
+        return (((s == 1) || (s == 3))
+                ? AUTO_WALL_MASK_VERTICAL
+                : AUTO_WALL_MASK_HORIZONTAL);
+    }
+
+    private static void drawAutoWalls(int mx, int my, int autoWallMask, int fromX, int fromY, int toX, int toY){
+        if ((isEquals(((State.drawedAutoWalls[my][mx] & autoWallMask)),0)) && (State.autoWallsCount
+                < MAX_AUTO_WALLS)) {
+
+            State.drawedAutoWalls[my][mx] |= autoWallMask;
+            appendAutoWall(fromX, fromY, toX, toY, AUTO_WALL_TYPE_TRANSP);
+        }
+    }
+
+    private static boolean isAutoWallDrawn(PortalTracer.TouchedCell tc){
+        return ((State.drawedAutoWalls[tc.y][tc.x] & AUTO_WALL_MASK_DOOR) == 0) && (State.autoWallsCount
+                < MAX_AUTO_WALLS);
+    }
+
+    private static int getMValue(int value1, int value2){
+        return ((value1 < value2) ? value1 : value2);
+    }
+
+    private static void drawObject(int tex, PortalTracer.TouchedCell tc){
+        if (tex > 0) {
+            float mx = (float)tc.x + 0.5f;
+            float my = (float)tc.y + 0.5f;
+
+            float fromX = mx + flatObjDy;
+            float toX = mx - flatObjDy;
+            float fromY = my - flatObjDx;
+            float toY = my + flatObjDx;
+
+            Renderer.x1 = fromX;
+            Renderer.y1 = -fromY;
+
+            Renderer.x2 = fromX;
+            Renderer.y2 = -fromY;
+
+            Renderer.x3 = toX;
+            Renderer.y3 = -toY;
+
+            Renderer.x4 = toX;
+            Renderer.y4 = -toY;
+
+            setObjLighting(mx, my);
+            Renderer.drawQuad(tex);
+        }
+    }
+
+    private static void willAutoWallBeDrawn(PortalTracer.TouchedCell tc, boolean vert, float fromX, float fromY, float toX, float toY){
+        if (isAutoWallDrawn(tc)) {
+
+            State.drawedAutoWalls[tc.y][tc.x] |= AUTO_WALL_MASK_DOOR;
+            AutoWall aw = State.autoWalls[State.autoWallsCount++];
+
+            aw.fromX = fromX;
+            aw.fromY = fromY;
+            aw.toX = toX;
+            aw.toY = toY;
+            aw.vert = vert;
+            aw.type = AUTO_WALL_TYPE_TRANSP;
+            aw.doorIndex = -1;
+            aw.door = null;
+        }
+    }
+
+    private static boolean matchS(int s){
+        return ((s == 1) || (s == 3));
+    }
+
     // render objects, decorations and transparents
     @SuppressWarnings("MagicNumber")
     private static void renderObjects() {
@@ -455,59 +617,13 @@ public final class LevelRenderer {
             PortalTracer.TouchedCell tc = tracer.touchedCells[i];
             int tex = State.objectsMap[tc.y][tc.x];
 
-            if (tex > 0) {
-                float mx = (float)tc.x + 0.5f;
-                float my = (float)tc.y + 0.5f;
-
-                float fromX = mx + flatObjDy;
-                float toX = mx - flatObjDy;
-                float fromY = my - flatObjDx;
-                float toY = my + flatObjDx;
-
-                Renderer.x1 = fromX;
-                Renderer.y1 = -fromY;
-
-                Renderer.x2 = fromX;
-                Renderer.y2 = -fromY;
-
-                Renderer.x3 = toX;
-                Renderer.y3 = -toY;
-
-                Renderer.x4 = toX;
-                Renderer.y4 = -toY;
-
-                setObjLighting(mx, my);
-                Renderer.drawQuad(tex);
-            }
+            drawTexPos(tex, tc);
 
             tex = State.decorationsMap[tc.y][tc.x];
 
             if (tex != 0) {
                 // if decoration tex == -1, than there is object here (or was before hero picked up it), but there can't be transparents
-                if (tex > 0) {
-                    float mx = (float)tc.x + 0.5f;
-                    float my = (float)tc.y + 0.5f;
-
-                    float fromX = mx + flatObjDy;
-                    float toX = mx - flatObjDy;
-                    float fromY = my - flatObjDx;
-                    float toY = my + flatObjDx;
-
-                    Renderer.x1 = fromX;
-                    Renderer.y1 = -fromY;
-
-                    Renderer.x2 = fromX;
-                    Renderer.y2 = -fromY;
-
-                    Renderer.x3 = toX;
-                    Renderer.y3 = -toY;
-
-                    Renderer.x4 = toX;
-                    Renderer.y4 = -toY;
-
-                    setObjLighting(mx, my);
-                    Renderer.drawQuad(tex);
-                }
+                drawObject(tex, tc);
             } else {
                 tex = State.transpMap[tc.y][tc.x];
 
@@ -533,21 +649,7 @@ public final class LevelRenderer {
                         toY = fromY;
                     }
 
-                    if (((State.drawedAutoWalls[tc.y][tc.x] & AUTO_WALL_MASK_DOOR) == 0) && (State.autoWallsCount
-                            < MAX_AUTO_WALLS)) {
-
-                        State.drawedAutoWalls[tc.y][tc.x] |= AUTO_WALL_MASK_DOOR;
-                        AutoWall aw = State.autoWalls[State.autoWallsCount++];
-
-                        aw.fromX = fromX;
-                        aw.fromY = fromY;
-                        aw.toX = toX;
-                        aw.toY = toY;
-                        aw.vert = vert;
-                        aw.type = AUTO_WALL_TYPE_TRANSP;
-                        aw.doorIndex = -1;
-                        aw.door = null;
-                    }
+                    willAutoWallBeDrawn(tc, vert, fromX, fromY, toX, toY);
 
                     Renderer.x1 = fromX;
                     Renderer.y1 = -fromY;
@@ -585,27 +687,53 @@ public final class LevelRenderer {
                             Renderer.x4 = (float)toX;
                             Renderer.y4 = -(float)toY;
 
-                            int mx = ((fromX < toX) ? fromX : toX);
-                            int my = ((fromY < toY) ? fromY : toY);
+                            int mx = getMValue(fromX, toX);
+                            int my = getMValue(fromY, toY);
 
-                            int autoWallMask = (((s == 1) || (s == 3))
-                                    ? AUTO_WALL_MASK_VERTICAL
-                                    : AUTO_WALL_MASK_HORIZONTAL);
+                            int autoWallMask = getAutoWallMask(s);
+                            drawAutoWalls(mx, my, autoWallMask, fromX, fromY, toX, toY);
 
-                            if ((isEquals(((State.drawedAutoWalls[my][mx] & autoWallMask)),0)) && (State.autoWallsCount
-                                    < MAX_AUTO_WALLS)) {
-
-                                State.drawedAutoWalls[my][mx] |= autoWallMask;
-                                appendAutoWall(fromX, fromY, toX, toY, AUTO_WALL_TYPE_TRANSP);
-                            }
-
-                            setWallLighting( intToFloat(fromX),  intToFloat(fromY),  intToFloat(toX), intToFloat(toY), ((s == 1) || (s == 3)));
+                            setWallLighting( intToFloat(fromX),  intToFloat(fromY),  intToFloat(toX), intToFloat(toY), matchS(s));
                             Renderer.drawQuad(tex);
                         }
                     }
                 }
             }
         }
+    }
+
+    private static long getMonDieTime(long die, long elapsed){
+        if (die == 0) {
+            die = elapsed;
+        }
+        return die;
+    }
+
+    private static int getTex(int tex, Monster mon, long elapsedTime){
+        if ((mon.hitTimeout <= 0) && (mon.attackTimeout > 0)) {
+            tex += 15;
+        } else if (mon.isAimedOnHero) {
+            tex += 2;
+        } else {
+            tex += (((((int)State.heroA + 360 + 45) - (mon.dir * 90)) % 360) / 90);
+        }
+
+        if (mon.hitTimeout > 0) {
+            tex += 8;
+        } else if (!mon.isInAttackState && ((elapsedTime % 800) > 400)) {
+            tex += 4;
+        }
+
+        return tex;
+    }
+
+    private static boolean isMonsterDead(Monster mon, int x, int y, boolean deadCorpses){
+        return (!(tracer.touchedCellsMap[y][x]
+                || tracer.touchedCellsMap[mon.cellX][mon.cellY]))
+                || (deadCorpses
+                && (mon.health > 0))
+                || (!deadCorpses
+                && (mon.health <= 0));
     }
 
     @SuppressWarnings("MagicNumber")
@@ -616,9 +744,7 @@ public final class LevelRenderer {
             int x = floatToInt(mon.x);
             int y = floatToInt(mon.y);
 
-            if ((!(tracer.touchedCellsMap[y][x] || tracer.touchedCellsMap[mon.cellX][mon.cellY])) || (deadCorpses && (
-                    mon.health
-                            > 0)) || (!deadCorpses && (mon.health <= 0))) {
+            if (isMonsterDead(mon, x, y, deadCorpses)) {
 
                 continue;
             }
@@ -644,19 +770,7 @@ public final class LevelRenderer {
             Renderer.y4 = -toY;
 
             if (mon.health > 0) {
-                if ((mon.hitTimeout <= 0) && (mon.attackTimeout > 0)) {
-                    tex += 15;
-                } else if (mon.isAimedOnHero) {
-                    tex += 2;
-                } else {
-                    tex += (((((int)State.heroA + 360 + 45) - (mon.dir * 90)) % 360) / 90);
-                }
-
-                if (mon.hitTimeout > 0) {
-                    tex += 8;
-                } else if (!mon.isInAttackState && ((elapsedTime % 800) > 400)) {
-                    tex += 4;
-                }
+                tex = getTex(tex, mon, elapsedTime);
 
                 if (visibleObjectsCount < MAX_VISIBLE_OBJECTS) {
                     VisibleObject vo = visibleObjects[visibleObjectsCount++];
@@ -675,9 +789,7 @@ public final class LevelRenderer {
                     vo.obj = mon;
                 }
             } else {
-                if (mon.dieTime == 0) {
-                    mon.dieTime = elapsedTime;
-                }
+                mon.dieTime = getMonDieTime(mon.dieTime, elapsedTime);
 
                 tex += 12 + ((mon.dieTime < 0) ? 2 : Math.min(2, (elapsedTime - mon.dieTime) / 150));
             }
@@ -895,6 +1007,25 @@ public final class LevelRenderer {
         gl.glEnable(GL10.GL_CULL_FACE);
     }
 
+    private static void drawMonster(Monster mon){
+        if (mon.health <= 0) {
+            Renderer.r1 = 0.5f;
+            Renderer.b1 = 0.5f;
+            Renderer.r2 = 0.5f;
+            Renderer.b2 = 0.5f;
+        } else if (mon.chaseMode) {
+            Renderer.r1 = 1.0f;
+            Renderer.b1 = 0.0f;
+            Renderer.r2 = 1.0f;
+            Renderer.b2 = 0.0f;
+        } else {
+            Renderer.r1 = 0.0f;
+            Renderer.b1 = 1.0f;
+            Renderer.r2 = 0.0f;
+            Renderer.b2 = 1.0f;
+        }
+    }
+
     @SuppressWarnings("MagicNumber")
     public static void renderAutoMap(GL10 gl) {
         gl.glDisable(GL10.GL_DEPTH_TEST);
@@ -975,22 +1106,7 @@ public final class LevelRenderer {
             for (int i = 0; i < State.monstersCount; i++) {
                 Monster mon = State.monsters[i];
 
-                if (mon.health <= 0) {
-                    Renderer.r1 = 0.5f;
-                    Renderer.b1 = 0.5f;
-                    Renderer.r2 = 0.5f;
-                    Renderer.b2 = 0.5f;
-                } else if (mon.chaseMode) {
-                    Renderer.r1 = 1.0f;
-                    Renderer.b1 = 0.0f;
-                    Renderer.r2 = 1.0f;
-                    Renderer.b2 = 0.0f;
-                } else {
-                    Renderer.r1 = 0.0f;
-                    Renderer.b1 = 1.0f;
-                    Renderer.r2 = 0.0f;
-                    Renderer.b2 = 1.0f;
-                }
+                drawMonster(mon);
 
                 float mdx = (float)Math.cos((float)mon.shootAngle * Common.G2RAD_F) * 0.75f;
                 float mdy = (float)Math.sin((float)mon.shootAngle * Common.G2RAD_F) * 0.75f;

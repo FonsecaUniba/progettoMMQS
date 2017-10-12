@@ -528,6 +528,12 @@ public class Game extends ZameGame {
         }
     }
 
+    private void chooseHitSound(boolean hit){
+        SoundManager.playSound(((Weapons.currentParams.noHitSoundIdx != 0) && !hit)
+                ? Weapons.currentParams.noHitSoundIdx
+                : Weapons.currentParams.soundIdx);
+    }
+
     @SuppressWarnings("MagicNumber")
     private void processShoot() {
         getBestWeapon();
@@ -546,9 +552,7 @@ public class Game extends ZameGame {
         }
 
         if (Weapons.currentCycle[Weapons.shootCycle] > -1000) {
-            SoundManager.playSound(((Weapons.currentParams.noHitSoundIdx != 0) && !hit)
-                    ? Weapons.currentParams.noHitSoundIdx
-                    : Weapons.currentParams.soundIdx);
+            chooseHitSound(hit);
         }
 
         if (Weapons.currentParams.ammoIdx >= 0) {
@@ -587,20 +591,24 @@ public class Game extends ZameGame {
         }
     }
 
+    private float updateHeroValue(float value, float toSet){
+        return ((value > 0) ? -toSet : toSet);
+    }
+
     private void updateHeroPhase1(float acc, float dx, float prevX){
         while (Math.abs(acc) >= 0.02f) {
             float add = acc * dx;
 
             while (Math.abs(add) > 0.1f) {
                 Level.fillInitialInWallMap(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_MASK_HERO);
-                State.heroX += ((add > 0) ? 0.1f : -0.1f);
+                State.heroX += updateHeroValue(add, -0.1f);
 
                 if (!Level.isPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_MASK_HERO)) {
                     add = 0;
                     break;
                 }
 
-                add += ((add > 0) ? -0.1f : 0.1f);
+                add += updateHeroValue(add, 0.1f);
             }
 
             if (Math.abs(add) > 0.02f) {
@@ -613,7 +621,7 @@ public class Game extends ZameGame {
             }
 
             State.heroX = prevX;
-            acc += ((acc > 0) ? -0.01f : 0.01f);
+            acc += updateHeroValue(acc, 0.01f);
         }
     }
 
@@ -623,14 +631,14 @@ public class Game extends ZameGame {
 
             while (Math.abs(add) > 0.1f) {
                 Level.fillInitialInWallMap(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_MASK_HERO);
-                State.heroY += ((add > 0) ? 0.1f : -0.1f);
+                State.heroY += updateHeroValue(add, -0.1f);
 
                 if (!Level.isPassable(State.heroX, State.heroY, WALK_WALL_DIST, Level.PASSABLE_MASK_HERO)) {
                     add = 0;
                     break;
                 }
 
-                add += ((add > 0) ? -0.1f : 0.1f);
+                add += updateHeroValue(add, 0.1f);
             }
 
             if (Math.abs(add) > 0.02f) {
@@ -643,7 +651,7 @@ public class Game extends ZameGame {
             }
 
             State.heroY = prevY;
-            acc += ((acc > 0) ? -0.01f : 0.01f);
+            acc += updateHeroValue(acc, 0.01f);
         }
     }
 
@@ -888,25 +896,46 @@ public class Game extends ZameGame {
         }
     }
 
-    private void playPickSound(){
-        switch (State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
+    private boolean isAmmo(){
+        boolean result = false;
+
+        switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
             case TextureLoader.OBJ_CLIP:
             case TextureLoader.OBJ_AMMO:
             case TextureLoader.OBJ_SHELL:
             case TextureLoader.OBJ_SBOX:
-                SoundManager.playSound(SoundManager.SOUND_PICK_AMMO);
+                result = true;
+            default:
                 break;
+        }
 
+        return result;
+    }
+
+    private boolean isWeapon(){
+        boolean result = false;
+
+        switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_BPACK:
             case TextureLoader.OBJ_SHOTGUN:
             case TextureLoader.OBJ_CHAINGUN:
             case TextureLoader.OBJ_DBLSHOTGUN:
-                SoundManager.playSound(SoundManager.SOUND_PICK_WEAPON);
+                result = true;
                 break;
-
             default:
-                SoundManager.playSound(SoundManager.SOUND_PICK_ITEM);
                 break;
+        }
+
+        return result;
+    }
+
+    private void playPickSound(){
+        if(isAmmo()){
+            SoundManager.playSound(SoundManager.SOUND_PICK_AMMO);
+        } else if (isWeapon()){
+            SoundManager.playSound(SoundManager.SOUND_PICK_WEAPON);
+        } else {
+            SoundManager.playSound(SoundManager.SOUND_PICK_ITEM);
         }
     }
 
@@ -1378,6 +1407,10 @@ public class Game extends ZameGame {
         return (int) a;
     }
 
+    private boolean isGameOver(){
+        return (killedTime > 0) && ((elapsedTime - killedTime) > 3500);
+    }
+
     private void renderNextLevel(GL10 gl){
         if (nextLevelTime > 0) {
             renderEndLevelLayer(gl, (float)(elapsedTime - nextLevelTime) / 500.0f);
@@ -1399,7 +1432,7 @@ public class Game extends ZameGame {
                     showEndLevelScreen();
                 }
             }
-        } else if ((killedTime > 0) && ((elapsedTime - killedTime) > 3500)) {
+        } else if (isGameOver()) {
             isGameOverFlag = true;
             nextLevelTime = elapsedTime;
         }

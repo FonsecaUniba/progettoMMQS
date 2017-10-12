@@ -286,6 +286,30 @@ public class PortalTracer {
         return new int[] {oa, ob};
     }
 
+    private int[] checkToXY(int x, int y, int toX, int toY){
+        if (y > toY) {
+            if (x >= toX) {
+                y--;
+            } else {
+                x++;
+            }
+        } else if (isEquals(y,toY)) {
+            if (x > toX) {
+                x--;
+            } else {
+                x++;
+            }
+        } else {
+            if (x <= toX) {
+                y++;
+            } else {
+                x--;
+            }
+        }
+
+        return new int[] {x, y};
+    }
+
     @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
     private void traceCell(int fromX, int fromY, float fromAngle, int toX, int toY, float toAngle) {
         boolean repeat = true;
@@ -489,25 +513,9 @@ public class PortalTracer {
                 prevX = x;
                 prevY = y;
 
-                if (y > toY) {
-                    if (x >= toX) {
-                        y--;
-                    } else {
-                        x++;
-                    }
-                } else if (isEquals(y,toY)) {
-                    if (x > toX) {
-                        x--;
-                    } else {
-                        x++;
-                    }
-                } else {
-                    if (x <= toX) {
-                        y++;
-                    } else {
-                        x--;
-                    }
-                }
+                int[] result = checkToXY(x, y, toX, toY);
+                x = result[0];
+                y = result[1];
             }
         } while (repeat);
     }

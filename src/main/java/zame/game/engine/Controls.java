@@ -96,6 +96,14 @@ public final class Controls {
                     icon = 5;
                     break;
 
+                default:
+                    updateIcon2();
+                    break;
+            }
+        }
+
+        private void updateIcon2(){
+            switch(type){
                 case ROTATE_LEFT:
                     icon = 6;
                     break;
@@ -425,6 +433,47 @@ public final class Controls {
     private Controls() {
     }
 
+    private static boolean isTrackballValid(float value){
+        return (value <= -0.01f) || (value >= 0.01f);
+    }
+
+    private static boolean isTrackballUpLeft(float value, int mask){
+        return (value < 0) && (mask != 0);
+    }
+
+    private static void updateTrackball(int maskUp, int maskDown, int maskLeft, int maskRight){
+        if (isTrackballValid(trackballX)) {
+            if (isTrackballUpLeft(trackballX, maskLeft)) {
+                trackballActionsMask |= maskLeft;
+                relativeOffset[maskLeft] = -trackballX;
+            } else if (maskRight != 0) {
+                trackballActionsMask |= maskRight;
+                relativeOffset[maskRight] = trackballX;
+            }
+        }
+
+        if (isTrackballValid(trackballY)) {
+            if (isTrackballUpLeft(trackballY, maskUp)) {
+                trackballActionsMask |= maskUp;
+                relativeOffset[maskUp] = -trackballY;
+            } else if (maskDown != 0) {
+                trackballActionsMask |= maskDown;
+                relativeOffset[maskDown] = trackballY;
+            }
+        }
+    }
+
+    private static int checkStrafe(int mask){
+        if ((mask & STRAFE_MODE) != 0) {
+            mask = (mask & ~(ROTATE_LEFT | ROTATE_RIGHT | STRAFE_LEFT | STRAFE_RIGHT)) | (((mask & ROTATE_LEFT) != 0)
+                    ? STRAFE_LEFT
+                    : 0) | (((mask & ROTATE_RIGHT) != 0) ? STRAFE_RIGHT : 0) | (((mask & STRAFE_LEFT) != 0)
+                    ? ROTATE_LEFT
+                    : 0) | (((mask & STRAFE_RIGHT) != 0) ? ROTATE_RIGHT : 0);
+        }
+        return mask;
+    }
+
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static int getActionsMask() {
         int maskLeft=0;
@@ -449,25 +498,7 @@ public final class Controls {
 
         trackballActionsMask = 0;
 
-        if ((trackballX <= -0.01f) || (trackballX >= 0.01f)) {
-            if ((trackballX < 0) && (maskLeft != 0)) {
-                trackballActionsMask |= maskLeft;
-                relativeOffset[maskLeft] = -trackballX;
-            } else if (maskRight != 0) {
-                trackballActionsMask |= maskRight;
-                relativeOffset[maskRight] = trackballX;
-            }
-        }
-
-        if ((trackballY <= -0.01f) || (trackballY >= 0.01f)) {
-            if ((trackballY < 0) && (maskUp != 0)) {
-                trackballActionsMask |= maskUp;
-                relativeOffset[maskUp] = -trackballY;
-            } else if (maskDown != 0) {
-                trackballActionsMask |= maskDown;
-                relativeOffset[maskDown] = trackballY;
-            }
-        }
+        updateTrackball(maskUp, maskDown, maskLeft, maskRight);
 
         trackballX = 0.0f;
         trackballY = 0.0f;
@@ -481,13 +512,7 @@ public final class Controls {
 
         int mask = (touchActionsMask | keysActionsMask | trackballActionsMask | joyButtonsMask);
 
-        if ((mask & STRAFE_MODE) != 0) {
-            mask = (mask & ~(ROTATE_LEFT | ROTATE_RIGHT | STRAFE_LEFT | STRAFE_RIGHT)) | (((mask & ROTATE_LEFT) != 0)
-                    ? STRAFE_LEFT
-                    : 0) | (((mask & ROTATE_RIGHT) != 0) ? STRAFE_RIGHT : 0) | (((mask & STRAFE_LEFT) != 0)
-                    ? ROTATE_LEFT
-                    : 0) | (((mask & STRAFE_RIGHT) != 0) ? ROTATE_RIGHT : 0);
-        }
+        mask = checkStrafe(mask);
 
         return mask;
     }
@@ -497,6 +522,26 @@ public final class Controls {
         joyX = 0.0f;
         joyY = 0.0f;
         joyButtonsMask = 0;
+    }
+
+    private static void updateControlMap(){
+        for (ControlItem ci : currentVariant.items) {
+            if (!ci.decoration) {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        controlsMap[ci.x + i][ci.y + j] = ci.type;
+                    }
+                }
+            }
+        }
+
+        if (currentVariant.hasMap) {
+            for (int i = 0; i < currentVariant.map.length; i++) {
+                for (int j = 0; j < currentVariant.map[i].length; j++) {
+                    controlsMap[currentVariant.mapX + j][currentVariant.mapY + i] = currentVariant.map[i][j];
+                }
+            }
+        }
     }
 
     @SuppressWarnings("MagicNumber")
@@ -533,23 +578,7 @@ public final class Controls {
             }
         }
 
-        for (ControlItem ci : currentVariant.items) {
-            if (!ci.decoration) {
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
-                        controlsMap[ci.x + i][ci.y + j] = ci.type;
-                    }
-                }
-            }
-        }
-
-        if (currentVariant.hasMap) {
-            for (int i = 0; i < currentVariant.map.length; i++) {
-                for (int j = 0; j < currentVariant.map[i].length; j++) {
-                    controlsMap[currentVariant.mapX + j][currentVariant.mapY + i] = currentVariant.map[i][j];
-                }
-            }
-        }
+        updateControlMap();
 
         for (int i = 0; i < POINTER_MAX_ID; i++) {
             pointerActionsMask[i] = 0;
@@ -562,9 +591,182 @@ public final class Controls {
         }
     }
 
+    private static void checkVariant(int pid, float x, float y, int ctlX, int ctlY){
+        if (currentVariant.hasPad && ((currentVariant.padX < 10) ? (ctlX < 10) : (ctlX >= 10))) {
+            pointerIsPad[pid] = true;
+        } else if (currentVariant.slidable && (controlsMap[ctlX][ctlY] == 0)) {
+            pointerIsSlide[pid] = true;
+        }
+
+        if ((State.levelNum == 1) && (controlsMap[ctlX][ctlY] == 0)) {
+            pointerClickX[pid] = x;
+            pointerClickY[pid] = y;
+            pointerIsClick[pid] = true;
+        }
+    }
+
+    private static void updatePointer(int pid, int pointerAction, float x, float y, int ctlX, int ctlY){
+        if (pointerAction == POINTER_DOWN) {
+            pointerActionsMask[pid] = 0;
+            pointerPrevX[pid] = x;
+            pointerIsPad[pid] = false;
+            pointerIsSlide[pid] = false;
+            pointerIsClick[pid] = false;
+
+            checkVariant(pid, x, y, ctlX, ctlY);
+        } else if ((State.levelNum == 1) && pointerIsClick[pid]) {
+            float distSq = ((pointerClickX[pid] - x) * (pointerClickX[pid] - x)) + ((pointerClickY[pid] - y) * (
+                    pointerClickY[pid]
+                            - y));
+
+            if (distSq > (10.0f * 10.0f)) {
+                pointerIsClick[pid] = false;
+            }
+        }
+    }
+
+    private static void centerPad(float x, float y){
+        if (!padActive) {
+            padActive = true;
+            padCenterX = x / (float)(Game.width + 1);
+            padCenterY = y / (float)(Game.height + 1);
+
+            if (padCenterX < (origPadCenterX - PAD_INIT_OFF)) {
+                padCenterX = origPadCenterX - PAD_INIT_OFF;
+            }
+            if (padCenterX > (origPadCenterX + PAD_INIT_OFF)) {
+                padCenterX = origPadCenterX + PAD_INIT_OFF;
+            }
+            if (padCenterY < (origPadCenterY - PAD_INIT_OFF)) {
+                padCenterY = origPadCenterY - PAD_INIT_OFF;
+            }
+            if (padCenterY > (origPadCenterY + PAD_INIT_OFF)) {
+                padCenterY = origPadCenterY + PAD_INIT_OFF;
+            }
+        }
+    }
+
+    private static void checkPadX(){
+        if (padX > 0.0f) {
+            padX -= PAD_MIN_OFF;
+
+            if (padX < 0.0f) {
+                padX = 0.0f;
+            } else if (padX > PAD_MAX_OFF) {
+                padX = PAD_MAX_OFF;
+            }
+        } else {
+            padX += PAD_MIN_OFF;
+
+            if (padX > 0.0f) {
+                padX = 0.0f;
+            } else if (padX < -PAD_MAX_OFF) {
+                padX = -PAD_MAX_OFF;
+            }
+        }
+    }
+
+    private static void checkPadY(){
+        if (padY > 0.0f) {
+            padY -= PAD_MIN_OFF;
+
+            if (padY < 0.0f) {
+                padY = 0.0f;
+            } else if (padY > PAD_MAX_OFF) {
+                padY = PAD_MAX_OFF;
+            }
+        } else {
+            padY += PAD_MIN_OFF;
+
+            if (padY > 0.0f) {
+                padY = 0.0f;
+            } else if (padY < -PAD_MAX_OFF) {
+                padY = -PAD_MAX_OFF;
+            }
+        }
+    }
+
+    private static void checkPointerUp(int pid){
+        if ((State.levelNum == 1) && pointerIsClick[pid]) {
+            pointerClickCounter += 1;
+
+            if (pointerClickCounter == 5) {
+                ZameApplication.trackEvent("Tutorial", "Click", "", 0);
+            }
+        }
+
+        if (pointerIsPad[pid]) {
+            padActive = false;
+            padX = 0.0f;
+            padY = 0.0f;
+            padCenterX = origPadCenterX;
+            padCenterY = origPadCenterY;
+        }
+    }
+
+    private static boolean isPIDValid(int pid){
+        return (pid < 0) || (pid >= POINTER_MAX_ID);
+    }
+
+    private static int checkPad(int pad){
+        return (pad < 1) ? 1 : pad;
+    }
+
+    private static void whatPointer(int pid, float x, float y, int ctlX, int ctlY){
+        if (pointerIsSlide[pid]) {
+            float distX = x - pointerPrevX[pid];
+            float da = (distX * Config.maxRotateAngle) / (float)Game.width;
+
+            pointerPrevX[pid] = x;
+
+            // if angle is more than half of max angle, this is incorrect MotionEvent (in most of cases)
+            // if (Math.abs(da) < (Config.maxRotateAngle / 2.0f)) {
+            rotatedAngle += (Config.invertRotation ? da : -da);
+            // }
+        } else if (pointerIsPad[pid]) {
+            centerPad(x, y);
+
+            int padWidth = (Game.width * 3) / 20;
+            padWidth = checkPad(padWidth);
+
+            int padHeight = (Game.height * 3) / 16;
+
+            padHeight = checkPad(padHeight);
+
+            padX = (x - (padCenterX * intToFloat(Game.width))) / intToFloat(padWidth);
+            padY = (y - (padCenterY * (float)Game.height)) / (float)padHeight;
+
+            checkPadX();
+
+            checkPadY();
+        } else {
+            pointerActionsMask[pid] = controlsMap[ctlX][ctlY];
+        }
+    }
+
+    private static int getCtlX(int ctlX){
+        if (ctlX < 0) {
+            ctlX = 0;
+        } else if (ctlX >= 20) {
+            ctlX = 19;
+        }
+
+        return ctlX;
+    }
+
+    private static int getCtlY(int ctlY){
+        if (ctlY < 0) {
+            ctlY = 0;
+        } else if (ctlY >= 16) {
+            ctlY = 15;
+        }
+
+        return ctlY;
+    }
+
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void processOnePointer(int pid, float x, float y, int pointerAction) {
-        if ((pid < 0) || (pid >= POINTER_MAX_ID)) {
+        if (isPIDValid(pid)) {
             return;
         }
 
@@ -576,146 +778,17 @@ public final class Controls {
         int ctlX = (Math.round(x) * 20) / (Game.width + 1);
         int ctlY = (Math.round(y) * 16) / (Game.height + 1);
 
-        if (ctlX < 0) {
-            ctlX = 0;
-        } else if (ctlX >= 20) {
-            ctlX = 19;
-        }
-
-        if (ctlY < 0) {
-            ctlY = 0;
-        } else if (ctlY >= 16) {
-            ctlY = 15;
-        }
+        ctlX = getCtlX(ctlX);
+        ctlY = getCtlY(ctlY);
 
         if ((pointerAction == POINTER_DOWN) || (pointerAction == POINTER_MOVE)) {
-            if (pointerAction == POINTER_DOWN) {
-                pointerActionsMask[pid] = 0;
-                pointerPrevX[pid] = x;
-                pointerIsPad[pid] = false;
-                pointerIsSlide[pid] = false;
-                pointerIsClick[pid] = false;
-
-                if (currentVariant.hasPad && ((currentVariant.padX < 10) ? (ctlX < 10) : (ctlX >= 10))) {
-                    pointerIsPad[pid] = true;
-                } else if (currentVariant.slidable && (controlsMap[ctlX][ctlY] == 0)) {
-                    pointerIsSlide[pid] = true;
-                }
-
-                if ((State.levelNum == 1) && (controlsMap[ctlX][ctlY] == 0)) {
-                    pointerClickX[pid] = x;
-                    pointerClickY[pid] = y;
-                    pointerIsClick[pid] = true;
-                }
-            } else if ((State.levelNum == 1) && pointerIsClick[pid]) {
-                float distSq = ((pointerClickX[pid] - x) * (pointerClickX[pid] - x)) + ((pointerClickY[pid] - y) * (
-                        pointerClickY[pid]
-                                - y));
-
-                if (distSq > (10.0f * 10.0f)) {
-                    pointerIsClick[pid] = false;
-                }
-            }
+            updatePointer(pid, pointerAction, x, y, ctlX, ctlY);
 
             // ----
 
-            if (pointerIsSlide[pid]) {
-                float distX = x - pointerPrevX[pid];
-                float da = (distX * Config.maxRotateAngle) / (float)Game.width;
-
-                pointerPrevX[pid] = x;
-
-                // if angle is more than half of max angle, this is incorrect MotionEvent (in most of cases)
-                // if (Math.abs(da) < (Config.maxRotateAngle / 2.0f)) {
-                rotatedAngle += (Config.invertRotation ? da : -da);
-                // }
-            } else if (pointerIsPad[pid]) {
-                if (!padActive) {
-                    padActive = true;
-                    padCenterX = x / (float)(Game.width + 1);
-                    padCenterY = y / (float)(Game.height + 1);
-
-                    if (padCenterX < (origPadCenterX - PAD_INIT_OFF)) {
-                        padCenterX = origPadCenterX - PAD_INIT_OFF;
-                    }
-                    if (padCenterX > (origPadCenterX + PAD_INIT_OFF)) {
-                        padCenterX = origPadCenterX + PAD_INIT_OFF;
-                    }
-                    if (padCenterY < (origPadCenterY - PAD_INIT_OFF)) {
-                        padCenterY = origPadCenterY - PAD_INIT_OFF;
-                    }
-                    if (padCenterY > (origPadCenterY + PAD_INIT_OFF)) {
-                        padCenterY = origPadCenterY + PAD_INIT_OFF;
-                    }
-                }
-
-                int padWidth = (Game.width * 3) / 20;
-                if (padWidth < 1) {
-                    padWidth = 1;
-                }
-
-                int padHeight = (Game.height * 3) / 16;
-                if (padHeight < 1) {
-                    padHeight = 1;
-                }
-
-                padX = (x - (padCenterX * intToFloat(Game.width))) / intToFloat(padWidth);
-                padY = (y - (padCenterY * (float)Game.height)) / (float)padHeight;
-
-                if (padX > 0.0f) {
-                    padX -= PAD_MIN_OFF;
-
-                    if (padX < 0.0f) {
-                        padX = 0.0f;
-                    } else if (padX > PAD_MAX_OFF) {
-                        padX = PAD_MAX_OFF;
-                    }
-                } else {
-                    padX += PAD_MIN_OFF;
-
-                    if (padX > 0.0f) {
-                        padX = 0.0f;
-                    } else if (padX < -PAD_MAX_OFF) {
-                        padX = -PAD_MAX_OFF;
-                    }
-                }
-
-                if (padY > 0.0f) {
-                    padY -= PAD_MIN_OFF;
-
-                    if (padY < 0.0f) {
-                        padY = 0.0f;
-                    } else if (padY > PAD_MAX_OFF) {
-                        padY = PAD_MAX_OFF;
-                    }
-                } else {
-                    padY += PAD_MIN_OFF;
-
-                    if (padY > 0.0f) {
-                        padY = 0.0f;
-                    } else if (padY < -PAD_MAX_OFF) {
-                        padY = -PAD_MAX_OFF;
-                    }
-                }
-            } else {
-                pointerActionsMask[pid] = controlsMap[ctlX][ctlY];
-            }
+            whatPointer(pid, x, y, ctlX, ctlY);
         } else if (pointerAction == POINTER_UP) {
-            if ((State.levelNum == 1) && pointerIsClick[pid]) {
-                pointerClickCounter += 1;
-
-                if (pointerClickCounter == 5) {
-                    ZameApplication.trackEvent("Tutorial", "Click", "", 0);
-                }
-            }
-
-            if (pointerIsPad[pid]) {
-                padActive = false;
-                padX = 0.0f;
-                padY = 0.0f;
-                padCenterX = origPadCenterX;
-                padCenterY = origPadCenterY;
-            }
+            checkPointerUp(pid);
 
             pointerActionsMask[pid] = 0;
             pointerIsClick[pid] = false;
@@ -727,6 +800,7 @@ public final class Controls {
         }
         return (int) a;
     }
+
     private static float intToFloat(int a)
     {
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
@@ -734,18 +808,24 @@ public final class Controls {
         }
         return (float) a;
     }
+
+    private static void updateTouchActionMask(){
+        for (int i = 0; i < POINTER_MAX_ID; i++) {
+            touchActionsMask |= pointerActionsMask[i];
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     @TargetApi(Build.VERSION_CODES.FROYO)
     public static void touchEvent(MotionEvent event) {
         int action = event.getAction();
         int actionCode = action & MotionEvent.ACTION_MASK;
         int points = event.getPointerCount();
-        int i=0;
         int aidx=0;
 
         switch (actionCode) {
             case MotionEvent.ACTION_DOWN:
-                for (i = 0; i < points; i++) {
+                for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i), event.getX(i), event.getY(i), POINTER_DOWN);
                 }
                 break;
@@ -753,7 +833,7 @@ public final class Controls {
             case MotionEvent.ACTION_POINTER_DOWN:
                 aidx = action >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 
-                for (i = 0; i < points; i++) {
+                for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i),
                             event.getX(i),
                             event.getY(i),
@@ -762,14 +842,25 @@ public final class Controls {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                for (i = 0; i < points; i++) {
+                for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i), event.getX(i), event.getY(i), POINTER_MOVE);
                 }
                 break;
+            default :
+                touchEvent2(event, points, action, actionCode, aidx);
+                break;
+        }
 
+        touchActionsMask = 0;
+
+        updateTouchActionMask();
+    }
+
+    private static void touchEvent2(MotionEvent event, int points, int action, int actionCode, int aidx){
+        switch (actionCode){
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                for (i = 0; i < points; i++) {
+                for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i), event.getX(i), event.getY(i), POINTER_UP);
                 }
                 break;
@@ -777,20 +868,13 @@ public final class Controls {
             case MotionEvent.ACTION_POINTER_UP:
                 aidx = action >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 
-                for (i = 0; i < points; i++) {
+                for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i),
                             event.getX(i),
                             event.getY(i),
                             ((i == aidx) ? POINTER_UP : POINTER_MOVE));
                 }
                 break;
-            default : break;
-        }
-
-        touchActionsMask = 0;
-
-        for (i = 0; i < POINTER_MAX_ID; i++) {
-            touchActionsMask |= pointerActionsMask[i];
         }
     }
 
@@ -824,6 +908,18 @@ public final class Controls {
         return false;
     }
 
+    private static void updateCA(){
+        for (ControlAcceleration ca : ACCELERATIONS) {
+            if (!ca.updated) {
+                ca.value *= 0.5f;
+
+                if (!ca.active()) {
+                    ca.value = 0.0f;
+                }
+            }
+        }
+    }
+
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void updateAccelerations(int mask) {
         for (ControlAcceleration ca : ACCELERATIONS) {
@@ -852,15 +948,7 @@ public final class Controls {
             }
         }
 
-        for (ControlAcceleration ca : ACCELERATIONS) {
-            if (!ca.updated) {
-                ca.value *= 0.5f;
-
-                if (!ca.active()) {
-                    ca.value = 0.0f;
-                }
-            }
-        }
+        updateCA();
     }
 
     @SuppressWarnings("WeakerAccess")
