@@ -534,6 +534,14 @@ public class Game extends ZameGame {
                 : Weapons.currentParams.soundIdx);
     }
 
+    private boolean isMonsterVisible(){
+        return (LevelRenderer.currVis != null) && (LevelRenderer.currVis.obj instanceof Monster);
+    }
+
+    private boolean isEntityNear(){
+        return (!Weapons.currentParams.isNear) || (LevelRenderer.currVis.dist <= 1.4);
+    }
+
     @SuppressWarnings("MagicNumber")
     private void processShoot() {
         getBestWeapon();
@@ -541,8 +549,8 @@ public class Game extends ZameGame {
         @SuppressWarnings("BooleanVariableAlwaysNegated")
         boolean hit = false;
 
-        if ((LevelRenderer.currVis != null) && (LevelRenderer.currVis.obj instanceof Monster)) {
-            if ((!Weapons.currentParams.isNear) || (LevelRenderer.currVis.dist <= 1.4)) {
+        if (isMonsterVisible()) {
+            if (isEntityNear()) {
                 Monster mon = (Monster)LevelRenderer.currVis.obj;
 
                 if (checkMonsterVisibilityAndHit(mon, Weapons.currentParams.hits)) {

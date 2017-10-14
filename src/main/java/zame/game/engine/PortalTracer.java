@@ -310,6 +310,141 @@ public class PortalTracer {
         return new int[] {x, y};
     }
 
+    private void updateTouchedCells(int x, int y){
+        if (!touchedCellsMap[y][x])    // just for case
+        {
+            touchedCellsMap[y][x] = true;
+
+            if ((level[y][x] <= 0) && (touchedCellsCount < MAX_TOUCHED_CELLS)) {
+                touchedCells[touchedCellsCount].x = x;
+                touchedCells[touchedCellsCount].y = y;
+                touchedCellsCount++;
+            }
+        }
+    }
+
+    private int[] gettoXY(int fromX, int fromY, int toX, int toY){
+        if (fromY > toY) {
+            if (fromX > toX) {
+                toX++;
+            } else {
+                toY++;
+            }
+        } else if (fromY == toY) {
+            if (fromX > toX) {
+                toX++;
+            } else {
+                toX--;
+            }
+        } else {
+            if (fromX < toX) {
+                toX--;
+            } else {
+                toY--;
+            }
+        }
+
+        return new int[] {toX, toY};
+    }
+
+    private boolean isSamePosition(int fromX, int fromY, int toX, int toY){
+        return (fromX == toX) && (fromY == toY);
+    }
+
+    private boolean isTFTT(float tf, float tt){
+        return (tf <= 0) && (tt >= 0);
+    }
+
+    private float[] updatePortTo(float portToX, float portToY, int x, int y){
+
+        if (tToSide >= 0) {
+            portToX = (float)x + X_ADD[(tFromSide + 1) % 4];
+            portToY = (float)y + Y_ADD[(tFromSide + 1) % 4];
+        }
+
+        return new float[] {portToX, portToY};
+    }
+
+    private boolean updatePortal(int x, int y, int fromX, int fromY){
+        return (((!isEquals(x,fromX))) || (!isEquals(y,fromY)));
+    }
+
+    private void tracePortal(boolean portal, float portToX, float portToY, int lastX, int lastY, int fromX, int fromY, float fromAngle, float toAngle){
+        if (portal) {
+            float innerToAngle = ((portToX >= 0)
+                    ? getAngle(portToX - heroX, portToY - heroY) /* + ANG_CORRECT (leaved here just for case) */
+                    : toAngle);
+
+            if (angleDiff(fromAngle, innerToAngle) < Math.PI) {
+                traceCell(fromX, fromY, fromAngle, lastX, lastY, innerToAngle);
+            }
+        }
+    }
+
+    private float updateFromAngle(float portFromX, float portFromY, float fromAngle){
+        if (portFromX >= 0) {
+            fromAngle = getAngle(portFromX - heroX,
+                    portFromY - heroY) /* - ANG_CORRECT (leaved here just for case) */;
+        }
+
+        return fromAngle;
+    }
+
+    private boolean equalToPos(int x, int y, int toX, int toY){
+        return (isEquals(x,toX)) && (isEquals(y,toY));
+    }
+
+    private float[] updatePortFrom(float portFromX, float portFromY, int x, int y){
+        if (tFromSide >= 0) {
+            portFromX = (float)x + X_ADD[tToSide];
+            portFromY = (float)y + Y_ADD[tToSide];
+        }
+        return new float[] {portFromX, portFromY};
+    }
+
+    private boolean isOneBetween(boolean visible, int oa, int ob){
+        return visible || ((oa > 0) && (ob > 0));
+    }
+
+    private int[] checkTouchedCellMap(int value1, int value2, float fromDx, float fromDy, float toDx, float toDy, boolean visible, int oa, int ob){
+        if (!touchedCellsMap[value2][value1]) {
+            for (int i = 0; i < 4; i++) {
+                float dx = ((float)value1 + X_ADD[i]) - heroX;
+                float dy = ((float)value2 + Y_ADD[i]) - heroY;
+
+                float tf = (dx * fromDy) + (dy * fromDx);
+                float tt = (dx * toDy) + (dy * toDx);
+
+                if (isTFTT(tf, tt)) {
+                    visible = true;
+                    break;
+                } else {
+                    int[] result = getOAB(oa, ob, tf, tt);
+                    oa = result[0];
+                    ob = result[1];
+                }
+            }
+        }
+
+        return new int[] {oa, ob, ( (visible) ? 0 : 1 )};
+    }
+
+    private boolean updateRepeat(boolean wall, boolean repeat){
+        if (wall) {
+            repeat = false;
+        }
+
+        return repeat;
+    }
+
+    private boolean checkAngleDiff(float fromAngle, float toAngle, boolean repeat){
+        if (angleDiff(fromAngle, toAngle) > Math.PI) {
+            repeat = false;
+        }
+
+        return repeat;
+    }
+
     @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
     private void traceCell(int fromX, int fromY, float fromAngle, int toX, int toY, float toAngle) {
         boolean repeat = true;
@@ -341,7 +476,7 @@ public class PortalTracer {
                         float tf = (dx * fromDy) + (dy * fromDx);
                         float tt = (dx * toDy) + (dy * toDx);
 
-                        if ((tf <= 0) && (tt >= 0)) {
+                        if (isTFTT(tf, tt)) {
                             visible = true;
                             break;
                         } else {
@@ -358,7 +493,7 @@ public class PortalTracer {
                     break;
                 }
 
-                if ((fromX == toX) && (fromY == toY)) {
+                if (isSamePosition(fromX, fromY, toX, toY)) {
                     repeat = false;
                     break;
                 } else {
@@ -381,7 +516,7 @@ public class PortalTracer {
                         float tf = (dx * fromDy) + (dy * fromDx);
                         float tt = (dx * toDy) + (dy * toDx);
 
-                        if ((tf <= 0) && (tt >= 0)) {
+                        if (isTFTT(tf, tt)) {
                             visible = true;
                             break;
                         } else {
@@ -394,31 +529,17 @@ public class PortalTracer {
 
                 // if at least one point is between fromAngle and toAngle
                 // or fromAngle and toAngle is between cell points
-                if (visible || ((oa > 0) && (ob > 0))) {
+                if (isOneBetween(visible, oa, ob)) {
                     break;
                 }
 
-                if ((fromX == toX) && (fromY == toY)) {
+                if (isSamePosition(fromX, fromY, toX, toY)) {
                     repeat = false;
                     break;
-                } else if (fromY > toY) {
-                    if (fromX > toX) {
-                        toX++;
-                    } else {
-                        toY++;
-                    }
-                } else if (fromY == toY) {
-                    if (fromX > toX) {
-                        toX++;
-                    } else {
-                        toX--;
-                    }
                 } else {
-                    if (fromX < toX) {
-                        toX--;
-                    } else {
-                        toY--;
-                    }
+                    int[] result = gettoXY(fromX, fromY, toX, toY);
+                    toX = result[0];
+                    toY = result[1];
                 }
             }
 
@@ -436,33 +557,13 @@ public class PortalTracer {
             boolean portal = false;
 
             while (true){
-                if (!touchedCellsMap[y][x])    // just for case
-                {
-                    touchedCellsMap[y][x] = true;
-
-                    if ((level[y][x] <= 0) && (touchedCellsCount < MAX_TOUCHED_CELLS)) {
-                        touchedCells[touchedCellsCount].x = x;
-                        touchedCells[touchedCellsCount].y = y;
-                        touchedCellsCount++;
-                    }
-                }
+                updateTouchedCells(x, y);
 
                 if (isEquals(level[y][x],0)) {
                     if (wall) {
-                        if (portal) {
-                            float innerToAngle = ((portToX >= 0)
-                                    ? getAngle(portToX - heroX, portToY - heroY) /* + ANG_CORRECT (leaved here just for case) */
-                                    : toAngle);
+                        tracePortal(portal, portToX, portToY, lastX, lastY, fromX, fromY, fromAngle, toAngle);
 
-                            if (angleDiff(fromAngle, innerToAngle) < Math.PI) {
-                                traceCell(fromX, fromY, fromAngle, lastX, lastY, innerToAngle);
-                            }
-                        }
-
-                        if (portFromX >= 0) {
-                            fromAngle = getAngle(portFromX - heroX,
-                                    portFromY - heroY) /* - ANG_CORRECT (leaved here just for case) */;
-                        }
+                        fromAngle = updateFromAngle(portFromX, portFromY, fromAngle);
 
                         fromX = x;
                         fromY = y;
@@ -476,21 +577,19 @@ public class PortalTracer {
                         lastX = prevX;
                         lastY = prevY;
                         wall = true;
-                        portal = (((!isEquals(x,fromX))) || (!isEquals(y,fromY)));
+                        portal = updatePortal(x, y, fromX, fromY);
 
-                        if (tToSide >= 0) {
-                            portToX = (float)x + X_ADD[(tFromSide + 1) % 4];
-                            portToY = (float)y + Y_ADD[(tFromSide + 1) % 4];
-                        }
+                        float[] result = updatePortTo(portToX, portToY, x, y);
+                        portToX = result[0];
+                        portToY = result[1];
                     }
 
-                    if (tFromSide >= 0) {
-                        portFromX = (float)x + X_ADD[tToSide];
-                        portFromY = (float)y + Y_ADD[tToSide];
-                    }
+                    float[] result = updatePortFrom(portFromX, portFromY, x, y);
+                    portFromX = result[0];
+                    portFromY = result[1];
                 }
 
-                if ((isEquals(x,toX)) && (isEquals(y,toY))) {
+                if (equalToPos(x, y, toX, toY)) {
                     if (portal) {
                         toX = lastX;
                         toY = lastY;
@@ -499,12 +598,10 @@ public class PortalTracer {
                             toAngle = getAngle(portToX - heroX,
                                     portToY - heroY) /* + ANG_CORRECT (leaved here just for case) */;
 
-                            if (angleDiff(fromAngle, toAngle) > Math.PI) {
-                                repeat = false;
-                            }
+                            repeat = checkAngleDiff(fromAngle, toAngle, repeat);
                         }
-                    } else if (wall) {
-                        repeat = false;
+                    } else {
+                        repeat = updateRepeat(wall, repeat);
                     }
 
                     break;
