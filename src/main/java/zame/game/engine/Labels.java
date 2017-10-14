@@ -53,8 +53,8 @@ public final class Labels {
     public static volatile LabelMaker maker = new LabelMaker(true,1000,1000);
     public static volatile LabelMaker msgMaker = new LabelMaker(true,1000,1000);
     //INIZIALIZZAZIONE DI QUESTE VARIABILI PERICOLOSA PER L'ESECUZIONE DEL PROGRAMMA
-    public static volatile NumericSprite numeric; //inizializzazione = black screen dopo new game
-    public static volatile NumericSprite statsNumeric;
+    public static volatile NumericSprite numeric = null; //inizializzazione = black screen dopo new game
+    public static volatile NumericSprite statsNumeric = null;
     //FINE VARIABILI PERICOLOSE
     private static Paint labelPaint  = new Paint();
     private static Paint msgPaint = new Paint();

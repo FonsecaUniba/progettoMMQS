@@ -402,11 +402,23 @@ public class PortalTracer {
         return new float[] {portFromX, portFromY};
     }
 
-    private boolean isOneBetween(boolean visible, int oa, int ob){
-        return visible || ((oa > 0) && (ob > 0));
+    private boolean updateRepeat(boolean wall, boolean repeat){
+        if (wall) {
+            repeat = false;
+        }
+
+        return repeat;
     }
 
-    private int[] checkTouchedCellMap(int value1, int value2, float fromDx, float fromDy, float toDx, float toDy, boolean visible, int oa, int ob){
+    private boolean checkAngleDiff(float fromAngle, float toAngle, boolean repeat){
+        if (angleDiff(fromAngle, toAngle) > Math.PI) {
+            repeat = false;
+        }
+
+        return repeat;
+    }
+
+    private int[] checkTouchedCellsMap(int value1, int value2, float fromDx, float fromDy, float toDx, float toDy, boolean visible, int oa, int ob){
         if (!touchedCellsMap[value2][value1]) {
             for (int i = 0; i < 4; i++) {
                 float dx = ((float)value1 + X_ADD[i]) - heroX;
@@ -426,23 +438,77 @@ public class PortalTracer {
             }
         }
 
-        return new int[] {oa, ob, ( (visible) ? 0 : 1 )};
+        return new int[] {oa, ob, ((visible) ? 0 : 1)};
     }
 
-    private boolean updateRepeat(boolean wall, boolean repeat){
-        if (wall) {
-            repeat = false;
+    private int[] iterateCells1(boolean repeat, int fromX, int fromY, int toX, int toY, float fromDx, float fromDy, float toDx, float toDy){
+        while (true){
+            boolean visible = false;
+            int oa = 0;
+            int ob = 0;
+
+            int[] result = checkTouchedCellsMap(fromX, fromY, fromDx, fromDy, toDx, toDy, false, oa, ob);
+            oa = result[0];
+            ob = result[1];
+            visible = (result[2] == 0);
+
+            // if at least one point is between fromAngle and toAngle
+            // or fromAngle and toAngle is between cell points
+            if (isInSight(visible, oa, ob)) {
+                break;
+            }
+
+            if (isSamePosition(fromX, fromY, toX, toY)) {
+                repeat = false;
+                break;
+            } else {
+                result = updateFromValues(fromX, fromY, toX, toY);
+                fromX = result[0];
+                fromY = result[1];
+            }
         }
 
-        return repeat;
+        return new int[] {fromX, fromY, ((repeat) ? 0 : 1)};
     }
 
-    private boolean checkAngleDiff(float fromAngle, float toAngle, boolean repeat){
-        if (angleDiff(fromAngle, toAngle) > Math.PI) {
-            repeat = false;
+    private int[] iterateCells2(boolean repeat, int fromX, int fromY, int toX, int toY, float fromDx, float fromDy, float toDx, float toDy){
+        while (true){
+            boolean visible = false;
+            int oa = 0;
+            int ob = 0;
+
+            int[] result = checkTouchedCellsMap(toX, toY, fromDx, fromDy, toDx, toDy, visible, oa, ob);
+            oa = result[0];
+            ob = result[1];
+            visible = (result[2] == 0);
+
+            // if at least one point is between fromAngle and toAngle
+            // or fromAngle and toAngle is between cell points
+            if (isInSight(visible, oa, ob)) {
+                break;
+            }
+
+            if (isSamePosition(fromX, fromY, toX, toY)) {
+                repeat = false;
+                break;
+            } else {
+                result = gettoXY(fromX, fromY, toX, toY);
+                toX = result[0];
+                toY = result[1];
+            }
         }
 
-        return repeat;
+        return new int[] {toX, toY, ((repeat) ? 0 : 1)};
+    }
+
+    private float[] checkPortX(boolean repeat, float toAngle, float fromAngle, float portToX, float portToY){
+        if (portToX >= 0) {
+            toAngle = getAngle(portToX - heroX,
+                    portToY - heroY) /* + ANG_CORRECT (leaved here just for case) */;
+
+            repeat = checkAngleDiff(fromAngle, toAngle, repeat);
+        }
+        return new float[] {toAngle, ((repeat) ? 0 : 2)};
     }
 
     @SuppressWarnings({ "MagicNumber", "ConstantConditions" })
@@ -463,85 +529,15 @@ public class PortalTracer {
 
             toY = getToY(toY, toAngle);
 
-            while (true){
-                boolean visible = false;
-                int oa = 0;
-                int ob = 0;
+            int[] result = iterateCells1(repeat, fromX, fromY, toX, toY, fromDx, fromDy, toDx, toDy);
+            fromX = result[0];
+            fromY = result[1];
+            repeat = (result[2] == 0);
 
-                if (!touchedCellsMap[fromY][fromX]) {
-                    for (int i = 0; i < 4; i++) {
-                        float dx = ((float)fromX + X_ADD[i]) - heroX;
-                        float dy = ((float)fromY + Y_ADD[i]) - heroY;
-
-                        float tf = (dx * fromDy) + (dy * fromDx);
-                        float tt = (dx * toDy) + (dy * toDx);
-
-                        if (isTFTT(tf, tt)) {
-                            visible = true;
-                            break;
-                        } else {
-                            int[] result = getOAB(oa, ob, tf, tt);
-                            oa = result[0];
-                            ob = result[1];
-                        }
-                    }
-                }
-
-                // if at least one point is between fromAngle and toAngle
-                // or fromAngle and toAngle is between cell points
-                if (isInSight(visible, oa, ob)) {
-                    break;
-                }
-
-                if (isSamePosition(fromX, fromY, toX, toY)) {
-                    repeat = false;
-                    break;
-                } else {
-                    int[] result = updateFromValues(fromX, fromY, toX, toY);
-                    fromX = result[0];
-                    fromY = result[1];
-                }
-            }
-
-            while (true){
-                boolean visible = false;
-                int oa = 0;
-                int ob = 0;
-
-                if (!touchedCellsMap[toY][toX]) {
-                    for (int i = 0; i < 4; i++) {
-                        float dx = ((float)toX + X_ADD[i]) - heroX;
-                        float dy = ((float)toY + Y_ADD[i]) - heroY;
-
-                        float tf = (dx * fromDy) + (dy * fromDx);
-                        float tt = (dx * toDy) + (dy * toDx);
-
-                        if (isTFTT(tf, tt)) {
-                            visible = true;
-                            break;
-                        } else {
-                            int[] result = getOAB(oa, ob, tf, tt);
-                            oa = result[0];
-                            ob = result[1];
-                        }
-                    }
-                }
-
-                // if at least one point is between fromAngle and toAngle
-                // or fromAngle and toAngle is between cell points
-                if (isOneBetween(visible, oa, ob)) {
-                    break;
-                }
-
-                if (isSamePosition(fromX, fromY, toX, toY)) {
-                    repeat = false;
-                    break;
-                } else {
-                    int[] result = gettoXY(fromX, fromY, toX, toY);
-                    toX = result[0];
-                    toY = result[1];
-                }
-            }
+            result = iterateCells2(repeat, fromX, fromY, toX, toY, fromDx, fromDy, toDx, toDy);
+            toX = result[0];
+            toY = result[1];
+            repeat = (result[2] == 0);
 
             int x = fromX;
             int y = fromY;
@@ -579,14 +575,14 @@ public class PortalTracer {
                         wall = true;
                         portal = updatePortal(x, y, fromX, fromY);
 
-                        float[] result = updatePortTo(portToX, portToY, x, y);
-                        portToX = result[0];
-                        portToY = result[1];
+                        float[] floatResult = updatePortTo(portToX, portToY, x, y);
+                        portToX = floatResult[0];
+                        portToY = floatResult[1];
                     }
 
-                    float[] result = updatePortFrom(portFromX, portFromY, x, y);
-                    portFromX = result[0];
-                    portFromY = result[1];
+                    float[] floatResult = updatePortFrom(portFromX, portFromY, x, y);
+                    portFromX = floatResult[0];
+                    portFromY = floatResult[1];
                 }
 
                 if (equalToPos(x, y, toX, toY)) {
@@ -594,12 +590,10 @@ public class PortalTracer {
                         toX = lastX;
                         toY = lastY;
 
-                        if (portToX >= 0) {
-                            toAngle = getAngle(portToX - heroX,
-                                    portToY - heroY) /* + ANG_CORRECT (leaved here just for case) */;
 
-                            repeat = checkAngleDiff(fromAngle, toAngle, repeat);
-                        }
+                        float[] floatResult = checkPortX(repeat, toAngle, fromAngle, portToX, portToY);
+                        toAngle = floatResult[0];
+                        repeat = (floatResult[1] < 1);
                     } else {
                         repeat = updateRepeat(wall, repeat);
                     }
@@ -610,7 +604,7 @@ public class PortalTracer {
                 prevX = x;
                 prevY = y;
 
-                int[] result = checkToXY(x, y, toX, toY);
+                result = checkToXY(x, y, toX, toY);
                 x = result[0];
                 y = result[1];
             }

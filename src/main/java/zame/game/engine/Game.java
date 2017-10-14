@@ -155,7 +155,7 @@ public class Game extends ZameGame {
         }
     }
 
-    public static void initPaths(Context appContext) {
+    public static void initPaths(Context appContext)  {
         if (pathsInitialized) {
             return;
         }
@@ -166,9 +166,9 @@ public class Game extends ZameGame {
         String noMediaPath = String.format(Locale.US, "%1$s%2$s.nomedia", externalStoragePath, File.separator);
 
         if (!(new File(noMediaPath)).exists()) {
-
+            FileOutputStream out = null;
             try {
-                FileOutputStream out = new FileOutputStream(noMediaPath);
+                out = new FileOutputStream(noMediaPath);
                 out.close();
             } catch (FileNotFoundException ex) {
                 System.err.println();
@@ -176,6 +176,14 @@ public class Game extends ZameGame {
                 System.err.println();
             } catch (IOException ex) {
                 System.err.println();
+            } finally {
+                if(out!=null) {
+                    try {
+                        out.close();
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
@@ -1552,20 +1560,29 @@ public class Game extends ZameGame {
 
         String tmpName = saveName + ".tmp";
         boolean success = true;
-
+        FileOutputStream fo = null;
         try {
-            FileOutputStream fo = new FileOutputStream(tmpName, false);
+            fo = new FileOutputStream(tmpName, false);
             ObjectOutputStream os = new ObjectOutputStream(fo);
 
             State.writeTo(os);
 
             os.flush();
+            os.close();
             fo.close();
 
             safeRename(tmpName, saveName);
         } catch (Exception ex) {
             Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
+        }finally {
+            if(fo!=null){
+                try{
+                    fo.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
         }
 
         if (!success) {
@@ -1592,9 +1609,9 @@ public class Game extends ZameGame {
 
         boolean success = true;
         String errorMessage = ZameApplication.self.getString(R.string.msg_cant_load_state);
-
+        FileInputStream fi = null;
         try {
-            FileInputStream fi = new FileInputStream(saveName);
+            fi = new FileInputStream(saveName);
             ObjectInputStream is = new ObjectInputStream(fi);
 
             State.readFrom(is);
@@ -1607,6 +1624,14 @@ public class Game extends ZameGame {
         } catch (Exception ex) {
             Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
+        }finally {
+            if(fi!=null){
+                try{
+                    fi.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
         }
 
         if (!success) {

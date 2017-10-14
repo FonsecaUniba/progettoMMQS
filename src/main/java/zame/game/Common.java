@@ -350,10 +350,11 @@ public final class Common {
 
     public static boolean copyFile(String srcFileName, String destFileName) {
         boolean success = true;
-
+        InputStream in = null;
+        OutputStream out = null;
         try {
-            InputStream in = new FileInputStream(srcFileName);
-            OutputStream out = new FileOutputStream(destFileName);
+             in = new FileInputStream(srcFileName);
+             out = new FileOutputStream(destFileName);
 
             //noinspection MagicNumber
             byte[] buf = new byte[1024];
@@ -368,6 +369,21 @@ public final class Common {
         } catch (Exception ex) {
             Log.e(Common.GAME_NAME, "Exception", ex);
             success = false;
+        }finally {
+
+            try {
+                if (in != null) {
+                    in.close();
+                }
+
+
+                if (out != null) {
+                    out.close();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (!success) {
