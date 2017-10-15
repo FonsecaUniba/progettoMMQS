@@ -914,15 +914,12 @@ public class Game extends ZameGame {
         boolean result = false;
 
         switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
-            case TextureLoader.OBJ_CLIP:
-            case TextureLoader.OBJ_AMMO:
-            case TextureLoader.OBJ_SHELL:
-            case TextureLoader.OBJ_SBOX:
-                result = true;
-            default:
-                break;
+            case TextureLoader.OBJ_CLIP: result = true;
+            case TextureLoader.OBJ_AMMO: result = true;
+            case TextureLoader.OBJ_SHELL: result = true;
+            case TextureLoader.OBJ_SBOX: result = true;
+            default: break;
         }
-
         return result;
     }
 

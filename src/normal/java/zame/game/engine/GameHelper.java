@@ -29,8 +29,6 @@ public final class GameHelper {
                     Game.getExternalStoragePath(),
                     File.separator);
 
-            File oldExternalStorageFile = new File(oldExternalStoragePath);
-
             externalStorageFile = checkOldPath();
         } else {
             String oldExternalStoragePath = String.format(Locale.US,
