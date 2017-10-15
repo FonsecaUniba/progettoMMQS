@@ -199,6 +199,22 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    private void processMask(){
+        if (checkMask()) {
+            State.objectsMap[cellY][cellX] = ammoType;
+            State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_OBJECT;
+        } else {
+            boolean keepGoing = true;
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    keepGoing = setKeepGoing(dx, dy);
+                    if (!keepGoing) break;
+                }
+                if (!keepGoing) break;
+            }
+        }
+    }
+
     public void hit(int amt, int hitTm) {
         hitTimeout = hitTm;
         health -= amt;
@@ -210,19 +226,7 @@ public class Monster implements Externalizable {
             State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_DEAD_CORPSE;
 
             if (ammoType > 0) {
-                if (checkMask()) {
-                    State.objectsMap[cellY][cellX] = ammoType;
-                    State.passableMap[cellY][cellX] |= Level.PASSABLE_IS_OBJECT;
-                } else {
-                    boolean keepGoing = true;
-                    for (int dy = -1; dy <= 1; dy++) {
-                        for (int dx = -1; dx <= 1; dx++) {
-                            keepGoing = setKeepGoing(dx, dy);
-                            if (!keepGoing) break;
-                        }
-                        if (!keepGoing) break;
-                    }
-                }
+                processMask();
             }
 
             State.killedMonsters++;
@@ -410,8 +414,8 @@ public class Monster implements Externalizable {
         return vis && (distSq <= attackDistSq);
     }
 
-    private int getDir(int dir){
-        return (dir + (inverseRotation ? 1 : 3)) % 4;
+    private int getDir(int direction){
+        return (direction + (inverseRotation ? 1 : 3)) % 4;
     }
 
     @SuppressWarnings("MagicNumber")

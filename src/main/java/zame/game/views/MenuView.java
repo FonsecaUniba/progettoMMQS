@@ -279,28 +279,28 @@ public class MenuView extends RelativeLayout {
     }
 
     @SuppressWarnings("deprecation")
-    private static void checkInstantSave(MenuActivity activity, Data data){
+    private static void checkInstantSave(MenuActivity window, Data info){
         if (hasInstantSave() && !MenuActivity.justLoaded) {
-            activity.showDialog(DIALOG_LOAD_WARN);
+            window.showDialog(DIALOG_LOAD_WARN);
         } else {
-            startGame(activity, data.slotFileNamesForLoad.get(data.currentIndex));
+            startGame(window, info.slotFileNamesForLoad.get(info.currentIndex));
         }
     }
 
-    private static void saveToSlot(Data data){
+    private static void saveToSlot(Data info){
         String newSaveName = String.format(Locale.US,
                 "%sslot-%d.%s.save",
                 Game.SAVES_ROOT,
-                data.currentIndex + 1,
+                info.currentIndex + 1,
                 (new SimpleDateFormat("yyyy-MM-dd-HH-mm",
                         Locale.US)).format(Calendar.getInstance().getTime()));
 
         if (Common.copyFile(Game.INSTANT_PATH, newSaveName + ".new")) {
             //noinspection SizeReplaceableByIsEmpty
-            if (data.slotFileNamesForSave.get(data.currentIndex).length() != 0) {
+            if (info.slotFileNamesForSave.get(info.currentIndex).length() != 0) {
                 //noinspection ResultOfMethodCallIgnored
                 (new File(Game.SAVES_ROOT
-                        + data.slotFileNamesForSave.get(data.currentIndex)
+                        + info.slotFileNamesForSave.get(info.currentIndex)
                         + ".save")).delete();
             }
 

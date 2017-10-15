@@ -15,68 +15,6 @@ public final class GameHelper {
     private GameHelper() {
     }
 
-    private static String[] writeFiles(String[] files, String externalStoragePath, String oldExternalStoragePath){
-        if (files != null) {
-            Pattern pat = Pattern.compile("^slot-(\\d)\\.(\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2})\\.save$");
-
-            //noinspection ForLoopReplaceableByForEach
-            for (int i = 0; i < files.length; i++) {
-                Matcher mt = pat.matcher(files[i]);
-
-                if (mt.find()) {
-                    int slotNum = Integer.valueOf(mt.group(1)) - 1;
-
-                    if ((slotNum >= 0) && (slotNum < 4)) {
-                        Common.copyFile(String.format(Locale.US,
-                                "%1$s%2$s%3$s",
-                                oldExternalStoragePath,
-                                File.separator,
-                                files[i]),
-                                String.format(Locale.US,
-                                        "%1$s%2$sslot-%3$s.%4$s.save",
-                                        externalStoragePath,
-                                        File.separator,
-                                        String.valueOf(slotNum + 5),
-                                        mt.group(2)));
-                    }
-                }
-
-                //noinspection ResultOfMethodCallIgnored
-                (new File(String.format(Locale.US,
-                        "%1$s%2$s%3$s",
-                        oldExternalStoragePath,
-                        File.separator,
-                        files[i]))).delete();
-            }
-        }
-
-        return files;
-    }
-
-    private static File checkOldPath(File externalStoragePath, String oldExternalStoragePath, File oldExternalStorageFile){
-        if (oldExternalStorageFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            oldExternalStorageFile.renameTo(externalStorageFile);
-        } else {
-            oldExternalStoragePath = String.format(Locale.US,
-                    "%1$s%2$sAndroid%2$sdata%2$szame.GloomyDungeons.freedemo.common",
-                    Game.getExternalStoragePath(),
-                    File.separator);
-
-            oldExternalStorageFile = new File(oldExternalStoragePath);
-
-            if (oldExternalStorageFile.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                oldExternalStorageFile.renameTo(externalStorageFile);
-            } else {
-                //noinspection ResultOfMethodCallIgnored
-                externalStorageFile.mkdirs();
-            }
-        }
-
-        return externalStorageFile;
-    }
-
     public static String initPaths(@SuppressWarnings("UnusedParameters") Context appContext) {
         String externalStoragePath = String.format(Locale.US,
                 "%1$s%2$sAndroid%2$sdata%2$szame.GloomyDungeons.common",

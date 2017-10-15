@@ -111,19 +111,14 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         updateTxtValues();
         startTask();
     }
+
     private static int floatToInt(float a) {
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
     }
-    private static float intToFloat(int a)
-    {
-        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
-            throw new IllegalArgumentException("Value not castable");
-        }
-        return (float) a;
-    }
+
     private void startTask() {
         if (!increaseValuesTaskActive) {
             increaseValuesTask = new TimerTask() {

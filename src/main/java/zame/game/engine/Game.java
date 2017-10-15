@@ -755,10 +755,8 @@ public class Game extends ZameGame {
 
         if ((actionsMask & Controls.ACTION) != 0) {
             if ((processedMask & Controls.ACTION) == 0) {
-                if (!processUse()) {
-                    if (Weapons.shootCycle == 0) {
-                        Weapons.shootCycle++;
-                    }
+                if (!processUse() && (Weapons.shootCycle == 0) ) {
+                    Weapons.shootCycle++;
                 }
 
                 processedMask |= Controls.ACTION;
@@ -1602,6 +1600,17 @@ public class Game extends ZameGame {
                 : (name.equals(AUTOSAVE_NAME) ? AUTOSAVE_PATH : (SAVES_ROOT + name + ".save")));
     }
 
+    private static void needToReload(boolean success, String errorMessage){
+        if (!success) {
+            Toast.makeText(ZameApplication.self, errorMessage, Toast.LENGTH_LONG).show();
+        }
+
+        if (success && State.tmpReloadLevel) {
+            State.tmpReloadLevel = false;
+            loadLevel(LOAD_LEVEL_RELOAD);
+        }
+    }
+
     private static boolean loadGameState(String name) {
         initPaths(ZameApplication.self);
 
@@ -1634,14 +1643,7 @@ public class Game extends ZameGame {
             }
         }
 
-        if (!success) {
-            Toast.makeText(ZameApplication.self, errorMessage, Toast.LENGTH_LONG).show();
-        }
-
-        if (success && State.tmpReloadLevel) {
-            State.tmpReloadLevel = false;
-            loadLevel(LOAD_LEVEL_RELOAD);
-        }
+        needToReload(success, errorMessage);
 
         return success;
     }

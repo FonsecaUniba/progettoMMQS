@@ -443,14 +443,13 @@ public class PortalTracer {
 
     private int[] iterateCells1(boolean repeat, int fromX, int fromY, int toX, int toY, float fromDx, float fromDy, float toDx, float toDy){
         while (true){
-            boolean visible = false;
             int oa = 0;
             int ob = 0;
 
             int[] result = checkTouchedCellsMap(fromX, fromY, fromDx, fromDy, toDx, toDy, false, oa, ob);
             oa = result[0];
             ob = result[1];
-            visible = (result[2] == 0);
+            boolean visible = (result[2] == 0);
 
             // if at least one point is between fromAngle and toAngle
             // or fromAngle and toAngle is between cell points
@@ -473,14 +472,13 @@ public class PortalTracer {
 
     private int[] iterateCells2(boolean repeat, int fromX, int fromY, int toX, int toY, float fromDx, float fromDy, float toDx, float toDy){
         while (true){
-            boolean visible = false;
             int oa = 0;
             int ob = 0;
 
-            int[] result = checkTouchedCellsMap(toX, toY, fromDx, fromDy, toDx, toDy, visible, oa, ob);
+            int[] result = checkTouchedCellsMap(toX, toY, fromDx, fromDy, toDx, toDy, false, oa, ob);
             oa = result[0];
             ob = result[1];
-            visible = (result[2] == 0);
+            boolean visible = (result[2] == 0);
 
             // if at least one point is between fromAngle and toAngle
             // or fromAngle and toAngle is between cell points
@@ -742,13 +740,5 @@ public class PortalTracer {
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
-    }
-
-    private static float intToFloat(int a)
-    {
-        if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
-            throw new IllegalArgumentException("Value not castable");
-        }
-        return (float) a;
     }
 }

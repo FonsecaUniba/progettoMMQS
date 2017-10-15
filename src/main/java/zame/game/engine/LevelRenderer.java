@@ -610,6 +610,40 @@ public final class LevelRenderer {
         return ((s == 1) || (s == 3));
     }
 
+    private static void renderThings(int tex, PortalTracer.TouchedCell tc){
+        for (int s = 0; s < 4; s++) {
+            if ((State.passableMap[tc.y + PortalTracer.Y_CELL_ADD[s]][tc.x + PortalTracer.X_CELL_ADD[s]]
+                    & Level.PASSABLE_MASK_WALL_N_TRANSP) == 0) {
+
+                int fromX = tc.x + PortalTracer.X_ADD[s];
+                int fromY = tc.y + PortalTracer.Y_ADD[s];
+                int toX = tc.x + PortalTracer.X_ADD[(s + 1) % 4];
+                int toY = tc.y + PortalTracer.Y_ADD[(s + 1) % 4];
+
+                Renderer.x1 = (float)fromX;
+                Renderer.y1 = -(float)fromY;
+
+                Renderer.x2 = (float)fromX;
+                Renderer.y2 = -(float)fromY;
+
+                Renderer.x3 = (float)toX;
+                Renderer.y3 = -(float)toY;
+
+                Renderer.x4 = (float)toX;
+                Renderer.y4 = -(float)toY;
+
+                int mx = getMValue(fromX, toX);
+                int my = getMValue(fromY, toY);
+
+                int autoWallMask = getAutoWallMask(s);
+                drawAutoWalls(mx, my, autoWallMask, fromX, fromY, toX, toY);
+
+                setWallLighting( intToFloat(fromX),  intToFloat(fromY),  intToFloat(toX), intToFloat(toY), matchS(s));
+                Renderer.drawQuad(tex);
+            }
+        }
+    }
+
     // render objects, decorations and transparents
     @SuppressWarnings("MagicNumber")
     private static void renderObjects() {
@@ -666,37 +700,7 @@ public final class LevelRenderer {
                     setWallLighting(fromX, fromY, toX, toY, vert);
                     Renderer.drawQuad(tex);
                 } else if (tex > 0) {
-                    for (int s = 0; s < 4; s++) {
-                        if ((State.passableMap[tc.y + PortalTracer.Y_CELL_ADD[s]][tc.x + PortalTracer.X_CELL_ADD[s]]
-                                & Level.PASSABLE_MASK_WALL_N_TRANSP) == 0) {
-
-                            int fromX = tc.x + PortalTracer.X_ADD[s];
-                            int fromY = tc.y + PortalTracer.Y_ADD[s];
-                            int toX = tc.x + PortalTracer.X_ADD[(s + 1) % 4];
-                            int toY = tc.y + PortalTracer.Y_ADD[(s + 1) % 4];
-
-                            Renderer.x1 = (float)fromX;
-                            Renderer.y1 = -(float)fromY;
-
-                            Renderer.x2 = (float)fromX;
-                            Renderer.y2 = -(float)fromY;
-
-                            Renderer.x3 = (float)toX;
-                            Renderer.y3 = -(float)toY;
-
-                            Renderer.x4 = (float)toX;
-                            Renderer.y4 = -(float)toY;
-
-                            int mx = getMValue(fromX, toX);
-                            int my = getMValue(fromY, toY);
-
-                            int autoWallMask = getAutoWallMask(s);
-                            drawAutoWalls(mx, my, autoWallMask, fromX, fromY, toX, toY);
-
-                            setWallLighting( intToFloat(fromX),  intToFloat(fromY),  intToFloat(toX), intToFloat(toY), matchS(s));
-                            Renderer.drawQuad(tex);
-                        }
-                    }
+                    renderThings(tex, tc);
                 }
             }
         }

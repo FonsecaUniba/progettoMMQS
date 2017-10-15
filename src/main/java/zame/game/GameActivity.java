@@ -2,7 +2,6 @@ package zame.game;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -293,7 +292,7 @@ public class GameActivity extends Activity implements SensorEventListener {
                 @SuppressLint("InflateParams")
                 final View codeDialogView = LayoutInflater.from(this).inflate(R.layout.code_dialog, null);
 
-                return new AlertDialog.Builder(this).setIcon(R.drawable.ic_dialog_alert)
+                return new android.app.AlertDialog.Builder(this).setIcon(R.drawable.ic_dialog_alert)
                         .setTitle(R.string.dlg_enter_code)
                         .setView(codeDialogView)
                         .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {

@@ -560,10 +560,8 @@ public final class Level {
                 if (State.heroAmmo[Weapons.AMMO_PISTOL] < Weapons.ENSURED_PISTOL_AMMO) {
                     State.heroAmmo[Weapons.AMMO_PISTOL] = Weapons.ENSURED_PISTOL_AMMO;
                 }
-            } else if (isShotgun(act)) {
-                if (State.heroAmmo[Weapons.AMMO_SHOTGUN] < Weapons.ENSURED_SHOTGUN_AMMO) {
-                    State.heroAmmo[Weapons.AMMO_SHOTGUN] = Weapons.ENSURED_SHOTGUN_AMMO;
-                }
+            } else if (isShotgun(act) && (State.heroAmmo[Weapons.AMMO_SHOTGUN] < Weapons.ENSURED_SHOTGUN_AMMO)) {
+                State.heroAmmo[Weapons.AMMO_SHOTGUN] = Weapons.ENSURED_SHOTGUN_AMMO;
             }
 
             Weapons.updateWeapon();

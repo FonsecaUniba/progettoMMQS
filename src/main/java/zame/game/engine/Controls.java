@@ -794,12 +794,6 @@ public final class Controls {
             pointerIsClick[pid] = false;
         }
     }
-    private static int floatToInt(float a) {
-        if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Value not castable");
-        }
-        return (int) a;
-    }
 
     private static float intToFloat(int a)
     {

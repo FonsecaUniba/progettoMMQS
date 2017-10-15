@@ -44,13 +44,13 @@ public class LevelConfig {
                 new MonsterConfig(4, 64, 64, HIT_TYPE_EAT), };
     }
 
-    public static LevelConfig read(AssetManager assMan, int levelNum) {
-        LevelConfig res = new LevelConfig(levelNum);
+    public static LevelConfig read(AssetManager assMan, int currLev) {
+        LevelConfig res = new LevelConfig(currLev);
 
         try {
             InputStreamReader isr = new InputStreamReader(assMan.open(String.format(Locale.US,
                     "config/level-%d.txt",
-                    levelNum)), "UTF-8");
+                    currLev)), "UTF-8");
 
             BufferedReader br = new BufferedReader(isr);
             String line = br.readLine();
