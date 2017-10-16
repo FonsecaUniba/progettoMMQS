@@ -853,6 +853,10 @@ public final class Controls {
     private static void touchEvent2(MotionEvent event, int points, int action, int actionCode, int aidx){
         switch (actionCode){
             case MotionEvent.ACTION_UP:
+                for (int i = 0; i < points; i++) {
+                processOnePointer(event.getPointerId(i), event.getX(i), event.getY(i), POINTER_UP);
+            }
+                break;
             case MotionEvent.ACTION_CANCEL:
                 for (int i = 0; i < points; i++) {
                     processOnePointer(event.getPointerId(i), event.getX(i), event.getY(i), POINTER_UP);
