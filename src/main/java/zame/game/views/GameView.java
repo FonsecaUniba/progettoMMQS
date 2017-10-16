@@ -11,20 +11,48 @@ import zame.game.SoundManager;
 import zame.game.engine.Controls;
 import zame.game.engine.Game;
 
+/**
+ * Class representing GameView
+ */
 public class GameView extends FrameLayout implements IZameView {
+    /**
+     * Class representing Data
+     */
     public static class Data {
+        /**
+         * The Game
+         */
         public Game game;
+        /**
+         * Render a Black Screen?
+         */
         public boolean noClearRenderBlackScreenOnce;
 
+        /**
+         * Class Constructor
+         * @param resources Resources
+         * @param assets Resource Manager
+         */
         public Data(Resources resources, AssetManager assets) {
             game = new Game(resources, assets);
             noClearRenderBlackScreenOnce = false;
         }
     }
 
+    /**
+     * Game data
+     */
     private Data data;
+    /**
+     * Game View
+     */
     private ZameGameView view;
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attributes
+     */
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -32,6 +60,9 @@ public class GameView extends FrameLayout implements IZameView {
         data = activity.gameViewData;
     }
 
+    /**
+     * When Activity Finishes loading
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -40,6 +71,9 @@ public class GameView extends FrameLayout implements IZameView {
         view.setGame(data.game);
     }
 
+    /**
+     * When Activity is Resumed
+     */
     @Override
     public void onResume() {
         if (data.noClearRenderBlackScreenOnce) {
@@ -55,6 +89,9 @@ public class GameView extends FrameLayout implements IZameView {
         view.onResume();
     }
 
+    /**
+     * When Activity is Paused
+     */
     @Override
     public void onPause() {
         view.onPause();

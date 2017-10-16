@@ -6,25 +6,74 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import zame.game.SoundManager;
 
+/**
+ * Class representing a Door
+ */
 @SuppressWarnings("WeakerAccess")
 public class Door implements Externalizable {
+    /**
+     * Class Constructor
+     */
     public Door(){}
+
+    /**
+     * Max Open Position
+     */
     public static final float OPEN_POS_MAX = 0.9f;
+    /**
+     * Position at which Door is Passable
+     */
     public static final float OPEN_POS_PASSABLE = 0.7f;
 
+    /**
+     * Door Index
+     */
     public int index;
+    /**
+     * Door Position X
+     */
     public int x;
+    /**
+     * Door Position Y
+     */
     public int y;
+    /**
+     * Door Texture
+     */
     public int texture;
+    /**
+     * Door Opens Vertically?
+     */
     public boolean vert;
+    /**
+     * Open Position
+     */
     public float openPos;
+    /**
+     * Door Direction
+     */
     public int dir;
+    /**
+     * Is Door Sticked?
+     */
     public boolean sticked;
+    /**
+     * Does Door require key?
+     */
     public int requiredKey;
 
+    /**
+     * Last Time Door was opened
+     */
     public long lastTime;
+    /**
+     * Door mark
+     */
     public Mark mark;
 
+    /**
+     * Initializes Variables
+     */
     public void init() {
         openPos = 0.0f;
         dir = 0;
@@ -34,6 +83,11 @@ public class Door implements Externalizable {
         mark = null;
     }
 
+    /**
+     * Writes Door on External File
+     * @param os Output Stream
+     * @throws IOException Error while writing
+     */
     @Override
     public void writeExternal(ObjectOutput os) throws IOException {
         os.writeInt(x);
@@ -46,6 +100,11 @@ public class Door implements Externalizable {
         os.writeInt(requiredKey);
     }
 
+    /**
+     * Reads Door from External File
+     * @param is Input Stream
+     * @throws IOException Error while reading
+     */
     @Override
     public void readExternal(ObjectInput is) throws IOException {
         x = is.readInt();
@@ -60,12 +119,20 @@ public class Door implements Externalizable {
         lastTime = Game.elapsedTime;
     }
 
+    /**
+     * Sticks the Door
+     * @param opened Is Open?
+     */
     public void stick(boolean opened) {
         sticked = true;
         dir = (opened ? 1 : -1);
         lastTime = 0; // instant open or close
     }
 
+    /**
+     * Get Door volume
+     * @return Door Volume
+     */
     @SuppressWarnings("MagicNumber")
     private float getVolume() {
         float dx = State.heroX - ((float)x + 0.5f);
@@ -75,6 +142,10 @@ public class Door implements Externalizable {
         return (1.0f / Math.max(1.0f, dist * 0.5f));
     }
 
+    /**
+     * Opens Door
+     * @return True if Open, False Otherwise
+     */
     public boolean open() {
         if (dir != 0) {
             return false;
@@ -87,6 +158,9 @@ public class Door implements Externalizable {
         return true;
     }
 
+    /**
+     * Tries to close Door
+     */
     @SuppressWarnings("MagicNumber")
     public void tryClose() {
         if (sticked
@@ -103,6 +177,9 @@ public class Door implements Externalizable {
         dir = -1;
     }
 
+    /**
+     * Is Door Passable?
+     */
     private void passableDoor(){
         if (openPos >= OPEN_POS_PASSABLE) {
             State.passableMap[y][x] &= ~Level.PASSABLE_IS_DOOR;
@@ -114,6 +191,10 @@ public class Door implements Externalizable {
         }
     }
 
+    /**
+     * Is Door Not Passable?
+     * @param elapsedTime Time elapsed
+     */
     private void notPassableDoor(long elapsedTime){
         if (openPos < OPEN_POS_PASSABLE) {
             if ((dir == -1) && ((State.passableMap[y][x] & Level.PASSABLE_MASK_DOOR) != 0)) {
@@ -132,6 +213,10 @@ public class Door implements Externalizable {
         }
     }
 
+    /**
+     * Update Door
+     * @param elapsedTime Time Elapsed
+     */
     public void update(long elapsedTime) {
         if (dir > 0) {
             State.wallsMap[y][x] = 0; // clear door mark for PortalTracer

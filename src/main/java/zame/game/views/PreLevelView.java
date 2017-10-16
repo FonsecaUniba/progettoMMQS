@@ -22,17 +22,51 @@ import zame.game.R;
 import zame.game.SoundManager;
 import zame.game.engine.State;
 
+/**
+ * Class representing the Pre Level View
+ */
 public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
+    /**
+     * Activity to load
+     */
     private GameActivity activity;
+    /**
+     * Event Handler
+     */
     private final Handler handler = new Handler();
+    /**
+     * Scrollable View
+     */
     private ScrollView scrollWrap;
+    /**
+     * TextView
+     */
     private TextView txtText;
+    /**
+     * Text to show
+     */
     private String preLevelText;
+    /**
+     * Current View Length
+     */
     private int currentLength;
+    /**
+     * Current View Height
+     */
     private int currentHeight;
+    /**
+     * Do we show more info?
+     */
     private boolean showMoreTextTaskActive;
+    /**
+     * Timed Task
+     */
     private TimerTask showMoreTextTask;
 
+    /**
+     * Sets image on view
+     * @param imgId Image resource ID
+     */
     private void setImage(String imgId){
         ImageView imgImage = (ImageView)findViewById(R.id.ImgImage);
         imgImage.setVisibility(View.VISIBLE);
@@ -52,6 +86,9 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     }
 
+    /**
+     * Updates the text
+     */
     private final Runnable updateText = new Runnable() {
         @Override
         public void run() {
@@ -70,6 +107,10 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     };
 
+    /**
+     * Updates text value
+     * @param ensureScroll Is Scroll active?
+     */
     private void updateTextValue(boolean ensureScroll) {
         txtText.setText(preLevelText.substring(0, currentLength));
         int newHeight = txtText.getHeight();
@@ -86,11 +127,19 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     }
 
+    /**
+     * Class constructor
+     * @param context App Context
+     * @param attrs Attribute Sets
+     */
     public PreLevelView(Context context, AttributeSet attrs) {
         super(context, attrs);
         activity = (GameActivity)context;
     }
 
+    /**
+     * When View finishes inflating
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -149,6 +198,9 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         });
     }
 
+    /**
+     * When View is Resumed
+     */
     @Override
     public void onResume() {
         currentHeight = 0;
@@ -171,6 +223,9 @@ public class PreLevelView extends zame.libs.FrameLayout implements IZameView {
         showMoreTextTimer.schedule(showMoreTextTask, 30, 30);
     }
 
+    /**
+     * When View is Paused
+     */
     @Override
     public void onPause() {
         if (showMoreTextTaskActive) {

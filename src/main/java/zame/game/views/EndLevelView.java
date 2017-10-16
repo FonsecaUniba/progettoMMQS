@@ -13,19 +13,58 @@ import zame.game.R;
 import zame.game.SoundManager;
 import zame.game.engine.Game;
 
+/**
+ * Class representing End Level View
+ */
 public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
+    /**
+     * Game Activity
+     */
     private GameActivity activity;
+    /**
+     * Event Handler
+     */
     private final Handler handler = new Handler();
+    /**
+     * Text showing Kills
+     */
     private TextView txtKills;
+    /**
+     * Text showing Items
+     */
     private TextView txtItems;
+    /**
+     * Text showing Secrets
+     */
     private TextView txtSecrets;
+    /**
+     * Current Number of Kills
+     */
     private float currentKills;
+    /**
+     * Current Number of Items
+     */
     private float currentItems;
+    /**
+     * Current Number of Secrets
+     */
     private float currentSecrets;
+    /**
+     * Current Number of Add
+     */
     private float currentAdd;
+    /**
+     * Do we need to increase Task Values?
+     */
     private boolean increaseValuesTaskActive;
+    /**
+     * Timed Task for Increasing Values
+     */
     private TimerTask increaseValuesTask;
 
+    /**
+     * Updates the values
+     */
     private final Runnable updateValues = new Runnable() {
         @SuppressWarnings("MagicNumber")
         @Override
@@ -68,17 +107,28 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     };
 
+    /**
+     * Updates End Level Text
+     */
     private void updateTxtValues() {
         txtKills.setText(String.format(activity.getString(R.string.endl_kills), floatToInt(currentKills)));
         txtItems.setText(String.format(activity.getString(R.string.endl_items), floatToInt(currentItems)));
         txtSecrets.setText(String.format(activity.getString(R.string.endl_secrets), floatToInt(currentSecrets)));
     }
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attributes
+     */
     public EndLevelView(Context context, AttributeSet attrs) {
         super(context, attrs);
         activity = (GameActivity)context;
     }
 
+    /**
+     * When View finishes inflating
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -112,6 +162,11 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         startTask();
     }
 
+    /**
+     * Casts Float value to Int
+     * @param a value to cast
+     * @return Int value of a
+     */
     private static int floatToInt(float a) {
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
@@ -119,6 +174,9 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         return (int) a;
     }
 
+    /**
+     * Starts Timed Task
+     */
     private void startTask() {
         if (!increaseValuesTaskActive) {
             increaseValuesTask = new TimerTask() {
@@ -134,6 +192,9 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     }
 
+    /**
+     * Stops Timed Task
+     */
     private void stopTask() {
         if (increaseValuesTaskActive) {
             increaseValuesTaskActive = false;
@@ -141,6 +202,10 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     }
 
+    /**
+     * When Focus Changes
+     * @param hasFocus Does View have focus?
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -152,10 +217,16 @@ public class EndLevelView extends zame.libs.FrameLayout implements IZameView {
         }
     }
 
+    /**
+     * When View is resumed
+     */
     @Override
     public void onResume() {
     }
 
+    /**
+     * When View is paused
+     */
     @Override
     public void onPause() {
         stopTask();

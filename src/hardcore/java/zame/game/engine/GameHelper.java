@@ -4,8 +4,16 @@ import android.content.Context;
 import java.io.File;
 import java.util.Locale;
 
+/**
+ * Class representing the Game Helper
+ */
 public class GameHelper
 {
+    /**
+     * Initializes External Files Paths
+     * @param appContext Context of the App
+     * @return External Storage Path
+     */
     public static String initPaths(Context appContext)
     {
         String externalStoragePath = String.format(

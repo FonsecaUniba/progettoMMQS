@@ -8,11 +8,22 @@ import zame.game.GameActivity;
 import zame.game.R;
 import zame.game.SoundManager;
 
+/**
+ * Class Representing Game Over Screen
+ */
 public class GameOverView extends zame.libs.FrameLayout implements IZameView {
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attribute
+     */
     public GameOverView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * When Activity finishes loading
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -29,10 +40,16 @@ public class GameOverView extends zame.libs.FrameLayout implements IZameView {
         });
     }
 
+    /**
+     * When Activity is Resumed
+     */
     @Override
     public void onResume() {
     }
 
+    /**
+     * When Activity is Paused
+     */
     @Override
     public void onPause() {
     }

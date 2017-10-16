@@ -13,30 +13,74 @@ import zame.game.Config;
 import zame.game.Renderer;
 import zame.game.ZameApplication;
 
+/**
+ * Class that represents the Game's Controls
+ */
 public final class Controls {
+    /**
+     * Class that represents the Hero's Acceleration
+     */
     @SuppressWarnings("WeakerAccess")
     public static class ControlAcceleration {
+        /**
+         * Minimal Acceleration Allowed
+         */
         public static final float MIN_ACCELERATION = 0.01f;
 
+        /**
+         * Current Acceleration value
+         */
         public float value;
+        /**
+         * Step by which value is altered
+         */
         public float step;
+        /**
+         * Has value changed?
+         */
         public boolean updated;
 
+        /**
+         * Class constructor
+         * @param step Step at which the Hero accelerates
+         */
         public ControlAcceleration(float step) {
             this.step = step;
         }
 
+        /**
+         * Is Acceleration active?
+         * @return Boolean response
+         */
         public boolean active() {
             return ((value <= -MIN_ACCELERATION) || (value >= MIN_ACCELERATION));
         }
     }
 
+    /**
+     * Class representing Accelerometer based Controls
+     */
     @SuppressWarnings("WeakerAccess")
     public static class ControlAccelerationBind {
+        /**
+         * Current Control Type
+         */
         public int controlType;
+        /**
+         * Current acceleration type
+         */
         public int accelerationType;
+        /**
+         * Current multiplier
+         */
         public int mult;
 
+        /**
+         * Class Constructor
+         * @param controlType controls type
+         * @param accelerationType acceleration type
+         * @param mult multiplier
+         */
         public ControlAccelerationBind(int controlType, int accelerationType, int mult) {
             this.controlType = controlType;
             this.accelerationType = accelerationType;
@@ -44,14 +88,38 @@ public final class Controls {
         }
     }
 
+    /**
+     * Class representing the Control's Button
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static class ControlItem {
+        /**
+         * Button position X
+         */
         public int x;
+        /**
+         * Button position Y
+         */
         public int y;
+        /**
+         * Button type
+         */
         public int type;
+        /**
+         * Does the Icon have effects?
+         */
         public boolean decoration;
+        /**
+         * Icon to load for the button
+         */
         public int icon;
 
+        /**
+         * Class Constructor
+         * @param x Button Position X
+         * @param y Button Position Y
+         * @param type Button Type
+         */
         public ControlItem(int x, int y, int type) {
             this.x = x;
             this.y = y;
@@ -61,6 +129,13 @@ public final class Controls {
             updateIcon();
         }
 
+        /**
+         * Class Constructor
+         * @param x Button Position X
+         * @param y Button Position Y
+         * @param type Button Type
+         * @param decoration Does the button have effects?
+         */
         public ControlItem(int x, int y, int type, boolean decoration) {
             this.x = x;
             this.y = y;
@@ -70,6 +145,9 @@ public final class Controls {
             updateIcon();
         }
 
+        /**
+         * Updates the Icon after pressing
+         */
         private void updateIcon() {
             switch (type) {
                 case FORWARD:
@@ -102,6 +180,9 @@ public final class Controls {
             }
         }
 
+        /**
+         * Continues to choose the correct icon update
+         */
         private void updateIcon2(){
             switch(type){
                 case ROTATE_LEFT:
@@ -127,21 +208,68 @@ public final class Controls {
         }
     }
 
+    /**
+     * Class representing different Controls Variant
+     */
     @SuppressWarnings("WeakerAccess")
     public static class ControlVariant {
+        /**
+         * Different Controls Array
+         */
         public ControlItem[] items;
+        /**
+         * Are Controls Slidable Pad?
+         */
         public boolean slidable;
+        /**
+         * Position Y of current Stats
+         */
         public float statsBaseY;
+        /**
+         * Position Y of Key count
+         */
         public float keysBaseY;
+        /**
+         * Position Y of Debug info
+         */
         public float debugLineBaseY;
+        /**
+         * Is the Map active?
+         */
         public boolean hasMap;
+        /**
+         * Map position X
+         */
         public int mapX;
+        /**
+         * Map position Y
+         */
         public int mapY;
+        /**
+         * Map array
+         */
         public int[][] map;
+        /**
+         * Are Controls Pad?
+         */
         public boolean hasPad;
+        /**
+         * Pad position X
+         */
         public int padX;
+        /**
+         * Pad position Y
+         */
         public int padY;
 
+        /**
+         * Class Constructor
+         * @param slidable Is Slidable Pad?
+         * @param statsBaseY Position Y of Stats
+         * @param keysBaseY Position Y of Keys
+         * @param debugLineBaseY Position Y of Debug Line
+         * @param items Control buttons
+         */
         public ControlVariant(boolean slidable,
                 float statsBaseY,
                 float keysBaseY,
@@ -157,6 +285,16 @@ public final class Controls {
             this.hasPad = false;
         }
 
+        /**
+         * Class Constructor
+         * @param slidable Is Slidable Pad?
+         * @param statsBaseY Position Y of Stats
+         * @param keysBaseY Position Y of Keys
+         * @param debugLineBaseY Position Y of Debug Line
+         * @param items Control buttons
+         * @param padX Position X of Pad
+         * @param padY Position Y of Pad
+         */
         public ControlVariant(boolean slidable,
                 float statsBaseY,
                 float keysBaseY,
@@ -176,6 +314,18 @@ public final class Controls {
             this.padY = padY;
         }
 
+        /**
+         *
+         * Class Constructor
+         * @param slidable Is Slidable Pad?
+         * @param statsBaseY Position Y of Stats
+         * @param keysBaseY Position Y of Keys
+         * @param debugLineBaseY Position Y of Debug Line
+         * @param items Control buttons
+         * @param mapX Map position X
+         * @param mapY Map position Y
+         * @param map Is Map Active?
+         */
         public ControlVariant(boolean slidable,
                 float statsBaseY,
                 float keysBaseY,
@@ -198,41 +348,131 @@ public final class Controls {
         }
     }
 
+    /**
+     * Constant for Classic Controls
+     */
     public static final int TYPE_CLASSIC = 0;
+    /**
+     * Constant for Improved Controls
+     */
     public static final int TYPE_IMPROVED = 1;
+    /**
+     * Constant for Pad L Controls
+     */
     public static final int TYPE_PAD_L = 2;
+    /**
+     * Constant for Pad R Controls
+     */
     public static final int TYPE_PAD_R = 3;
+    /**
+     * Constant for Experimental A Controls
+     */
     public static final int TYPE_EXPERIMENTAL_A = 4;
+    /**
+     * Constant for Experimental B Controls
+     */
     public static final int TYPE_EXPERIMENTAL_B = 5;
+    /**
+     * Constant for Zeemote Controls
+     */
     public static final int TYPE_ZEEMOTE = 6; // Must be last
 
+    /**
+     * Constant for Forward key
+     */
     public static final int FORWARD = 1;
+    /**
+     * Constant for Backward key
+     */
     public static final int BACKWARD = 2;
+    /**
+     * Constant for Strafe Left key
+     */
     public static final int STRAFE_LEFT = 4;
+    /**
+     * Constant for Strafe Right key
+     */
     public static final int STRAFE_RIGHT = 8;
+    /**
+     * Constant for Action key
+     */
     public static final int ACTION = 16;
+    /**
+     * Constant for Next Weapon Key
+     */
     public static final int NEXT_WEAPON = 32;
+    /**
+     * Constant for Rotate Left Key
+     */
     public static final int ROTATE_LEFT = 64;
+    /**
+     * Constant for Rotate Right Key
+     */
     public static final int ROTATE_RIGHT = 128;
+    /**
+     * Constant for Toogle Map Key
+     */
     public static final int TOGGLE_MAP = 256;
+    /**
+     * Constant for Strafe Mode Key
+     */
     public static final int STRAFE_MODE = 512;
+    /**
+     * Constant for Open Menu Key
+     */
     @SuppressWarnings("WeakerAccess") public static final int OPEN_MENU = 1024;
+    /**
+     * Constant for MAX Mask value
+     */
     @SuppressWarnings("WeakerAccess") public static final int MASK_MAX = 2048;
 
+    /**
+     * Constant for Acceleration Move Key
+     */
     @SuppressWarnings("WeakerAccess") public static final int ACCELERATION_MOVE = 0;
+    /**
+     * Constant for Acceleration Strafe Key
+     */
     @SuppressWarnings("WeakerAccess") public static final int ACCELERATION_STRAFE = 1;
+    /**
+     * Constant for Acceleration Rotate Key
+     */
     @SuppressWarnings("WeakerAccess") public static final int ACCELERATION_ROTATE = 2;
 
+    /**
+     * Constant for Pointer Down
+     */
     private static final int POINTER_DOWN = 1;
+    /**
+     * Constant for Pointer Move
+     */
     private static final int POINTER_MOVE = 2;
+    /**
+     * Constant for Pointer Up
+     */
     private static final int POINTER_UP = 3;
 
+    /**
+     * Constant for Max Pointer ID
+     */
     private static final int POINTER_MAX_ID = 4;
 
+    /**
+     * Constant for Minimum Pad Offset
+     */
     private static final float PAD_MIN_OFF = 0.05f;
+    /**
+     * Constant for Maximum Pad Offset
+     */
     private static final float PAD_MAX_OFF = 1.125f;
+    /**
+     * Constant for Initial Pad Offset
+     */
     private static final float PAD_INIT_OFF = 0.03f;
 
+    /**
+     * Constant for Acceleration Settings
+     */
     @SuppressWarnings("WeakerAccess")
     public static final ControlAcceleration[] ACCELERATIONS = { new ControlAcceleration(0.1f),
             // ACCELERATION_MOVE
@@ -242,6 +482,9 @@ public final class Controls {
             // ACCELERATION_ROTATE
     };
 
+    /**
+     * Constant for Acceleration Control Bindings
+     */
     @SuppressWarnings("WeakerAccess")
     public static final ControlAccelerationBind[] ACCELERATION_BINDS = { new ControlAccelerationBind(FORWARD,
             ACCELERATION_MOVE,
@@ -253,6 +496,9 @@ public final class Controls {
             new ControlAccelerationBind(ROTATE_RIGHT, ACCELERATION_ROTATE, 1) };
 
     // @formatter:off
+    /**
+     * Constant for Control Variants
+     */
     @SuppressWarnings("WeakerAccess") public static final ControlVariant[] VARIANTS = {
             // TYPE_CLASSIC
             new ControlVariant(false,
@@ -376,29 +622,98 @@ public final class Controls {
                     new ControlItem(18, 1, OPEN_MENU), }), };
     // @formatter:on
 
+    /**
+     * Controls Map
+     */
     @SuppressWarnings("MagicNumber") private static int[][] controlsMap = new int[20][16];
+    /**
+     * All Pointers Action Mask
+     */
     private static int[] pointerActionsMask = new int[POINTER_MAX_ID];
+    /**
+     * Is Pointer Slide?
+     */
     private static boolean[] pointerIsSlide = new boolean[POINTER_MAX_ID];
+    /**
+     * Is Pointer Pad?
+     */
     private static boolean[] pointerIsPad = new boolean[POINTER_MAX_ID];
+    /**
+     * Pointer previous Position X
+     */
     private static float[] pointerPrevX = new float[POINTER_MAX_ID];
+    /**
+     * Pointer Click Counter
+     */
     private static int pointerClickCounter=0;
+    /**
+     * Pointer Click Position X
+     */
     private static float[] pointerClickX = new float[POINTER_MAX_ID];
+    /**
+     * Pointer Click Position Y
+     */
     private static float[] pointerClickY = new float[POINTER_MAX_ID];
+    /**
+     * Is Pointer Click Based?
+     */
     private static boolean[] pointerIsClick = new boolean[POINTER_MAX_ID];
+    /**
+     * Touch Screen Action Mask
+     */
     private static int touchActionsMask=0;
+    /**
+     * Buttons Action Mask
+     */
     private static int keysActionsMask=0;
+    /**
+     * How long a Key has been pressed
+     */
     @SuppressLint("UseSparseArrays") private static Map<Integer, Long> keyDownTimeMap = new HashMap<Integer, Long>();
+    /**
+     * How long the key is held up
+     */
     @SuppressLint("UseSparseArrays") private static Map<Integer, Long> keyUpTimeMap = new HashMap<Integer, Long>();
+    /**
+     * Trackball Action Mask
+     */
     private static int trackballActionsMask=0;
+    /**
+     * Trackball Position X
+     */
     private static float trackballX=0;
+    /**
+     * Trackball Position Y
+     */
     private static float trackballY=0;
+    /**
+     * Relative Offset of the Buttons
+     */
     private static float[] relativeOffset = new float[MASK_MAX];
+    /**
+     * Is Pad Active?
+     */
     private static boolean padActive=true;
+    /**
+     * Original Pad Center Position X
+     */
     private static float origPadCenterX=0;
+    /**
+     * Original Pad Center Position Y
+     */
     private static float origPadCenterY=0;
+    /**
+     * Current Pad Center Position X
+     */
     private static float padCenterX=0;
+    /**
+     * Current Pad Center Position Y
+     */
     private static float padCenterY=0;
 
+    /**
+     * Current control Variant
+     */
     @SuppressWarnings("WeakerAccess") public static ControlVariant currentVariant = new ControlVariant(false,0.8125f, 0.7f,0.0f, new ControlItem[] {
         new ControlItem(12, 1, OPEN_MENU),
                 new ControlItem(15, 1, TOGGLE_MAP),
@@ -421,26 +736,71 @@ public final class Controls {
                 new int[] { ROTATE_LEFT, ROTATE_LEFT, 0, BACKWARD, 0, ROTATE_RIGHT, ROTATE_RIGHT, ROTATE_RIGHT },
                 new int[] { BACKWARD | ROTATE_LEFT, BACKWARD | ROTATE_LEFT, BACKWARD, BACKWARD, BACKWARD, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT },
                 new int[] { BACKWARD | ROTATE_LEFT, BACKWARD | ROTATE_LEFT, BACKWARD, BACKWARD, BACKWARD, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT, BACKWARD | ROTATE_RIGHT } });
+    /**
+     * Rotated Angle of the Controls
+     */
     @SuppressWarnings("WeakerAccess") public static float rotatedAngle=0;
+    /**
+     * Joystick Position X
+     */
     @SuppressWarnings("WeakerAccess") public static float joyX=0;
+    /**
+     * Joystick Position Y
+     */
     @SuppressWarnings("WeakerAccess") public static float joyY=0;
+    /**
+     * Joystick Action Mask
+     */
     @SuppressWarnings("WeakerAccess") public static int joyButtonsMask=0;
+    /**
+     * Accelerometer Position X
+     */
     public static float accelerometerX=0;
+    /**
+     * Accelerometer Position Y
+     */
     public static float accelerometerY=0;
+    /**
+     * Pad Position X
+     */
     @SuppressWarnings("WeakerAccess") public static float padX=0;
+    /**
+     * Pad Position Y
+     */
     @SuppressWarnings("WeakerAccess") public static float padY=0;
 
+    /**
+     * Class Constructor
+     */
     private Controls() {
     }
 
+    /**
+     * Checks if Trackball is out of the Dead Zone
+     * @param value Current Position
+     * @return True if out of Dead Zone, False Otherwise
+     */
     private static boolean isTrackballValid(float value){
         return (value <= -0.01f) || (value >= 0.01f);
     }
 
+    /**
+     * Is Trackball In Up or Left Position?
+     * @param value Current Value
+     * @param mask Current Mask
+     * @return True or false
+     */
     private static boolean isTrackballUpLeft(float value, int mask){
         return (value < 0) && (mask != 0);
     }
 
+    /**
+     * Updates the Trackball current values
+     * @param maskUp Mask for Up Trackball
+     * @param maskDown Mask for Down Trackball
+     * @param maskLeft Mask for Left Trackball
+     * @param maskRight Mask for Right Trackball
+     */
     private static void updateTrackball(int maskUp, int maskDown, int maskLeft, int maskRight){
         if (isTrackballValid(trackballX)) {
             if (isTrackballUpLeft(trackballX, maskLeft)) {
@@ -463,6 +823,11 @@ public final class Controls {
         }
     }
 
+    /**
+     * Checks if Strafe is Active
+     * @param mask Current Mask
+     * @return True or False
+     */
     private static int checkStrafe(int mask){
         if ((mask & STRAFE_MODE) != 0) {
             mask = (mask & ~(ROTATE_LEFT | ROTATE_RIGHT | STRAFE_LEFT | STRAFE_RIGHT)) | (((mask & ROTATE_LEFT) != 0)
@@ -474,6 +839,10 @@ public final class Controls {
         return mask;
     }
 
+    /**
+     * Retrieves the current action mask
+     * @return The Action Mask
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static int getActionsMask() {
         int maskLeft=0;
@@ -517,6 +886,9 @@ public final class Controls {
         return mask;
     }
 
+    /**
+     * Initializes Joystick Variables
+     */
     @SuppressWarnings("WeakerAccess")
     public static void initJoystickVars() {
         joyX = 0.0f;
@@ -524,6 +896,9 @@ public final class Controls {
         joyButtonsMask = 0;
     }
 
+    /**
+     * Updates Control Map
+     */
     private static void updateControlMap(){
         for (ControlItem ci : currentVariant.items) {
             if (!ci.decoration) {
@@ -544,6 +919,9 @@ public final class Controls {
         }
     }
 
+    /**
+     * Fills the Map
+     */
     @SuppressWarnings("MagicNumber")
     public static void fillMap() {
         rotatedAngle = 0;
@@ -591,6 +969,14 @@ public final class Controls {
         }
     }
 
+    /**
+     * Checks for current variant
+     * @param pid Process ID
+     * @param x Control Position X
+     * @param y Control Position Y
+     * @param ctlX Tile Position X
+     * @param ctlY Tile Position Y
+     */
     private static void checkVariant(int pid, float x, float y, int ctlX, int ctlY){
         if (currentVariant.hasPad && ((currentVariant.padX < 10) ? (ctlX < 10) : (ctlX >= 10))) {
             pointerIsPad[pid] = true;
@@ -605,6 +991,15 @@ public final class Controls {
         }
     }
 
+    /**
+     * Updates the Pointer
+     * @param pid Process ID
+     * @param pointerAction Pointer Action Mask
+     * @param x Pad Position X
+     * @param y Pad Position Y
+     * @param ctlX Tile Position X
+     * @param ctlY Tile Position Y
+     */
     private static void updatePointer(int pid, int pointerAction, float x, float y, int ctlX, int ctlY){
         if (pointerAction == POINTER_DOWN) {
             pointerActionsMask[pid] = 0;
@@ -625,6 +1020,11 @@ public final class Controls {
         }
     }
 
+    /**
+     * Center the Pad
+     * @param x Current Position X
+     * @param y Current Position Y
+     */
     private static void centerPad(float x, float y){
         if (!padActive) {
             padActive = true;
@@ -646,6 +1046,9 @@ public final class Controls {
         }
     }
 
+    /**
+     * Checks Pad Position X
+     */
     private static void checkPadX(){
         if (padX > 0.0f) {
             padX -= PAD_MIN_OFF;
@@ -666,6 +1069,9 @@ public final class Controls {
         }
     }
 
+    /**
+     * Checks Pad Position Y
+     */
     private static void checkPadY(){
         if (padY > 0.0f) {
             padY -= PAD_MIN_OFF;
@@ -686,6 +1092,10 @@ public final class Controls {
         }
     }
 
+    /**
+     * Checks if Pointer is Up
+     * @param pid Process ID
+     */
     private static void checkPointerUp(int pid){
         if ((State.levelNum == 1) && pointerIsClick[pid]) {
             pointerClickCounter += 1;
@@ -704,14 +1114,32 @@ public final class Controls {
         }
     }
 
-    private static boolean isPIDValid(int pid){
+    /**
+     * Is Process ID not valid?
+     * @param pid Process ID
+     * @return True if it's beyond range (0 < pid < Pointer_MAX_ID)
+     */
+    private static boolean isPIDNotValid(int pid){
         return (pid < 0) || (pid >= POINTER_MAX_ID);
     }
 
+    /**
+     * Check pad value
+     * @param pad Pad current value
+     * @return 1 if pad < 1, pad otherwise
+     */
     private static int checkPad(int pad){
         return (pad < 1) ? 1 : pad;
     }
 
+    /**
+     * Checks What Pointer is being used
+     * @param pid Process ID
+     * @param x Pointer Position X
+     * @param y Pointer Position Y
+     * @param ctlX Tile Position X
+     * @param ctlY Tile Position Y
+     */
     private static void whatPointer(int pid, float x, float y, int ctlX, int ctlY){
         if (pointerIsSlide[pid]) {
             float distX = x - pointerPrevX[pid];
@@ -744,6 +1172,11 @@ public final class Controls {
         }
     }
 
+    /**
+     * Updates Tile Position X
+     * @param ctlX Current Tile Position X
+     * @return New Tile Position X
+     */
     private static int getCtlX(int ctlX){
         if (ctlX < 0) {
             ctlX = 0;
@@ -754,6 +1187,11 @@ public final class Controls {
         return ctlX;
     }
 
+    /**
+     * Updates Tile Position Y
+     * @param ctlY Current Tile Position Y
+     * @return New Tile Position Y
+     */
     private static int getCtlY(int ctlY){
         if (ctlY < 0) {
             ctlY = 0;
@@ -764,9 +1202,16 @@ public final class Controls {
         return ctlY;
     }
 
+    /**
+     * Process One Pointer
+     * @param pid Process ID
+     * @param x Pointer Position X
+     * @param y Pointer Position Y
+     * @param pointerAction Pointer Action Mask
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void processOnePointer(int pid, float x, float y, int pointerAction) {
-        if (isPIDValid(pid)) {
+        if (isPIDNotValid(pid)) {
             return;
         }
 
@@ -795,6 +1240,11 @@ public final class Controls {
         }
     }
 
+    /**
+     * Casts Int to Float
+     * @param a Int value to cast
+     * @return Float value of a
+     */
     private static float intToFloat(int a)
     {
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
@@ -803,12 +1253,19 @@ public final class Controls {
         return (float) a;
     }
 
+    /**
+     * Updated TouchScreen Action Mask
+     */
     private static void updateTouchActionMask(){
         for (int i = 0; i < POINTER_MAX_ID; i++) {
             touchActionsMask |= pointerActionsMask[i];
         }
     }
 
+    /**
+     * Touch Event Handler
+     * @param event Event
+     */
     @SuppressWarnings("WeakerAccess")
     @TargetApi(Build.VERSION_CODES.FROYO)
     public static void touchEvent(MotionEvent event) {
@@ -850,6 +1307,14 @@ public final class Controls {
         updateTouchActionMask();
     }
 
+    /**
+     * Continues Touch Event Handler Process
+     * @param event Event
+     * @param points Current Points
+     * @param action Current Action
+     * @param actionCode Current Action Code
+     * @param aidx Action ID X
+     */
     private static void touchEvent2(MotionEvent event, int points, int action, int actionCode, int aidx){
         switch (actionCode){
             case MotionEvent.ACTION_UP:
@@ -876,6 +1341,11 @@ public final class Controls {
         }
     }
 
+    /**
+     * Handles Key Down event
+     * @param keyCode Key pressed
+     * @return true if valid key, false otherwise
+     */
     @SuppressWarnings("WeakerAccess")
     public static boolean keyDown(int keyCode) {
         if ((keyCode >= 0) && (keyCode < Config.keyMappings.length) && (Config.keyMappings[keyCode] != 0)) {
@@ -889,6 +1359,11 @@ public final class Controls {
         return false;
     }
 
+    /**
+     * Handles Key release
+     * @param keyCode Key released
+     * @return true if valid key, false otherwise
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static boolean keyUp(int keyCode) {
         if ((keyCode >= 0) && (keyCode < Config.keyMappings.length) && (Config.keyMappings[keyCode] != 0)) {
@@ -906,6 +1381,9 @@ public final class Controls {
         return false;
     }
 
+    /**
+     * Updates ControlAcceleration values
+     */
     private static void updateCA(){
         for (ControlAcceleration ca : ACCELERATIONS) {
             if (!ca.updated) {
@@ -918,6 +1396,10 @@ public final class Controls {
         }
     }
 
+    /**
+     * Updates Acceleration Controls
+     * @param mask Current Mask
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void updateAccelerations(int mask) {
         for (ControlAcceleration ca : ACCELERATIONS) {
@@ -949,12 +1431,26 @@ public final class Controls {
         updateCA();
     }
 
+    /**
+     * Handles Trackball Event
+     * @param event Event
+     */
     @SuppressWarnings("WeakerAccess")
     public static void trackballEvent(MotionEvent event) {
         trackballX += event.getX();
         trackballY += event.getY();
     }
 
+    /**
+     * Draws Control Icon
+     * @param sx Position X
+     * @param sy Position Y
+     * @param texNum Texture ID
+     * @param pressed Is Icon Pressed?
+     * @param highlighted Is Icon Highlighted?
+     * @param elapsedTime Time spent
+     * @param inverseHighlighting Is Icon Highlighted with opposite cycle?
+     */
     @SuppressWarnings("MagicNumber")
     private static void drawIcon(float sx,
             float sy,
@@ -992,6 +1488,15 @@ public final class Controls {
         Renderer.drawQuad(texNum);
     }
 
+    /**
+     * Draw Control Icon
+     * @param xpos Position X
+     * @param ypos Position Y
+     * @param texNum Texture Number
+     * @param pressed Is Pressed?
+     * @param highlighted Is Highlighted?
+     * @param elapsedTime Time elapsed
+     */
     @SuppressWarnings("MagicNumber")
     private static void drawControlIcon(int xpos,
             int ypos,
@@ -1006,6 +1511,10 @@ public final class Controls {
         drawIcon(sx, sy, texNum, pressed, highlighted, elapsedTime, false);
     }
 
+    /**
+     * Draw Pad Icons
+     * @param elapsedTime Time elapsed
+     */
     @SuppressWarnings({ "MagicNumber", "PointlessArithmeticExpression" })
     private static void drawPad(long elapsedTime) {
         float sx = (padCenterX * Common.ratio) - 0.125f;
@@ -1052,6 +1561,11 @@ public final class Controls {
                 false);
     }
 
+    /**
+     * Renders the Controls
+     * @param gl Renderer
+     * @param elapsedTime Time elapsed
+     */
     @SuppressWarnings("WeakerAccess")
     public static void render(GL10 gl, long elapsedTime) {
         Renderer.setQuadRGB(1.0f, 1.0f, 1.0f);

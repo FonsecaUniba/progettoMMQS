@@ -33,33 +33,95 @@ import zame.game.SoundManager;
 import zame.game.ZameApplication;
 import zame.game.engine.Game;
 
+/**
+ * Class representing the MenuView
+ */
 public class MenuView extends RelativeLayout {
+    /**
+     * Class representing the data
+     */
     public static class Data {
+        /**
+         * Current Data index
+         */
         @SuppressWarnings("WeakerAccess") public int currentIndex;
+        /**
+         * Slots Strings to Load
+         */
         @SuppressWarnings("WeakerAccess") public ArrayList<String> slotStringsForLoad;
+        /**
+         * Slots File Names to Load
+         */
         @SuppressWarnings("WeakerAccess") public ArrayList<String> slotFileNamesForLoad;
+        /**
+         * Slots String to Save
+         */
         @SuppressWarnings("WeakerAccess") public ArrayList<String> slotStringsForSave;
+        /**
+         * SLots File Name to Save
+         */
         @SuppressWarnings("WeakerAccess") public ArrayList<String> slotFileNamesForSave;
 
+        /**
+         * Adapter for Loading
+         */
         @SuppressWarnings("WeakerAccess") public ArrayAdapter<String> loadSlotsAdapter;
+        /**
+         * Adapter for Saving
+         */
         @SuppressWarnings("WeakerAccess") public ArrayAdapter<String> saveSlotsAdapter;
 
+        /**
+         * Dialog to show Alerts
+         */
         @SuppressWarnings("WeakerAccess") public AlertDialog aboutDialog;
+        /**
+         * Dialog to show save slots
+         */
         @SuppressWarnings("WeakerAccess") public AlertDialog saveSlotsDialog;
     }
 
+    /**
+     * Constant for New Game Warning
+     */
     private static final int DIALOG_NEW_GAME_WARN = 101;
+    /**
+     * Constant for Load Game Warning
+     */
     private static final int DIALOG_LOAD_WARN = 102;
+    /**
+     * Constant for Load Slots
+     */
     private static final int DIALOG_LOAD_SLOTS = 103;
+    /**
+     * Constant for Save Slots
+     */
     private static final int DIALOG_SAVE_SLOTS = 104;
+    /**
+     * Constant for About
+     */
     private static final int DIALOG_ABOUT = 105;
 
     // actually 4 slots is enough, but this is required to fix issued with bad-named saves folder
+    /**
+     * Constant for Max Slots
+     */
     private static final int MAX_SLOTS = 8;
 
+    /**
+     * This Activity
+     */
     private MenuActivity activity;
+    /**
+     * Data to show
+     */
     private Data data;
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attributes
+     */
     public MenuView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -67,10 +129,17 @@ public class MenuView extends RelativeLayout {
         data = activity.menuViewData;
     }
 
+    /**
+     * When View is created
+     * @param window View to create
+     */
     public static void onActivityCreate(MenuActivity window) {
         PreferenceManager.getDefaultSharedPreferences(window.getApplicationContext());
     }
 
+    /**
+     * When View finishes inflating
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -165,6 +234,10 @@ public class MenuView extends RelativeLayout {
         updateSlotsAndButtons();
     }
 
+    /**
+     * When Focus Changes
+     * @param hasWindowFocus Does View have focus?
+     */
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -174,6 +247,9 @@ public class MenuView extends RelativeLayout {
         }
     }
 
+    /**
+     *
+     */
     private void updateSlotsAndButtons() {
         fillSlots(data.slotStringsForSave, data.slotFileNamesForSave, false);
 
@@ -182,6 +258,13 @@ public class MenuView extends RelativeLayout {
         findViewById(R.id.BtnLoad).setEnabled(fillSlots(data.slotStringsForLoad, data.slotFileNamesForLoad, true) > 0);
     }
 
+    /**
+     * Save slots
+     * @param saves Saves
+     * @param files File Paths
+     * @param pat Pattern for matching
+     * @return saves
+     */
     private HashMap<Integer, Pair<String, String>>  saveSlots(HashMap<Integer, Pair<String, String>>  saves, String[] files, Pattern pat){
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < files.length; i++) {
@@ -205,6 +288,13 @@ public class MenuView extends RelativeLayout {
         return saves;
     }
 
+    /**
+     * Fills the slots
+     * @param slotStrings String for slots
+     * @param slotFileNames Slots file names
+     * @param hideUnused Do unused slots be hidden?
+     * @return Saves Size
+     */
     private int fillSlots(ArrayList<String> slotStrings, ArrayList<String> slotFileNames, boolean hideUnused) {
         slotStrings.clear();
         slotFileNames.clear();
@@ -245,6 +335,12 @@ public class MenuView extends RelativeLayout {
         return saves.size();
     }
 
+    /**
+     * When an option is selected
+     * @param window View to show
+     * @param item Item selected
+     * @return true if saved, false otherwise
+     */
     @SuppressWarnings({ "deprecation", "MagicNumber" })
     public static boolean onOptionsItemSelected(final MenuActivity window, MenuItem item) {
         switch (item.getItemId()) {
@@ -278,6 +374,11 @@ public class MenuView extends RelativeLayout {
 
     }
 
+    /**
+     * Check if instant save is available
+     * @param window View to show
+     * @param info Info to show
+     */
     @SuppressWarnings("deprecation")
     private static void checkInstantSave(MenuActivity window, Data info){
         if (hasInstantSave() && !MenuActivity.justLoaded) {
@@ -287,6 +388,10 @@ public class MenuView extends RelativeLayout {
         }
     }
 
+    /**
+     * Save to Slots
+     * @param info Info to show
+     */
     private static void saveToSlot(Data info){
         String newSaveName = String.format(Locale.US,
                 "%sslot-%d.%s.save",
@@ -314,6 +419,12 @@ public class MenuView extends RelativeLayout {
         }
     }
 
+    /**
+     * When Dialog is created
+     * @param ownerActivity Activity who owns Dialog
+     * @param id Dialog ID
+     * @return Dialog to show
+     */
     @SuppressWarnings("deprecation")
     public static Dialog onCreateDialog(MenuActivity ownerActivity, int id) {
         final MenuActivity activity = ownerActivity;
@@ -396,6 +507,11 @@ public class MenuView extends RelativeLayout {
         return MenuViewHelper.onCreateDialog(activity, data, id);
     }
 
+    /**
+     * Starts the game
+     * @param window View to show
+     * @param saveName Save name
+     */
     private static void startGame(MenuActivity window, String saveName) {
         if (!saveName.equals(Game.INSTANT_NAME)) {
             // new game started or loaded non-instant state
@@ -407,6 +523,10 @@ public class MenuView extends RelativeLayout {
         window.startActivity(new Intent(window, GameActivity.class));
     }
 
+    /**
+     * Does the game have instant saves?
+     * @return True if instant saves exist, false otherwise
+     */
     private static boolean hasInstantSave() {
         return (new File(Game.INSTANT_PATH)).exists();
     }

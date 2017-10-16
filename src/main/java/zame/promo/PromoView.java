@@ -25,23 +25,65 @@ import java.io.InputStream;
 import java.util.Locale;
 import zame.game.BuildConfig;
 
+/**
+ * Class Representing the Ad View
+ */
 public class PromoView extends FrameLayout {
+    /**
+     * Ad URL
+     */
     protected static final String PROMO_URL = "http://mobile.zame-dev.org/promo/index.php?package=";
 
+    /**
+     * Reload Interval
+     */
     protected static final long RELOAD_INTERVAL = 10L * 1000L;
+    /**
+     * Rotation Interval
+     */
     protected static final long ROTATE_INTERVAL = 15L * 1000L;
 
+    /**
+     * Constant for Initialization
+     */
     protected static final int STATE_INITIALIZED = 0;
+    /**
+     * Constant for Loading
+     */
     protected static final int STATE_LOADING = 1;
+    /**
+     * Constant for Loaded
+     */
     protected static final int STATE_LOADED = 2;
+    /**
+     * Constant for Dismissed
+     */
     protected static final int STATE_DISMISSED = 3;
 
+    /**
+     * Event Handler
+     */
     protected final Handler handler = new Handler();
+    /**
+     * View Context
+     */
     protected Context context;
+    /**
+     * Previous Web View
+     */
     protected WebView prevWebView;
+    /**
+     * Current Web View
+     */
     protected WebView currentWebView;
+    /**
+     * View state
+     */
     protected int state;
 
+    /**
+     * Loads the Ad
+     */
     protected Runnable loadPromoRunnable = new Runnable() {
         @Override
         public void run() {
@@ -49,6 +91,9 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    /**
+     * Reloads the Ad
+     */
     protected Runnable reloadPromoRunnable = new Runnable() {
         @Override
         public void run() {
@@ -56,6 +101,9 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    /**
+     * Rotates the Ad
+     */
     protected Runnable rotatePromoRunnable = new Runnable() {
         @Override
         public void run() {
@@ -63,6 +111,9 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    /**
+     * When Ad is Loaded
+     */
     protected Runnable promoLoadedRunnable = new Runnable() {
         @Override
         public void run() {
@@ -70,6 +121,9 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    /**
+     * Dismiss Ad
+     */
     protected Runnable promoDismissedRunnable = new Runnable() {
         @Override
         public void run() {
@@ -77,26 +131,48 @@ public class PromoView extends FrameLayout {
         }
     };
 
+    /**
+     * Initializes Ad
+     */
     private void init(Context c)
     {
         initialize(c);
     }
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     */
     public PromoView(Context context) {
         super(context);
         init(context);
     }
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attributes
+     */
     public PromoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
+    /**
+     * Class Constructor
+     * @param context App Context
+     * @param attrs App Attributes
+     * @param defStyle View Style
+     */
     public PromoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
 
+    /**
+     * Initializes the Class
+     * @param cont App Context
+     */
     protected void initialize(Context cont) {
         this.context = cont;
 
@@ -106,6 +182,10 @@ public class PromoView extends FrameLayout {
         loadPromo();
     }
 
+    /**
+     * Creates a WebView
+     * @return Nothing because it's disabled
+     */
     @SuppressLint({ "AddJavascriptInterface", "SetJavaScriptEnabled" })
     protected WebView createWebView() {
         WebView webView = new WebView(context);
@@ -150,6 +230,9 @@ public class PromoView extends FrameLayout {
         return webView;
     }
 
+    /**
+     * Loads the Ad
+     */
     protected void loadPromo() {
         handler.removeCallbacks(loadPromoRunnable);
         handler.removeCallbacks(reloadPromoRunnable);
@@ -176,6 +259,9 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * Reloads the Ad
+     */
     protected void reloadPromo() {
         currentWebView.setVisibility(View.INVISIBLE);
         currentWebView.stopLoading();
@@ -185,6 +271,9 @@ public class PromoView extends FrameLayout {
         loadPromo();
     }
 
+    /**
+     * Rotates the Ad
+     */
     protected void rotatePromo() {
         WebView tmpWebView = prevWebView;
         prevWebView = currentWebView;
@@ -193,6 +282,9 @@ public class PromoView extends FrameLayout {
         reloadPromo();
     }
 
+    /**
+     * Loads the Ad
+     */
     protected void promoLoaded() {
         if (state == STATE_LOADING) {
             currentWebView.setVisibility(View.VISIBLE);
@@ -206,6 +298,9 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * Dismiss the Ad
+     */
     protected void promoDismissed() {
         if ((state == STATE_LOADING) || (state == STATE_LOADED)) {
             prevWebView.setVisibility(View.INVISIBLE);
@@ -221,6 +316,10 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * When View Focus Changes
+     * @param hasWindowFocus Does View have focus?
+     */
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -236,6 +335,9 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * When View is attached
+     */
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -245,6 +347,9 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * When View is Detached
+     */
     @Override
     protected void onDetachedFromWindow() {
         handler.removeCallbacks(loadPromoRunnable);
@@ -255,6 +360,10 @@ public class PromoView extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
+    /**
+     * Is network connected?
+     * @return true if connected, false otherwise
+     */
     protected boolean isNetworkConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -266,6 +375,10 @@ public class PromoView extends FrameLayout {
         return ((networkInfo != null) && networkInfo.isConnected());
     }
 
+    /**
+     * Opens External Browser
+     * @param uri URI to open
+     */
     protected void openExternalBrowser(final String uri) {
         handler.post(new Runnable() {
             @Override
@@ -284,6 +397,10 @@ public class PromoView extends FrameLayout {
         });
     }
 
+    /**
+     * Opens External Intent
+     * @param intent Intent to Open
+     */
     protected void openExternalIntent(final Intent intent) {
         handler.post(new Runnable() {
             @Override
@@ -301,21 +418,38 @@ public class PromoView extends FrameLayout {
         });
     }
 
+    /**
+     * Class representing Javascript API
+     */
     @SuppressWarnings("unused")
     protected class JsApi {
+        /**
+         * When Javascript is loaded
+         */
         @JavascriptInterface
         public void loaded() {
             //noinspection MagicNumber
             handler.postDelayed(promoLoadedRunnable, 100L);
         }
 
+        /**
+         * When Javascript is dismissed
+         */
         @JavascriptInterface
         public void dismiss() {
             handler.post(promoDismissedRunnable);
         }
     }
 
+    /**
+     * Class representing the WebViewClient
+     */
     private class PromoWebViewClient extends WebViewClient {
+        /**
+         * When Page Finishes loading
+         * @param view WebView
+         * @param url URL to load
+         */
         @Override
         public void onPageFinished(WebView view, String url) {
             view.setBackgroundColor(0);
@@ -325,6 +459,12 @@ public class PromoView extends FrameLayout {
             }
         }
 
+        /**
+         * Should we Override URL loading?
+         * @param view WebView
+         * @param url URL to load
+         * @return True or false
+         */
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             final String MAILTO_PREFIX = "mailto:";
@@ -340,6 +480,12 @@ public class PromoView extends FrameLayout {
             return false;
         }
 
+        /**
+         * Should we Intercept Request?
+         * @param view WebView
+         * @param url URL to load
+         * @return True or false
+         */
         @SuppressLint("NewApi")
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
@@ -358,6 +504,13 @@ public class PromoView extends FrameLayout {
             return null;
         }
 
+        /**
+         * When Error is received
+         * @param view WebView
+         * @param errorCode Error Code
+         * @param description Error Description
+         * @param failingUrl URL which failed
+         */
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             view.stopLoading();
@@ -366,6 +519,13 @@ public class PromoView extends FrameLayout {
             handler.post(reloadPromoRunnable);
         }
 
+        /**
+         * When HTTP Auth Request is received
+         * @param view WebView
+         * @param httpAuthHandler HTTPAuth Handler
+         * @param host Host who requested Auth
+         * @param realm Realm
+         */
         @Override
         public void onReceivedHttpAuthRequest(WebView view,
                 HttpAuthHandler httpAuthHandler,
@@ -379,9 +539,20 @@ public class PromoView extends FrameLayout {
         }
     }
 
+    /**
+     * Class representing Chrome Client
+     */
     private class PromoWebChromeClient extends WebChromeClient {
         private WebView childWebView;
 
+        /**
+         * When View is created
+         * @param view View
+         * @param dialog Is dialog?
+         * @param userGesture Does it support UserGestures?
+         * @param resultMsg Message to show
+         * @return true if created, false otherwise
+         */
         @Override
         public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, Message resultMsg) {
             try {

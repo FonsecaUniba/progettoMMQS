@@ -15,20 +15,36 @@ import com.zeemote.zc.event.JoystickEvent;
 import com.zeemote.zc.ui.android.ControllerAndroidUi;
 import zame.game.engine.Controls;
 
+/**
+ * Class Representing Game Activity Helper
+ */
 @SuppressWarnings("WeakerAccess")
 public class GameActivityZeemoteHelper implements IStatusListener, IJoystickListener, IButtonListener {
     private Controller zeemoteController;
     private ControllerAndroidUi zeemoteControllerUi;
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean keepConnection;
 
+    /**
+     * Get Menu Resource ID
+     * @return
+     */
     public int getMenuResId() {
         return R.menu.game_zeemote;
     }
 
+    /**
+     * When Option Menu gets prepared
+     * @param menu Sets Zeemote controls as visible
+     */
     public void onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.menu_zeemote).setVisible(Config.controlsType == Controls.TYPE_ZEEMOTE);
     }
 
+    /**
+     * When an option is selected
+     * @param item Item selected
+     * @return True if Zeemote is set, false otherwise
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_zeemote:
@@ -44,6 +60,10 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
         return false;
     }
 
+    /**
+     * When Activity Starts
+     * @param activity Current Activity
+     */
     public void onStart(GameActivity activity) {
         if (Config.controlsType != Controls.TYPE_ZEEMOTE) {
             return;
@@ -69,6 +89,9 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
         }
     }
 
+    /**
+     * When Activity gets paused
+     */
     public void onPause() {
         if (!keepConnection && (zeemoteController != null) && zeemoteController.isConnected()) {
             try {
@@ -79,20 +102,36 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
         }
     }
 
+    /**
+     * Updates Zeemote Battery Icon
+     * @param event Event
+     */
     @Override
     public void batteryUpdate(BatteryEvent event) {
     }
 
+    /**
+     * When Zeemote is Connected
+     * @param event Event
+     */
     @Override
     public void connected(ControllerEvent event) {
         Controls.initJoystickVars();
     }
 
+    /**
+     * When Zeemote is Disconnected
+     * @param event Event
+     */
     @Override
     public void disconnected(DisconnectEvent event) {
         Controls.initJoystickVars();
     }
 
+    /**
+     * When Joystick is Moved
+     * @param e Event
+     */
     @SuppressWarnings("MagicNumber")
     @Override
     public void joystickMoved(JoystickEvent e) {
@@ -102,6 +141,10 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
         }
     }
 
+    /**
+     * When Button is Pressed
+     * @param e Event
+     */
     @Override
     public void buttonPressed(ButtonEvent e) {
         if (Config.controlsType == Controls.TYPE_ZEEMOTE) {
@@ -113,6 +156,10 @@ public class GameActivityZeemoteHelper implements IStatusListener, IJoystickList
         }
     }
 
+    /**
+     * When Button is released
+     * @param e Event
+     */
     @Override
     public void buttonReleased(ButtonEvent e) {
         if (Config.controlsType == Controls.TYPE_ZEEMOTE) {

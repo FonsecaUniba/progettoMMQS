@@ -3,15 +3,34 @@ package zame.game;
 import android.content.SharedPreferences;
 import com.zeemote.zc.event.ButtonEvent;
 
+/**
+ * Configures Zeemote
+ */
 @SuppressWarnings("WeakerAccess")
 public final class ConfigZeemote {
+    /**
+     * Zeemote X Acceleration
+     */
     public static float zeemoteXAccel=0;
+    /**
+     * Zeemote Y Acceleration
+     */
     public static float zeemoteYAccel=0;
+    /**
+     * Zeemote Button Mappings
+     */
     public static int[] zeemoteButtonMappings=0;
 
+    /**
+     * Configure Zeemote
+     */
     private ConfigZeemote() {
     }
 
+    /**
+     * Initializes the Zeemote
+     * @param sp Shared Preferences
+     */
     @SuppressWarnings("MagicNumber")
     public static void initialize(SharedPreferences sp) {
         int tmpZeemoteXAccel = sp.getInt("ZeemoteXAccel", 8); // zeemoteXAccel : 0.5 (1) -> 1.0 (8) -> 2.0 (15)

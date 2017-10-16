@@ -9,13 +9,29 @@ import zame.game.MenuActivity;
 import zame.game.R;
 import zame.game.ZameApplication;
 
+/**
+ * Class representing Menu View Helper
+ */
 public class MenuViewHelper {
+    /**
+     * Constant for Dialog Rate
+     */
     private static final int DIALOG_RATE_OFFER = 107;
 
+    /**
+     * Can the Ad be exited?
+     * @param activity Activity to show
+     * @return True if ad can be exited
+     */
     public static boolean canExit(MenuActivity activity) {
         return (!showRateOffer(activity));
     }
 
+    /**
+     * Show an Ad
+     * @param activity Activity to show
+     * @return True if Ad is shown, false otherwise
+     */
     @SuppressWarnings("deprecation")
     public static boolean showRateOffer(final MenuActivity activity) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
@@ -44,6 +60,13 @@ public class MenuViewHelper {
         return false;
     }
 
+    /**
+     * When Dialog is Created
+     * @param activity Activity to show
+     * @param data Data to show
+     * @param id View ID
+     * @return Null or Dialog
+     */
     public static Dialog onCreateDialog(final MenuActivity activity, final MenuView.Data data, int id) {
         switch (id) {
             case DIALOG_RATE_OFFER: {
@@ -100,6 +123,10 @@ public class MenuViewHelper {
         return null;
     }
 
+    /**
+     * Remind Rate Offer Later
+     * @param activity Activity to show
+     */
     private static void rateOfferRemindMeLater(MenuActivity activity) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
         SharedPreferences.Editor spEditor = sp.edit();
