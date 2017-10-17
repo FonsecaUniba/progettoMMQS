@@ -1338,6 +1338,7 @@ public final class Controls {
                             ((i == aidx) ? POINTER_UP : POINTER_MOVE));
                 }
                 break;
+            default: break;
         }
     }
 

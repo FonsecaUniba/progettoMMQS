@@ -24,21 +24,54 @@ import zame.game.engine.State;
 
 // http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3_r1/android/os/FileUtils.java#FileUtils
 
+/**
+ * Class representing a Common Data Pool
+ */
 public final class Common {
+    /**
+     * The Game's Name
+     */
     public static final String GAME_NAME = "GloomyDungeons";
+    /**
+     * Degree to Radiant constant
+     */
     public static final float G2RAD_F = (float)(Math.PI / 180.0);
+    /**
+     * Radiant to Degree constant
+     */
     public static final float RAD2G_F = (float)(180.0 / Math.PI);
 
+    /**
+     * Hero Angle in Radians
+     */
     public static float heroAr=0; // angle in radians
+    /**
+     * Hero Cosine in Radians
+     */
     public static float heroCs=0; // cos of angle
+    /**
+     * Hero Sin in Radians
+     */
     public static float heroSn=0; // sin of angle
+    /**
+     * Hero Current Ratio
+     */
     public static float ratio=0;
 
+    /**
+     * RNG
+     */
     private static volatile Random random = new Random();
 
+    /**
+     * Class Constructor
+     */
     private Common() {
     }
 
+    /**
+     * Initializes Random and Ratio
+     */
     public static void init() {
         if (random == null) {
             random = new Random();
@@ -47,6 +80,9 @@ public final class Common {
         ratio = 1.0f;
     }
 
+    /**
+     * Updates the Hero's Angle
+     */
     @SuppressWarnings("MagicNumber")
     public static void heroAngleUpdated() {
         State.heroA = (360.0f + (State.heroA % 360.0f)) % 360.0f;
@@ -56,7 +92,15 @@ public final class Common {
         heroSn = (float)Math.sin(heroAr);
     }
 
-    public static boolean isCheckLineInvalid(int cx1, int cx2, int cy1, int cy2){
+    /**
+     * Checks if line is in not allowed range
+     * @param cx1 Start position X
+     * @param cx2 End Position X
+     * @param cy1 Start Position Y
+     * @param cy2 End Position Y
+     * @return True if not allowed, false otherwise
+     */
+    private static boolean isCheckLineInvalid(int cx1, int cx2, int cy1, int cy2){
         return (cx1 < 0)
                 || (cx1 >= State.levelWidth)
                 || (cx2 < 0)
@@ -66,25 +110,52 @@ public final class Common {
                 || (cy2 < 0)
                 || (cy2 >= State.levelHeight);
     }
+
+    /**
+     * Casts Float value to Int
+     * @param a value to cast
+     * @return int value of a
+     */
     private static int floatToInt(float a) {
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
         }
         return (int) a;
     }
-        private static float intToFloat(int a)
-    {
+
+    /**
+     * Casts Int value to Float
+     * @param a value to cast
+     * @return float value of a
+     */
+    private static float intToFloat(int a) {
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
         }
         return (float) a;
     }
 
+    /**
+     * Checks if two int are equal
+     * @param a First value
+     * @param b Second value
+     * @return True if they are equal
+     */
     private static boolean isEquals(int a, int b)
     {
         return Math.abs(a-b) < 1e-6;
     }
 
+    /**
+     * Updates CheckLineX value
+     * @param cx1 Start Position X
+     * @param cx2 End Position X
+     * @param mask Mask
+     * @param y Y
+     * @param stepX Step to increase X
+     * @param stepY Step to increase Y
+     * @return True
+     */
     private static boolean checkXLine(int cx1, int cx2, int mask, float y, int stepX, float stepY){
         do {
             if ((!isEquals((State.passableMap[floatToInt(y)][cx1] & mask),0))) {
@@ -98,6 +169,16 @@ public final class Common {
         return true;
     }
 
+    /**
+     * Updates CheckLineY value
+     * @param cy1 Start Position Y
+     * @param cy2 End Position Y
+     * @param mask Mask
+     * @param x x
+     * @param stepX Step to increase X
+     * @param stepY Step to increase Y
+     * @return True
+     */
     private static boolean checkYLine(int cy1, int cy2, int mask, float x, float stepX, int stepY){
         do {
             if (!isEquals((State.passableMap[cy1][floatToInt(x)] & mask),0)) {
@@ -111,10 +192,23 @@ public final class Common {
         return true;
     }
 
+    /**
+     * Returns the step
+     * @param value1 First Value to check
+     * @param value2 Second value to check
+     * @return 1 if value2 > value1, -1 otherwise
+     */
     private static int getStep(int value1, int value2){
         return (value2 > value1) ? 1 : -1;
     }
 
+    /**
+     * Returns the Partial value
+     * @param value1 First value
+     * @param value2 Second value
+     * @param mod Modifier
+     * @return New Partial value
+     */
     private static float getPartial(int value1, int value2, float mod){
         return (value2 > value1)
                 ? (1.0f - (mod - intToFloat(floatToInt(mod))))
@@ -122,6 +216,16 @@ public final class Common {
     }
 
     // modified Level_CheckLine from wolf3d for iphone by Carmack
+
+    /**
+     * Traces the line position
+     * @param x1 Start Position X
+     * @param y1 Start Position Y
+     * @param x2 End Position X
+     * @param y2 End Position Y
+     * @param mask Current mask
+     * @return True if valid, false otherwise
+     */
     public static boolean traceLine(float x1, float y1, float x2, float y2, int mask) {
         float add = 0.5f;
         int cx1 = Math.round(x1+add);
@@ -164,6 +268,12 @@ public final class Common {
         return true;
     }
 
+    /**
+     * Get actual damage value
+     * @param maxHits Pure damage value
+     * @param dist Distance to target
+     * @return Damage done
+     */
     @SuppressWarnings("MagicNumber")
     public static int getRealHits(int maxHits, float dist) {
         float div = Math.max(1.0f, dist * 0.35f);
@@ -173,6 +283,12 @@ public final class Common {
         return (random.nextInt(maxHits - minHits + 1) + minHits);
     }
 
+    /**
+     * Writes a Boolean Array to file
+     * @param os Output stream
+     * @param list List of boolean to write
+     * @throws IOException Error while writing
+     */
     public static void writeBooleanArray(ObjectOutput os, boolean[] list) throws IOException {
         os.writeInt(list.length);
 
@@ -182,6 +298,12 @@ public final class Common {
         }
     }
 
+    /**
+     * Writes an int Array to file
+     * @param os Output stream
+     * @param list List of int to write
+     * @throws IOException Error while writing
+     */
     @SuppressWarnings("ForLoopReplaceableByForEach")
     public static void writeIntArray(ObjectOutput os, int[] list) throws IOException {
         os.writeInt(list.length);
@@ -191,6 +313,12 @@ public final class Common {
         }
     }
 
+    /**
+     * Writes an Object Array to file
+     * @param os Output stream
+     * @param list List of Object to write
+     * @throws IOException Error while writing
+     */
     public static void writeObjectArray(ObjectOutput os, Object[] list, int size) throws IOException {
         os.writeInt(size);
 
@@ -199,6 +327,12 @@ public final class Common {
         }
     }
 
+    /**
+     * Writes an Int Matrix to file
+     * @param os Output stream
+     * @param map Matrix of int to write
+     * @throws IOException Error while writing
+     */
     @SuppressWarnings("ForLoopReplaceableByForEach")
     public static void writeInt2dArray(ObjectOutput os, int[][] map) throws IOException {
         os.writeInt(map.length);
@@ -211,6 +345,12 @@ public final class Common {
         }
     }
 
+    /**
+     * Reads Boolean array from file
+     * @param is Input stream
+     * @return Array of int
+     * @throws IOException Error while reading
+     */
     public static boolean[] readBooleanArray(ObjectInput is) throws IOException {
         int size = is.readInt();
         boolean[] list = new boolean[size];
@@ -222,6 +362,12 @@ public final class Common {
         return list;
     }
 
+    /**
+     * Reads int array from file
+     * @param is Input Stream
+     * @return Array of int
+     * @throws IOException Error while reading
+     */
     public static int[] readIntArray(ObjectInput is) throws IOException {
         int size = is.readInt();
         int[] list = new int[size];
@@ -233,6 +379,12 @@ public final class Common {
         return list;
     }
 
+    /**
+     * Reads int matrix from file
+     * @param is input stream
+     * @return Int Matrix
+     * @throws IOException Error while reading
+     */
     public static int[][] readInt2dArray(ObjectInput is) throws IOException {
         int h = is.readInt();
         int w = is.readInt();
@@ -247,6 +399,15 @@ public final class Common {
         return map;
     }
 
+    /**
+     * Reads Object Array from file
+     * @param is Input Stream
+     * @param list Array of Object
+     * @param theClass Class of the Object
+     * @return Size of the array
+     * @throws IOException Error while reading
+     * @throws ClassNotFoundException Class not found
+     */
     public static int readObjectArray(ObjectInput is, Object[] list, Class<?> theClass) throws
             IOException,
             ClassNotFoundException {
@@ -270,6 +431,13 @@ public final class Common {
         return size;
     }
 
+    /**
+     * Opens a localized resource
+     * @param assetManager Asset Manager
+     * @param pathTemplate Path to resource
+     * @return Input Stream with localized resource
+     * @throws IOException Error while reading
+     */
     public static InputStream openLocalizedAsset(AssetManager assetManager, String pathTemplate) throws IOException {
         String path = String.format(Locale.US,
                 pathTemplate,
@@ -287,6 +455,11 @@ public final class Common {
         return res;
     }
 
+    /**
+     * Sets the font
+     * @param view View
+     * @param viewIds View IDs
+     */
     @SuppressWarnings("ForLoopReplaceableByForEach")
     public static void setTypeface(View view, int[] viewIds) {
         Context context = view.getContext();
@@ -303,6 +476,11 @@ public final class Common {
         }
     }
 
+    /**
+     * Sets the font
+     * @param activity Activity
+     * @param viewIds View IDs
+     */
     @SuppressWarnings("unused")
     public static void setTypeface(Activity activity, int[] viewIds) {
         Typeface typeface = Typeface.createFromAsset(activity.getAssets(),
@@ -318,6 +496,12 @@ public final class Common {
         }
     }
 
+    /**
+     * Opens Play Store
+     * @param context App Context
+     * @param packageName Package to find
+     * @return True if page opened, false otherwise
+     */
     @SuppressWarnings("unused")
     public static boolean openMarket(Context context, String packageName) {
         try {
@@ -334,6 +518,12 @@ public final class Common {
         return false;
     }
 
+    /**
+     * Opens browser
+     * @param context App Context
+     * @param uri URL to Open
+     * @return True if Browser opened, False otherwise
+     */
     public static boolean openBrowser(Context context, String uri) {
         try {
             context.startActivity((new Intent(Intent.ACTION_VIEW,
@@ -348,6 +538,12 @@ public final class Common {
         return false;
     }
 
+    /**
+     * Copy file
+     * @param srcFileName Source file name
+     * @param destFileName Destination file name
+     * @return true if successful, false otherwise
+     */
     public static boolean copyFile(String srcFileName, String destFileName) {
         boolean success = true;
         InputStream in = null;
