@@ -5,16 +5,46 @@ import zame.game.engine.TextureLoader.TextureToLoad;
 import zame.game.engine.Weapons;
 import zame.game.engine.Weapons.WeaponParams;
 
+/**
+ * Class representing App Configuration
+ */
 public final class AppConfig {
+    /**
+     * Texture for Hand
+     */
     public static final int TEXTURE_HAND = 4; // 4, 5, 6, 7
+    /**
+     * Texture for Pistol
+     */
     public static final int TEXTURE_PIST = 8; // 8, 9, 10, 11, 12
+    /**
+     * Texture for Shotgun
+     */
     public static final int TEXTURE_SHTG = 13; // 13, 14, 15, 16, 17
+    /**
+     * Texture for Chaingun
+     */
     public static final int TEXTURE_CHGN = 18; // 18, 19, 20, 21
+    /**
+     * Texture for Double Shotgun
+     */
     public static final int TEXTURE_DBLSHTG = 22; // 22, 23, 24, 25, 26
+    /**
+     * Texture for Double Chaingun
+     */
     public static final int TEXTURE_DBLCHGN = 27; // 27, 28, 29, 30
+    /**
+     * Texture for Chainsaw
+     */
     public static final int TEXTURE_SAW = 31; // 31, 32, 33
+    /**
+     * Texture for Last Resort
+     */
     public static final int TEXTURE_LAST = 34;
 
+    /**
+     * Weapons Textures
+     */
     @SuppressWarnings("PointlessArithmeticExpression") public static final TextureToLoad[] TEXTURES_TO_LOAD = {
             // Base
 
@@ -75,6 +105,9 @@ public final class AppConfig {
             new TextureToLoad(TEXTURE_SAW + 2, R.drawable.hit_saw_3), };
 
     // @formatter:off
+    /**
+     * Weapons Parameters for normal game
+     */
     public static final WeaponParams[] WEAPONS = {
             // WEAPON_HAND
             new WeaponParams(
@@ -172,6 +205,9 @@ public final class AppConfig {
                     SoundManager.SOUND_SHOOT_SAW, true, 0), };
     // @formatter:on
 
+    /**
+     * Class Constructor
+     */
     private AppConfig() {
     }
 }

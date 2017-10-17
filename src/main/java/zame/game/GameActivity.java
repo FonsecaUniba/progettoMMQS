@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.EditText;
 import zame.game.engine.Controls;
 import zame.game.engine.Game;
-import zame.game.views.GameView;
 import zame.game.views.IZameView;
 
 /**
@@ -96,7 +95,7 @@ public class GameActivity extends Activity implements SensorEventListener {
     /**
      * Data to show
      */
-    public GameView.Data gameViewData;
+    public zame.game.views.GameView.Data gameViewData;
 
     /**
      * Opens Option Menu
@@ -182,7 +181,7 @@ public class GameActivity extends Activity implements SensorEventListener {
         SoundManager.init(getApplicationContext(), getAssets(), true);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        gameViewData = new GameView.Data(getResources(), getAssets());
+        gameViewData = new zame.game.views.GameView.Data(getResources(), getAssets());
 
         currentView = null;
         currentLayoutResId = -1;

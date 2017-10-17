@@ -7,14 +7,39 @@ import java.util.ArrayList;
 
 @SuppressWarnings("WeakerAccess")
 public class ZameApplicationAnalyticsHelper {
+    /**
+     * Event Handler
+     */
     private final Handler handler = new Handler();
 
+    /**
+     * Event to Track
+     */
     public static class EventToTrack {
+        /**
+         * Event Category
+         */
         public String category;
+        /**
+         * Event Action
+         */
         public String action;
+        /**
+         * Event Label
+         */
         public String label;
+        /**
+         * Event value
+         */
         public int value;
 
+        /**
+         * Class Constructor
+         * @param category Event category
+         * @param action Event Action
+         * @param label Event Label
+         * @param value Event Value
+         */
         public EventToTrack(String category, String action, String label, int value) {
             this.category = category;
             this.action = action;
@@ -23,9 +48,19 @@ public class ZameApplicationAnalyticsHelper {
         }
     }
 
+    /**
+     * Google Analytics Tracker
+     */
     private GoogleAnalyticsTracker tracker;
+    /**
+     * ArrayList of Events to track
+     */
     private ArrayList<EventToTrack> eventsToTrack = new ArrayList<EventToTrack>();
 
+    /**
+     * Tracks Page views
+     * @param pageUrl Page URL to track
+     */
     public void trackPageView(final String pageUrl) {
         handler.post(new Runnable() {
             @Override
@@ -39,6 +74,13 @@ public class ZameApplicationAnalyticsHelper {
         });
     }
 
+    /**
+     * Tracks an event
+     * @param category Event Category
+     * @param action Event Action
+     * @param label Event Label
+     * @param value Event Value
+     */
     public void trackEvent(final String category, final String action, final String label, final int value) {
         handler.post(new Runnable() {
             @Override
@@ -48,6 +90,9 @@ public class ZameApplicationAnalyticsHelper {
         });
     }
 
+    /**
+     * Flushes all events
+     */
     public void flushEvents() {
         handler.post(new Runnable() {
             @Override
@@ -65,6 +110,11 @@ public class ZameApplicationAnalyticsHelper {
         });
     }
 
+    /**
+     * When Activity is created
+     * @param app This App
+     * @param initialControlsType Initial Control Scheme
+     */
     public void onCreate(ZameApplication app, String initialControlsType) {
         try {
             tracker = GoogleAnalyticsTracker.getInstance();

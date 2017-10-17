@@ -4,17 +4,27 @@ import android.content.Context;
 import android.widget.Toast;
 import java.io.File;
 import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import zame.game.Common;
 import zame.game.R;
 import zame.game.ZameApplication;
 
+/**
+ * Class Representing Normal Game Helper
+ */
 @SuppressWarnings("WeakerAccess")
 public final class GameHelper {
+    /**
+     * Class Constructor
+     */
     private GameHelper() {
     }
 
+    /**
+     * Initializes External Storage Path
+     * @param appContext App Context
+     * @return External Storage Path
+     */
     public static String initPaths(@SuppressWarnings("UnusedParameters") Context appContext) {
         String externalStoragePath = String.format(Locale.US,
                 "%1$s%2$sAndroid%2$sdata%2$szame.GloomyDungeons.common",
