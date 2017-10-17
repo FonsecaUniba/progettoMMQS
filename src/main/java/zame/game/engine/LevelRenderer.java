@@ -5,47 +5,134 @@ import zame.game.Common;
 import zame.game.Config;
 import zame.game.Renderer;
 
+/**
+ * Class representing Level Renderer
+ */
 @SuppressWarnings("WeakerAccess")
 public final class LevelRenderer {
+    /**
+     * Class representing a Visible Object
+     */
     public static class VisibleObject {
+        /**
+         * Middle Position X
+         */
         public float midX;
+        /**
+         * Middle Position Y
+         */
         public float midY;
+        /**
+         * Starting Position X
+         */
         public float fromX;
+        /**
+         * Starting Position Y
+         */
         public float fromY;
+        /**
+         * Ending Position X
+         */
         public float toX;
+        /**
+         * Ending Position Y
+         */
         public float toY;
+        /**
+         * Visible Object
+         */
         public Object obj;
+        /**
+         * Distance from Object
+         */
         public float dist;
     }
 
+    /**
+     * Max number of concurrently visible objects
+     */
     private static final int MAX_VISIBLE_OBJECTS = 64;
+    /**
+     * Floor fade transparency value
+     */
     private static final float FLOOR_FADE_ALPHA = 1.0f;
 
+    /**
+     * Auto Wall Type
+     */
     private static final int AUTO_WALL_TYPE_WALL = 0;
+    /**
+     * Transparent Auto Wall Type
+     */
     private static final int AUTO_WALL_TYPE_TRANSP = 1;
+    /**
+     * Door Auto Wall Type
+     */
     private static final int AUTO_WALL_TYPE_DOOR = 2;
 
+    /**
+     * Horizontal Mask Type
+     */
     private static final int AUTO_WALL_MASK_HORIZONTAL = 1;
+    /**
+     * Vertical Mask Type
+     */
     private static final int AUTO_WALL_MASK_VERTICAL = 2;
+    /**
+     * Door Mask Type
+     */
     private static final int AUTO_WALL_MASK_DOOR = 4;
 
+    /**
+     * Max Autowalls allowed
+     */
     public static final int MAX_AUTO_WALLS = Level.MAX_WIDTH * Level.MAX_HEIGHT * 2;
+    /**
+     * Half Wall Constant
+     */
     public static final float HALF_WALL = 1.0f / 2.5f;
 
+    /**
+     * Portal Tracer for Level
+     */
     public static PortalTracer tracer = new PortalTracer();
 
+    /**
+     * Array of all Visible Objects
+     */
     public static VisibleObject[] visibleObjects = new VisibleObject[MAX_VISIBLE_OBJECTS];
+    /**
+     * Count of Visible Objects
+     */
     public static int visibleObjectsCount=0;
+    /**
+     * Currently visible Object
+     */
     public static VisibleObject currVis = new VisibleObject();
 
+    /**
+     * Floating Object Derivate X
+     */
     private static float flatObjDx=0;
+    /**
+     * Floating Object Derivate Y
+     */
     private static float flatObjDy=0;
 
+    /**
+     * Do we show monsters on Map?
+     */
     public static boolean showMonstersOnMap = true;
 
+    /**
+     * Class Constructor
+     */
     private LevelRenderer() {
     }
 
+    /**
+     * Initializes Level Renderer
+     */
     public static void init() {
         visibleObjectsCount = 0;
         currVis = null;
@@ -56,6 +143,9 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Updates the AutoWalls
+     */
     public static void updateAutoWalls() {
         for (int i = 0; i < State.autoWallsCount; i++) {
             AutoWall aw = State.autoWalls[i];
@@ -66,6 +156,12 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Updates the CI value
+     * @param t hero approximate position
+     * @param ci value to update
+     * @return update value of ci
+     */
     public static int updateCI(float t, int ci){
         if (t >= 0) {
             ci++;
@@ -74,6 +170,12 @@ public final class LevelRenderer {
         return ci;
     }
 
+    /**
+     * Updates the CO value
+     * @param t hero approximate position
+     * @param co value to update
+     * @return updated value of co
+     */
     public static int updateCO(float t, int co){
         if (t <= 0) {
             co++;
@@ -82,6 +184,9 @@ public final class LevelRenderer {
         return co;
     }
 
+    /**
+     * Sorts all Visible Object
+     */
     public static void sortVisibleObjects() {
         currVis = null;
 
@@ -115,6 +220,10 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Updates Doors
+     * @param elapsedTime Time elapsed
+     */
     @SuppressWarnings("MagicNumber")
     private static void updateDoors(long elapsedTime) {
         for (int i = 0; i < State.doorsCount; i++) {
@@ -132,6 +241,12 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Get Lightness for Object
+     * @param x Position X of Object
+     * @param y Position Y of Object
+     * @return Lightness value
+     */
     @SuppressWarnings("MagicNumber")
     public static float getLightness(float x, float y) {
         x -= State.heroX;
@@ -143,11 +258,24 @@ public final class LevelRenderer {
         return (1.0f - ((d > 0.8f) ? 0.8f : d));
     }
 
+    /**
+     * Sets an Object Lightning
+     * @param x Position X of Object
+     * @param y Position Y of Object
+     */
     public static void setObjLighting(float x, float y) {
         float l = getLightness(x, y);
         Renderer.setQuadRGB(l, l, l);
     }
 
+    /**
+     * Sets Wall Lightning
+     * @param fromX Starting Position X
+     * @param fromY Starting Position Y
+     * @param toX Ending Position X
+     * @param toY Ending Position Y
+     * @param vert Is Wall Vertical?
+     */
     @SuppressWarnings("MagicNumber")
     public static void setWallLighting(float fromX, float fromY, float toX, float toY, boolean vert) {
         int ang = ((int)State.heroA + (vert ? 0 : 270)) % 360;
@@ -185,11 +313,22 @@ public final class LevelRenderer {
         Renderer.b4 = l2;
     }
 
+    /**
+     * Checks if two int are equal
+     * @param a first value
+     * @param b second value
+     * @return true if a and b are equals, false otherwise
+     */
     private static boolean isEquals(int a, int b)
     {
         return Math.abs(a-b) < 1e-6;
     }
 
+    /**
+     * Casts float value to int
+     * @param a float value to cast
+     * @return int value of a
+     */
     private static int floatToInt(float a){
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
@@ -197,6 +336,11 @@ public final class LevelRenderer {
         return (int) a;
     }
 
+    /**
+     * Casts int value to float
+     * @param a int value to cast
+     * @return float value of a
+     */
     private static float intToFloat(int a){
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
@@ -204,24 +348,56 @@ public final class LevelRenderer {
         return (float) a;
     }
 
+    /**
+     * Returns the next index
+     * @param index Current Index
+     * @param nextIndex Next Index
+     * @return nextIndex - 1 if nextIndex>index, nextIndex otherwise
+     */
     private static int getIndex(int index, int nextIndex){
         return ((nextIndex > index) ? (nextIndex - 1) : nextIndex);
     }
 
+    /**
+     * Is value in allowed range?
+     * @param value1 First value
+     * @param value2 Second value
+     * @param value3 Third value
+     * @param value4 Fourth value
+     * @return true if allowed, false otherwise
+     */
     private static boolean isValid(int value1, int value2, int value3, int value4) {
         return ((value1 == value2) && (value3 == value4));
     }
 
+    /**
+     * is AutoWall skippable?
+     * @param aw AutoWall
+     * @param awi Next AutoWall
+     * @param i Index of Aw
+     * @param index Index of Awi
+     * @return True if skippable, false otherwise
+     */
     private static boolean isSkippable(AutoWall aw, AutoWall awi, int i, int index){
         return (i == index) || (aw.door != null) || (aw.vert != awi.vert) || (aw.type != awi.type);
     }
 
+    /**
+     * Copies two autowalls
+     * @param index index of first autowall
+     */
     private static void copyAutoWalls(int index){
         for (int i = index; i < State.autoWallsCount; i++) {
             State.autoWalls[i].copyFrom(State.autoWalls[i + 1]);
         }
     }
 
+    /**
+     * Cycles between autowalls
+     * @param index Index of first Autowall
+     * @param nextIndex Index of next Autowall
+     * @return updated nextIndex
+     */
     private static int cycleWalls(int index, int nextIndex){
         AutoWall awi = State.autoWalls[index];
 
@@ -258,6 +434,10 @@ public final class LevelRenderer {
         return nextIndex;
     }
 
+    /**
+     * Swap two Autowalls
+     * @param index Index of first Autowall
+     */
     private static void swapAutoWall(int index){
         while(true) {
             int nextIndex = -1;
@@ -276,10 +456,25 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Checks if Autowall is valid
+     * @param aw Autowall to check
+     * @param vert Is Autowall vertical?
+     * @param type Type of Autowall
+     * @return True or false
+     */
     private static boolean isAwValid(AutoWall aw, boolean vert, int type){
         return (aw.door != null) || (aw.vert != vert) || (aw.type != type);
     }
 
+    /**
+     * Checks if value1==value2 && value3==value4
+     * @param value1 first value
+     * @param value2 second value
+     * @param value3 third value
+     * @param value4 fourth value
+     * @return True or false
+     */
     private static boolean bothEquals(int value1, int value2, int value3, int value4){
         return (isEquals(value1, value2)) && (isEquals(value3, value4));
     }
@@ -289,6 +484,15 @@ public final class LevelRenderer {
     // did *not* check if wall already exists,
     // did *not* append wall mask,
     // did *not* add doors
+
+    /**
+     * Appends a new Autowall
+     * @param fromX Starting position X
+     * @param fromY Starting Position Y
+     * @param toX Ending Position X
+     * @param toY Ending Position Y
+     * @param type Autowall Type
+     */
     public static void appendAutoWall(int fromX, int fromY, int toX, int toY, int type) {
         int index = -1;
         boolean vert = (isEquals(fromX,toX));
@@ -341,10 +545,20 @@ public final class LevelRenderer {
         swapAutoWall(index);
     }
 
+    /**
+     * Sets Door texture
+     * @param door Door to check
+     * @param wall Wall with texture
+     * @return Door.texture if Door NOT null, Wall.texture otherwise
+     */
     private static int isDoorOrWall(Door door, PortalTracer.Wall wall){
         return (door != null) ? (door.texture + 0x10) : wall.texture;
     }
 
+    /**
+     * Set Visible Object Values
+     * @param wall Wall to add as VisibleObject
+     */
     private static void setVisibleObject(PortalTracer.Wall wall){
         if ((Level.marksMap[wall.cellY][wall.cellX] != null) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS)) {
             VisibleObject vo = visibleObjects[visibleObjectsCount++];
@@ -359,6 +573,13 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Appensa a Wall
+     * @param mx Mid Position X
+     * @param my Mid Position Y
+     * @param wall Wall to Append
+     * @param autoWallMask Auto Wall mask
+     */
     private static void toAppendWall(int mx, int my, PortalTracer.Wall wall, int autoWallMask){
         if ((isEquals((State.drawedAutoWalls[my][mx] & autoWallMask),0)) && (State.autoWallsCount < MAX_AUTO_WALLS)) {
             State.drawedAutoWalls[my][mx] |= autoWallMask;
@@ -366,6 +587,9 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Renders the level
+     */
     @SuppressWarnings("MagicNumber")
     public static void renderLevel() {
         Renderer.z1 = -HALF_WALL;
@@ -422,15 +646,28 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Is Wall a Door?
+     * @param door Door to check
+     * @return True if Door, false otherwise
+     */
     private static boolean isValidDoor(Door door){
         return ((State.drawedAutoWalls[door.y][door.x] & AUTO_WALL_MASK_DOOR) == 0)
                 && (State.autoWallsCount < MAX_AUTO_WALLS);
     }
 
+    /**
+     * Is Door Open?
+     * @param door Door to check
+     * @return True if Door open, false otherwise
+     */
     private static boolean isDoorOpen(Door door){
         return ((door.openPos) < 0.7f) && (visibleObjectsCount < MAX_VISIBLE_OBJECTS);
     }
 
+    /**
+     * Renders Doors
+     */
     @SuppressWarnings("MagicNumber")
     private static void renderDoors() {
         for (int i = 0; i < tracer.touchedCellsCount; i++) {
@@ -511,6 +748,11 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Draws texture
+     * @param tex Texture to draw
+     * @param tc Touched Cell to draw on
+     */
     private static void drawTexPos(int tex, PortalTracer.TouchedCell tc){
         if (tex > 0) {
             float mx = (float)tc.x + 0.5f;
@@ -538,12 +780,27 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Returns correct AutoWallMask
+     * @param s Screen orientation
+     * @return Vertical Mask if s is 1 or 3, false otherwise
+     */
     private static int getAutoWallMask(int s){
         return (((s == 1) || (s == 3))
                 ? AUTO_WALL_MASK_VERTICAL
                 : AUTO_WALL_MASK_HORIZONTAL);
     }
 
+    /**
+     * Draws Auto Walls
+     * @param mx Mid Position X
+     * @param my Mid Position Y
+     * @param autoWallMask AutoWall Mask
+     * @param fromX Starting Position X
+     * @param fromY Starting Position Y
+     * @param toX Ending Position X
+     * @param toY Ending Position Y
+     */
     private static void drawAutoWalls(int mx, int my, int autoWallMask, int fromX, int fromY, int toX, int toY){
         if ((isEquals(((State.drawedAutoWalls[my][mx] & autoWallMask)),0)) && (State.autoWallsCount
                 < MAX_AUTO_WALLS)) {
@@ -553,15 +810,31 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Is Auto Wall being Drawn?
+     * @param tc TouchedCell to check
+     * @return True if Autowall is Door, False otherwise
+     */
     private static boolean isAutoWallDrawn(PortalTracer.TouchedCell tc){
         return ((State.drawedAutoWalls[tc.y][tc.x] & AUTO_WALL_MASK_DOOR) == 0) && (State.autoWallsCount
                 < MAX_AUTO_WALLS);
     }
 
+    /**
+     * Updates MValue
+     * @param value1 Value 1
+     * @param value2 Value 2
+     * @return Updated MValue
+     */
     private static int getMValue(int value1, int value2){
         return ((value1 < value2) ? value1 : value2);
     }
 
+    /**
+     * Draws an Object
+     * @param tex Texture of the Object
+     * @param tc Touched Cell to draw onto
+     */
     private static void drawObject(int tex, PortalTracer.TouchedCell tc){
         if (tex > 0) {
             float mx = (float)tc.x + 0.5f;
@@ -589,6 +862,15 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Checks if Auto Wall will be drawn
+     * @param tc Touched Cell to Draw on
+     * @param vert Autowall is vertical?
+     * @param fromX Starting Position X
+     * @param fromY Starting Position Y
+     * @param toX Ending Position X
+     * @param toY Ending Position Y
+     */
     private static void willAutoWallBeDrawn(PortalTracer.TouchedCell tc, boolean vert, float fromX, float fromY, float toX, float toY){
         if (isAutoWallDrawn(tc)) {
 
@@ -606,10 +888,20 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Checks if Screen is Horizontal
+     * @param s Screen Orientation
+     * @return True if s is 1 or 3
+     */
     private static boolean matchS(int s){
         return ((s == 1) || (s == 3));
     }
 
+    /**
+     * Render Things
+     * @param tex Texture to draw
+     * @param tc Touched Cell to draw on
+     */
     private static void renderThings(int tex, PortalTracer.TouchedCell tc){
         for (int s = 0; s < 4; s++) {
             if ((State.passableMap[tc.y + PortalTracer.Y_CELL_ADD[s]][tc.x + PortalTracer.X_CELL_ADD[s]]
@@ -646,6 +938,9 @@ public final class LevelRenderer {
 
     // render objects, decorations and transparents
     @SuppressWarnings("MagicNumber")
+    /**
+     * Renders all Objects
+     */
     private static void renderObjects() {
         for (int i = 0; i < tracer.touchedCellsCount; i++) {
             PortalTracer.TouchedCell tc = tracer.touchedCells[i];
@@ -706,6 +1001,12 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Returns Monster Death Time
+     * @param die Time of death
+     * @param elapsed Elapsed Time
+     * @return Updated Death Time
+     */
     private static long getMonDieTime(long die, long elapsed){
         if (die == 0) {
             die = elapsed;
@@ -713,6 +1014,13 @@ public final class LevelRenderer {
         return die;
     }
 
+    /**
+     * Returns Monster Textures
+     * @param tex Current Textures
+     * @param mon Monster
+     * @param elapsedTime elapsed Time
+     * @return Updated Textures
+     */
     private static int getTex(int tex, Monster mon, long elapsedTime){
         if ((mon.hitTimeout <= 0) && (mon.attackTimeout > 0)) {
             tex += 15;
@@ -731,6 +1039,14 @@ public final class LevelRenderer {
         return tex;
     }
 
+    /**
+     * Check if Monster is dead
+     * @param mon Monster to check
+     * @param x Position X of Monster
+     * @param y Position Y of Monster
+     * @param deadCorpses Is dead Corpse?
+     * @return True if Monster is not a corpse and has no health, false otherwise
+     */
     private static boolean isMonsterDead(Monster mon, int x, int y, boolean deadCorpses){
         return (!(tracer.touchedCellsMap[y][x]
                 || tracer.touchedCellsMap[mon.cellX][mon.cellY]))
@@ -740,6 +1056,11 @@ public final class LevelRenderer {
                 && (mon.health <= 0));
     }
 
+    /**
+     * Renders all Monsters
+     * @param elapsedTime elapsed Time
+     * @param deadCorpses Are Monsters Dead?
+     */
     @SuppressWarnings("MagicNumber")
     private static void renderMonsters(long elapsedTime, boolean deadCorpses) {
         for (int i = 0; i < State.monstersCount; i++) {
@@ -802,6 +1123,10 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Renders the Floor
+     * @param gl Renderer
+     */
     private static void renderFloor(GL10 gl) {
         gl.glDisable(GL10.GL_DEPTH_TEST);
 
@@ -931,6 +1256,12 @@ public final class LevelRenderer {
         gl.glMatrixMode(GL10.GL_MODELVIEW);
     }
 
+    /**
+     * Renders the whole level
+     * @param gl Renderer
+     * @param elapsedTime Elapsed Time
+     * @param ypos Starting Y Position
+     */
     @SuppressWarnings("MagicNumber")
     public static void render(GL10 gl, long elapsedTime, float ypos) {
         updateDoors(elapsedTime);
@@ -1011,6 +1342,10 @@ public final class LevelRenderer {
         gl.glEnable(GL10.GL_CULL_FACE);
     }
 
+    /**
+     * Draws a Monster
+     * @param mon Monster to Draw
+     */
     private static void drawMonster(Monster mon){
         if (mon.health <= 0) {
             Renderer.r1 = 0.5f;
@@ -1030,6 +1365,10 @@ public final class LevelRenderer {
         }
     }
 
+    /**
+     * Renders AutoMap
+     * @param gl Renderer
+     */
     @SuppressWarnings("MagicNumber")
     public static void renderAutoMap(GL10 gl) {
         gl.glDisable(GL10.GL_DEPTH_TEST);
@@ -1148,6 +1487,10 @@ public final class LevelRenderer {
         gl.glPopMatrix();
     }
 
+    /**
+     * When Surface Size Changes
+     * @param gl Renderer
+     */
     @SuppressWarnings("MagicNumber")
     public static void surfaceSizeChanged(GL10 gl) {
         gl.glMatrixMode(GL10.GL_PROJECTION);

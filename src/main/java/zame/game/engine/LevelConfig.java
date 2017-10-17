@@ -7,18 +7,40 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+/**
+ * Class representing Level Configuration
+ */
 @SuppressWarnings("WeakerAccess")
 public class LevelConfig {
+    /**
+     * Constant for Bite Hit
+     */
     public static final int HIT_TYPE_EAT = 0;
+    /**
+     * Constant for Pistol Hit
+     */
     public static final int HIT_TYPE_PIST = 1;
+    /**
+     * Constant for Shotgun hit
+     */
     public static final int HIT_TYPE_SHTG = 2;
 
+    /**
+     * Class representing Monster Configuration
+     */
     public static class MonsterConfig {
         int texture;
         int health;
         int hits;
         int hitType;
 
+        /**
+         * Class Constructor
+         * @param texture Monster Texture
+         * @param health Monster Health value
+         * @param hits Monster Hit value
+         * @param hitType Monster Hit Type
+         */
         public MonsterConfig(int texture, int health, int hits, int hitType) {
             this.texture = texture;
             this.health = health;
@@ -27,11 +49,27 @@ public class LevelConfig {
         }
     }
 
+    /**
+     * Current Level ID
+     */
     public int levelNum;
+    /**
+     * Floor texture
+     */
     public int floorTexture;
+    /**
+     * Ceiling texture
+     */
     public int ceilTexture;
+    /**
+     * Configuration for all monsters
+     */
     public MonsterConfig[] monsters;
 
+    /**
+     * Class Constructor
+     * @param levelNum Current Level ID
+     */
     public LevelConfig(int levelNum) {
         this.levelNum = levelNum;
         this.floorTexture = 2;
@@ -44,6 +82,12 @@ public class LevelConfig {
                 new MonsterConfig(4, 64, 64, HIT_TYPE_EAT), };
     }
 
+    /**
+     * Reads Level Configuration from file
+     * @param assMan Asset Manager
+     * @param currLev Current Level ID
+     * @return True if read successfully, false otherwise
+     */
     public static LevelConfig read(AssetManager assMan, int currLev) {
         LevelConfig res = new LevelConfig(currLev);
 

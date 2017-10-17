@@ -3,45 +3,97 @@ package zame.game.engine;
 import javax.microedition.khronos.opengles.GL10;
 import zame.game.Renderer;
 
+/**
+ * Class Representing an Overlay
+ */
 @SuppressWarnings("WeakerAccess")
 public final class Overlay {
+    /**
+     * Constant for Blood Overlay
+     */
     public static final int BLOOD = 1;
+    /**
+     * Constant for Item Overlay
+     */
     public static final int ITEM = 2;
+    /**
+     * Constant for Mark Overlay
+     */
     public static final int MARK = 3;
 
+    /**
+     * Constant for Color set
+     */
     private static final float[][] COLORS = { new float[] { 1.0f, 0.0f, 0.0f }, // BLOOD
             new float[] { 1.0f, 1.0f, 1.0f }, // ITEM
             new float[] { 1.0f, 1.0f, 1.0f } // MARK
     };
 
+    /**
+     * Overlay Type
+     */
     private static int overlayType=0;
+    /**
+     * Overlay Time to stay rendered
+     */
     private static long overlayTime=0;
+    /**
+     * Label Type
+     */
     private static int labelType=0;
+    /**
+     * Label Time to stay rendered
+     */
     private static long labelTime=0;
 
+    /**
+     * Class Constructor
+     */
     private Overlay() {
     }
 
+    /**
+     * Initializes the Overlay
+     */
     public static void init() {
         overlayType = 0;
         labelType = 0;
     }
 
+    /**
+     * Shows the Overlay
+     * @param type Type of Overlay to show
+     */
     public static void showOverlay(int type) {
         overlayType = type;
         overlayTime = Game.elapsedTime;
     }
 
+    /**
+     * Show Label
+     * @param type Label to show
+     */
     public static void showLabel(int type) {
         labelType = type;
         labelTime = Game.elapsedTime;
     }
 
+    /**
+     * Renders Overlay and Label
+     * @param gl Renderer
+     */
     public static void render(GL10 gl) {
         renderOverlay(gl);
         renderLabel(gl);
     }
 
+    /**
+     * Appends Overlay Color
+     * @param r Red Value 0-255
+     * @param g Green Value 0-255
+     * @param b Blue Value 0-255
+     * @param a Alpha Value
+     */
     @SuppressWarnings("MagicNumber")
     private static void appendOverlayColor(float r, float g, float b, float a) {
         float d = (Renderer.a1 + a) - (Renderer.a1 * a);
@@ -56,6 +108,10 @@ public final class Overlay {
         Renderer.a1 = d;
     }
 
+    /**
+     * Renders the overlays
+     * @param gl Renderer
+     */
     @SuppressWarnings("MagicNumber")
     private static void renderOverlay(GL10 gl) {
         Renderer.r1 = 0.0f;
@@ -121,6 +177,10 @@ public final class Overlay {
         gl.glPopMatrix();
     }
 
+    /**
+     * Renders the Labels
+     * @param gl Renderer
+     */
     @SuppressWarnings("MagicNumber")
     private static void renderLabel(GL10 gl) {
         int heightOffset = ((State.shownMessageId != 0) ? 25 : 0);

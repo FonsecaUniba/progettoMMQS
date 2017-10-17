@@ -10,32 +10,101 @@ import zame.game.ZameApplication;
 import zame.libs.LabelMaker;
 import zame.libs.NumericSprite;
 
+/**
+ * Class representing Labels
+ */
 @SuppressWarnings("WeakerAccess")
 public final class Labels {
+    /**
+     * Constant for FPS Label
+     */
     public static final int LABEL_FPS = 1;
+    /**
+     * Constant for Can't Open Label
+     */
     public static final int LABEL_CANT_OPEN = 2;
+    /**
+     * Constant for Blue Key required label
+     */
     public static final int LABEL_NEED_BLUE_KEY = 3;
+    /**
+     * Constant for Red Key Required Label
+     */
     public static final int LABEL_NEED_RED_KEY = 4;
+    /**
+     * Constant for Green Key Required Label
+     */
     public static final int LABEL_NEED_GREEN_KEY = 5;
+    /**
+     * Constant for Secrets Found label
+     */
     public static final int LABEL_SECRET_FOUND = 6;
+    /**
+     * Constant for Last weapon label
+     */
     public static final int LABEL_LAST = 7;
 
+    /**
+     * Constant for Press Forward label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_FORWARD = 1;
+    /**
+     * Constant for Press rotate label
+     */
     public static final int MSG_PRESS_ROTATE = 2;
+    /**
+     * Constant for Press Action to open door label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_ACTION_TO_OPEN_DOOR = 3;
+    /**
+     * Constant for switch at right label
+     */
     @SuppressWarnings("unused") public static final int MSG_SWITCH_AT_RIGHT = 4;
+    /**
+     * Constant for Press action to switch label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_ACTION_TO_SWITCH = 5;
+    /**
+     * Constant for Key at left label
+     */
     @SuppressWarnings("unused") public static final int MSG_KEY_AT_LEFT = 6;
+    /**
+     * Constant for Press Action to fight label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_ACTION_TO_FIGHT = 7;
+    /**
+     * Constant for Press Map Label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_MAP = 8;
+    /**
+     * Constant for Press Next Weapon label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_NEXT_WEAPON = 9;
+    /**
+     * Constant for Open Door with key label
+     */
     @SuppressWarnings("unused") public static final int MSG_OPEN_DOOR_USING_KEY = 10;
+    /**
+     * Constant for End Level Switch label
+     */
     @SuppressWarnings("unused") public static final int MSG_PRESS_END_LEVEL_SWITCH = 11;
+    /**
+     * Constant for Go To Door Label
+     */
     @SuppressWarnings("unused") public static final int MSG_GO_TO_DOOR = 12;
+    /**
+     * Constant for Last Message Label
+     */
     public static final int MSG_LAST = 13;
 
+    /**
+     * Label Map
+     */
     public static int[] map = new int[LABEL_LAST];
 
+    /**
+     * Message Map
+     */
     public static final int[] MSG_MAP = { 0, R.string.lblm_press_forward, // MSG_PRESS_FORWARD
             R.string.lblm_press_rotate, // MSG_PRESS_ROTATE
             R.string.lblm_press_action_to_open_door, // MSG_PRESS_ACTION_TO_OPEN_DOOR
@@ -50,23 +119,59 @@ public final class Labels {
             R.string.lblm_go_to_door, // MSG_GO_TO_DOOR
     };
 
+    /**
+     * Label Maker
+     */
     public static volatile LabelMaker maker = new LabelMaker(true,1000,1000);
+    /**
+     * Message Maker
+     */
     public static volatile LabelMaker msgMaker = new LabelMaker(true,1000,1000);
     //INIZIALIZZAZIONE DI QUESTE VARIABILI PERICOLOSA PER L'ESECUZIONE DEL PROGRAMMA
+    /**
+     * Number of sprites
+     */
     public static volatile NumericSprite numeric = null; //inizializzazione = black screen dopo new game
+    /**
+     * Stats Sprite
+     */
     public static volatile NumericSprite statsNumeric = null;
     //FINE VARIABILI PERICOLOSE
+    /**
+     * Label Paint
+     */
     private static Paint labelPaint  = new Paint();
+    /**
+     * Message Paint
+     */
     private static Paint msgPaint = new Paint();
+    /**
+     * Stats Paint
+     */
     private static Paint statsPaint = new Paint();
 
+    /**
+     * Current Message ID
+     */
     private static int currentMessageId=0;
+    /**
+     * Current Label ID
+     */
     private static int currentMessageLabelId=0;
+    /**
+     * Current Message Value
+     */
     private static String currentMessageString ="";
 
+    /**
+     * Class constructor
+     */
     private Labels() {
     }
 
+    /**
+     * Initializes Labels
+     */
     @SuppressWarnings("MagicNumber")
     public static void init() {
         Typeface labelTypeface = Typeface.createFromAsset(Game.assetManager,
@@ -88,10 +193,19 @@ public final class Labels {
         statsPaint.setARGB(0xFF, 0xFF, 0xFF, 0xFF);
     }
 
+    /**
+     * Returns int value of resource
+     * @param resId Resource ID
+     * @return Int value of resource
+     */
     private static int getInt(int resId) {
         return Integer.parseInt(ZameApplication.self.getString(resId));
     }
 
+    /**
+     * When Surface Size Changes
+     * @param width New Width
+     */
     @SuppressWarnings("MagicNumber")
     public static void surfaceSizeChanged(int width) {
         labelPaint.setTextSize(getInt((width < 480)
@@ -107,6 +221,12 @@ public final class Labels {
                 : ((width < 800) ? R.string.font_stats_size_md : R.string.font_stats_size_lg)));
     }
 
+    /**
+     * Get Message Label ID
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * @param messageId Message ID
+     * @return Message ID
+     */
     public static int getMessageLabelId(GL10 gl, int messageId) {
         if (currentMessageId == messageId) {
             return currentMessageLabelId;
@@ -134,6 +254,12 @@ public final class Labels {
         return currentMessageLabelId;
     }
 
+    /**
+     * Get Message ID From String
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * @param message Message to identify
+     * @return Message ID
+     */
     @SuppressWarnings("unused")
     public static int getMessageLabelIdForString(GL10 gl, String message) {
         if (currentMessageString.equals(message)) {
@@ -150,6 +276,10 @@ public final class Labels {
         return currentMessageLabelId;
     }
 
+    /**
+     * Create Labels
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @SuppressWarnings("MagicNumber")
     public static void createLabels(GL10 gl) {
         if (maker == null) {

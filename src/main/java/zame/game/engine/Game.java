@@ -28,59 +28,185 @@ import zame.game.SoundManager;
 import zame.game.ZameApplication;
 import zame.game.ZameGame;
 
+/**
+ * Class representing the Game
+ */
 public class Game extends ZameGame {
+    /**
+     * Constant for distance from Wall
+     */
     private static final float WALK_WALL_DIST = 0.2f;
+    /**
+     * Constant for Normal Level Load
+     */
     private static final int LOAD_LEVEL_NORMAL = 1;
+    /**
+     * Constant for Next Level Load
+     */
     private static final int LOAD_LEVEL_NEXT = 2;
+    /**
+     * Constant for Reload Level
+     */
     public static final int LOAD_LEVEL_RELOAD = 3;
 
+    /**
+     * Instant Save Name
+     */
     public static final String INSTANT_NAME = "instant";
+    /**
+     * Autosave Name
+     */
     public static final String AUTOSAVE_NAME = "autosave";
+    /**
+     * Were paths initialized
+     */
     private static boolean pathsInitialized=false;
 
+    /**
+     * Average FPS Length
+     */
     private static final int FPS_AVG_LEN = 2;
 
+    /**
+     * Save Folder
+     */
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_FOLDER="";
+    /**
+     * Save Root
+     */
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String SAVES_ROOT="";
+    /**
+     * Instant Path
+     */
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") public static String INSTANT_PATH="";
+    /**
+     * Autosave path
+     */
     @SuppressWarnings("NonConstantFieldWithUpperCaseName") private static String AUTOSAVE_PATH="";
 
+    /**
+     * Do we show FPS?
+     */
     private boolean showFps=true;
+    /**
+     * Current Action Mask
+     */
     private int actionsMask=0;
+    /**
+     * Processed Mask
+     */
     private int processedMask=0;
+    /**
+     * Did the Hero Move?
+     */
     private boolean hasMoved=true;
+    /**
+     * Last Time the Hero moved
+     */
     private long prevMovedTime=0;
+    /**
+     * Not yer processed GameCode
+     */
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private String unprocessedGameCode = "";
 
+    /**
+     * Next Level Screen Time
+     */
     private static long nextLevelTime=0;
+    /**
+     * Monster Killed Time
+     */
     private static long killedTime=0;
+    /**
+     * Monster Killed Angle
+     */
     private static float killedAngle=0;
+    /**
+     * Player Killer Angle
+     */
     private static float killedHeroAngle=0;
+    /**
+     * Is the Game over?
+     */
     private static boolean isGameOverFlag=true;
+    /**
+     * Do we play the Level Start Sound?
+     */
     private static boolean playStartLevelSound=true;
+    /**
+     * Do we skip End Level Screen?
+     */
     @SuppressWarnings("BooleanVariableAlwaysNegated") private static boolean skipEndLevelActivityOnce=false;
+    /**
+     * Do we render a Black Screen?
+     */
     public static boolean renderBlackScreen=true;
+    /**
+     * Default Save Game Parameter
+     */
     public static String savedGameParam = INSTANT_NAME;
 
+    /**
+     * End Level Total Kills
+     */
     public static int endlTotalKills=0;
+    /**
+     * End Level Total Items
+     */
     public static int endlTotalItems=0;
+    /**
+     * End Level Total Secrets
+     */
     public static int endlTotalSecrets=0;
 
+    /**
+     * Hero Current Cell X
+     */
     private static int heroCellX=0;
+    /**
+     * Hero Current Cell Y
+     */
     private static int heroCellY=0;
 
+    /**
+     * Number of created Textures
+     */
     private int createdTexturesCount;
+    /**
+     * All Textures loaded
+     */
     private int totalTexturesCount;
 
+    /**
+     * Moving Frames
+     */
     private int mFrames;
+    /**
+     * Moving Render Time
+     */
     private long mPrevRenderTime;
+    /**
+     * Some FPS values
+     */
     private int[] fpsList = new int[FPS_AVG_LEN];
+    /**
+     * Current FPS value
+     */
     private int currFpsPtr;
 
+    /**
+     * Initializes the game
+     */
     private void init()
     {
         initialize();
     }
+
+    /**
+     * Class Constructor
+     * @param res Game Resources
+     * @param assets Game Assets
+     */
     public Game(Resources res, AssetManager assets) {
         super(res, assets);
 
@@ -89,6 +215,9 @@ public class Game extends ZameGame {
         init();
     }
 
+    /**
+     * Initializes the variables
+     */
     public void initialize() {
         nextLevelTime = 0;
         killedTime = 0;
@@ -113,6 +242,10 @@ public class Game extends ZameGame {
         savedGameParam = INSTANT_NAME;
     }
 
+    /**
+     * Get Internal Storage Path
+     * @param appContext App Context
+     */
     private static String getInternalStoragePath(Context appContext) {
         String result = "";
 
@@ -137,9 +270,11 @@ public class Game extends ZameGame {
         return result;
     }
 
+    /**
+     * Get External Storage Path
+     */
     @SuppressLint("SdCardPath")
     @SuppressWarnings("WeakerAccess")
-
     public static String getExternalStoragePath() {
         String sd = Environment.getExternalStorageDirectory().getPath();
         try {
@@ -155,6 +290,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Initializes the Paths
+     * @param appContext App Context
+     */
     public static void initPaths(Context appContext)  {
         if (pathsInitialized) {
             return;
@@ -199,12 +338,20 @@ public class Game extends ZameGame {
         pathsInitialized = true;
     }
 
+    /**
+     * Sets the Game Code
+     * @param code to set
+     */
     public void setGameCode(String code) {
         synchronized (lockUpdate) {
             unprocessedGameCode = code;
         }
     }
 
+    /**
+     * Checks if code is level reload
+     * @param code code to reload Level
+     */
     private boolean isLevelReload(String code){
         return (code.length() == 4)
                 && (code.charAt(0) == 't')
@@ -214,6 +361,10 @@ public class Game extends ZameGame {
                 && ((code.charAt(3) >= '0') && (code.charAt(3) <= '9'));
     }
 
+    /**
+     * Reloads the level
+     * @param newLevelNum Level to load
+     */
     private static void reloadLevel(int newLevelNum){
         if (Level.exists(newLevelNum)) {
             State.levelNum = newLevelNum;
@@ -221,6 +372,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Processes the Game code
+     * @param code code to process
+     */
     private void processGameCode2(String code){
         if ("tfps".equals(code)) {
             showFps = !showFps;
@@ -240,6 +395,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Processes the Game codes
+     * @param codes Codes to process
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public void processGameCode(String codes) {
         String[] codeList = codes.toLowerCase(Locale.US).split(" ");
@@ -273,11 +432,18 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Save game state
+     */
     @Override
     public void saveState() {
         saveGameState(INSTANT_NAME);
     }
 
+    /**
+     * Loads a Level
+     * @param loadLevelType Type of level to load
+     */
     public static void loadLevel(int loadLevelType) {
         if (loadLevelType == LOAD_LEVEL_NEXT) {
             if (!Level.exists(State.levelNum + 1)) {
@@ -302,6 +468,9 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Shows the Game Over Screen
+     */
     private void showGameOverScreen() {
         renderBlackScreen = true;
         SoundManager.setPlaylist(SoundManager.LIST_GAMEOVER);
@@ -309,6 +478,9 @@ public class Game extends ZameGame {
         ZameApplication.trackPageView("/game/game-over");
     }
 
+    /**
+     * Shows the End Level Screen
+     */
     private void showEndLevelScreen() {
         endlTotalKills = ((State.totalMonsters == 0) ? 100 : ((State.killedMonsters * 100) / State.totalMonsters));
         endlTotalItems = ((State.totalItems == 0) ? 100 : ((State.pickedItems * 100) / State.totalItems));
@@ -318,6 +490,10 @@ public class Game extends ZameGame {
         skipEndLevelActivityOnce = false;
     }
 
+    /**
+     * Loads the Next Level
+     * @param isTutorial Is the current level Tutorial?
+     */
     @SuppressWarnings("WeakerAccess")
     public static void nextLevel(boolean isTutorial) {
         skipEndLevelActivityOnce = isTutorial;
@@ -330,31 +506,55 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Toogles the AutoMap
+     */
     @SuppressWarnings("WeakerAccess")
     public void toggleAutoMap() {
         State.showAutoMap = !State.showAutoMap;
     }
 
+    /**
+     * Handles key released
+     * @param keyCode Key released
+     * @return true or false
+     */
     @Override
     protected boolean keyUp(int keyCode) {
         return Controls.keyUp(keyCode);
     }
 
+    /**
+     * Handles key pressed
+     * @param keyCode Key pressed
+     * @return true or false
+     */
     @Override
     protected boolean keyDown(int keyCode) {
         return Controls.keyDown(keyCode);
     }
 
+    /**
+     * Handles touch event
+     * @param event event
+     */
     @Override
     protected void touchEvent(MotionEvent event) {
         Controls.touchEvent(event);
     }
 
+    /**
+     * Handles trackball event
+     * @param event Event
+     */
     @Override
     protected void trackballEvent(MotionEvent event) {
         Controls.trackballEvent(event);
     }
 
+    /**
+     * Updates the Controls
+     */
     @Override
     @SuppressWarnings("MagicNumber")
     protected void updateControls() {
@@ -378,6 +578,12 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Processes Hero hit
+     * @param amt Amount of damage
+     * @param soundIdx Sound ID
+     * @param mon Monster hit
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void hitHero(int amt, int soundIdx, Monster mon) {
         if (killedTime > 0) {
@@ -417,10 +623,18 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Is Monster Reachable?
+     * @return true if reachable, false otherwise
+     */
     private boolean isNotReachable(){
         return (LevelRenderer.currVis == null) || (LevelRenderer.currVis.dist > 1.8);
     }
 
+    /**
+     * Print The "Key required" message
+     * @param door Door to open
+     */
     private void printKeyRequired(Door door){
         if (door.requiredKey == 4) {
             Overlay.showLabel(Labels.LABEL_NEED_GREEN_KEY);
@@ -431,6 +645,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Marks a door
+     * @param door Door to mark
+     */
     private void markDoor(Door door){
         if (door.mark != null) {
             if (door.sticked) {
@@ -441,6 +659,11 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Checks if door is sticked
+     * @param door Door to check
+     * @return True if sticked, false otherwise
+     */
     private boolean checkStickedDoor(Door door){
         if (door.sticked) {
             if (door.requiredKey == 0) {
@@ -467,6 +690,10 @@ public class Game extends ZameGame {
         return false;
     }
 
+    /**
+     * Process Use Action
+     * @return True if action is performed, false otherwise
+     */
     @SuppressWarnings("MagicNumber")
     private boolean processUse() {
 
@@ -496,6 +723,12 @@ public class Game extends ZameGame {
         return false;
     }
 
+    /**
+     * Checks Monster Visibility and Hits
+     * @param mon Monster to check
+     * @param hits Hits
+     * @return True if Monster is hittable, false otherwise
+     */
     @SuppressWarnings("MagicNumber")
     private boolean checkMonsterVisibilityAndHit(Monster mon, int hits) {
         float dx = mon.x - State.heroX;
@@ -529,6 +762,9 @@ public class Game extends ZameGame {
         return false;
     }
 
+    /**
+     * Equips the best weapon
+     */
     private void getBestWeapon(){
         // just for case
         if (Weapons.hasNoAmmo(State.heroWeapon)) {
@@ -536,20 +772,35 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Chooses if we play hit sound
+     * @param hit true if we do, false otherwise
+     */
     private void chooseHitSound(boolean hit){
         SoundManager.playSound(((Weapons.currentParams.noHitSoundIdx != 0) && !hit)
                 ? Weapons.currentParams.noHitSoundIdx
                 : Weapons.currentParams.soundIdx);
     }
 
+    /**
+     * Checks if Monster is in range
+     * @return true if Monster is visible, false otherwise
+     */
     private boolean isMonsterVisible(){
         return (LevelRenderer.currVis != null) && (LevelRenderer.currVis.obj instanceof Monster);
     }
 
+    /**
+     * Checks if an entity is near
+     * @return True if Entity is near the hero visual, false otherwise
+     */
     private boolean isEntityNear(){
         return (!Weapons.currentParams.isNear) || (LevelRenderer.currVis.dist <= 1.4);
     }
 
+    /**
+     * Processes the Hero shoots
+     */
     @SuppressWarnings("MagicNumber")
     private void processShoot() {
         getBestWeapon();
@@ -584,17 +835,29 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Check if two floats are equal
+     * @param a First float
+     * @param b Second float
+     * @return True if a and b are equal (1e-6 precision), false otherwise
+     */
     private static boolean isEquals(float a, float b)
     {
         return Math.abs(a - b) < 1e-6;
     }
 
+    /**
+     * Updates an Open door
+     */
     private void updateOpenedDoors() {
         for (int i = 0; i < State.doorsCount; i++) {
             State.doors[i].tryClose();
         }
     }
 
+    /**
+     * Updates all Monsters
+     */
     private void updateMonsters() {
         for (int i = 0; i < State.monstersCount; i++) {
             State.monsters[i].update();
@@ -607,10 +870,22 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Updates Hero Values
+     * @param value Value to check
+     * @param toSet Value to set
+     * @return Result
+     */
     private float updateHeroValue(float value, float toSet){
         return ((value > 0) ? -toSet : toSet);
     }
 
+    /**
+     * Update Hero
+     * @param acc Acceleration
+     * @param dx Derivate
+     * @param prevX Previous Position X
+     */
     private void updateHeroPhase1(float acc, float dx, float prevX){
         while (Math.abs(acc) >= 0.02f) {
             float add = acc * dx;
@@ -641,6 +916,12 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Updates Hero... continues
+     * @param acc Acceleration
+     * @param dy Derivate
+     * @param prevY Previous Position Y
+     */
     private void updateHeroPhase2(float acc, float dy, float prevY){
         while (Math.abs(acc) >= 0.02f) {
             float add = acc * dy;
@@ -671,6 +952,12 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Updates Hero Position
+     * @param dx Derivate X
+     * @param dy Derivate Y
+     * @param accel Acceleration
+     */
     @SuppressWarnings("MagicNumber")
     private void updateHeroPosition(float dx, float dy, float accel) {
         Level.quickReturnFromFillInitialInWall = false;
@@ -689,6 +976,10 @@ public class Game extends ZameGame {
         hasMoved |= ((!isEquals(State.heroX,prevX)) || (!isEquals(State.heroY,prevY)));
     }
 
+    /**
+     * Sets New Control Type
+     * @param controlsType Control to set
+     */
     @SuppressWarnings("unused")
     protected void setNewControlsType(int controlsType) {
         Config.controlsType = controlsType;
@@ -698,6 +989,10 @@ public class Game extends ZameGame {
         Overlay.showOverlay(Overlay.MARK);
     }
 
+    /**
+     * Renders Level Start
+     * @return True if rendered, false otherwise
+     */
     private boolean renderLevelStart(){
         if ((unprocessedGameCode != null) && (unprocessedGameCode.length() != 0)) {
             processGameCode(unprocessedGameCode);
@@ -716,6 +1011,9 @@ public class Game extends ZameGame {
         return true;
     }
 
+    /**
+     * Update Cycles
+     */
     private void updateCycles(){
         if (((actionsMask & (~processedMask) & Controls.ACTION) != 0) || (Weapons.currentCycle[Weapons.shootCycle]
                 < 0)) {
@@ -736,12 +1034,19 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Checks if Weapon ended Ammo
+     * @return True if empty, false otherwise
+     */
     private boolean isAmmoEmpty(){
         return (Weapons.shootCycle == 0)
                 && ((processedMask & Controls.NEXT_WEAPON) == 0)
                 && (Weapons.changeWeaponDir == 0);
     }
 
+    /**
+     * Updates Next Weapon
+     */
     private void updateNext(){
         if ((actionsMask & Controls.NEXT_WEAPON) != 0) {
             if (isAmmoEmpty()) {
@@ -766,6 +1071,9 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Updates Menu
+     */
     private void updateMenu(){
         if ((actionsMask & Controls.TOGGLE_MAP) != 0) {
             if ((processedMask & Controls.TOGGLE_MAP) == 0) {
@@ -786,10 +1094,17 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Has enough time passed?
+     * @return True or false
+     */
     private boolean hasTimePassed(){
         return (nextLevelTime > 0) || (killedTime > 0);
     }
 
+    /**
+     * Checks Acceleration values
+     */
     private void checkAcceleration(){
         if (Controls.ACCELERATIONS[Controls.ACCELERATION_MOVE].active()) {
             updateHeroPosition(Common.heroCs,
@@ -811,6 +1126,11 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Checks Joystick values
+     * @param joyX Joystick X position
+     * @param joyY Joystick Y position
+     */
     private void checkJoystick(float joyX, float joyY){
         if (Math.abs(joyY) >= 0.05f) {
             updateHeroPosition(Common.heroCs, -Common.heroSn, joyY / 7.0f);
@@ -833,6 +1153,9 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Updates game
+     */
     @SuppressWarnings("MagicNumber")
     @Override
     protected void update() {
@@ -892,6 +1215,10 @@ public class Game extends ZameGame {
         // Debug.stopMethodTracing();
     }
 
+    /**
+     * Processes one Mark
+     * @param markId Mark to process
+     */
     private void processOneMark(int markId) {
         if (Level.executeActions(markId)) {
             // if this is *not* end level switch, play sound
@@ -902,6 +1229,9 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Processes All Marks
+     */
     private void processMarks() {
         if ((Level.marksMap[(int)State.heroY][(int)State.heroX] != null)
                 && (Level.doorsMap[(int)State.heroY][(int)State.heroX] == null)) {
@@ -910,26 +1240,49 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Is Pickup Object Ammo?
+     * @return True if ammo, false otherwise
+     */
     private boolean isAmmo(){
         boolean result = false;
 
         switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]) {
-            case TextureLoader.OBJ_CLIP: result = true;
-            case TextureLoader.OBJ_AMMO: result = true;
-            case TextureLoader.OBJ_SHELL: result = true;
-            case TextureLoader.OBJ_SBOX: result = true;
-            default: break;
+            case TextureLoader.OBJ_CLIP:
+                result = true;
+                break;
+            case TextureLoader.OBJ_AMMO:
+                result = true;
+                break;
+            case TextureLoader.OBJ_SHELL:
+                result = true;
+                break;
+            case TextureLoader.OBJ_SBOX:
+                result = true;
+                break;
+            default:
+                break;
         }
         return result;
     }
 
+    /**
+     * Is Pickup Object Weapon?
+     * @return True if weapon, false otherwise
+     */
     private boolean isWeapon(){
         boolean result = false;
 
         switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_BPACK:
+                result = true;
+                break;
             case TextureLoader.OBJ_SHOTGUN:
+                result = true;
+                break;
             case TextureLoader.OBJ_CHAINGUN:
+                result = true;
+                break;
             case TextureLoader.OBJ_DBLSHOTGUN:
                 result = true;
                 break;
@@ -940,6 +1293,9 @@ public class Game extends ZameGame {
         return result;
     }
 
+    /**
+     * Play pick sound
+     */
     private void playPickSound(){
         if(isAmmo()){
             SoundManager.playSound(SoundManager.SOUND_PICK_AMMO);
@@ -950,6 +1306,12 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Get Better Weapon
+     * @param bestWeapon Currently best weapon
+     * @param toCheck Weapon to confront
+     * @param normal Is game mode normal?
+     */
     private void getBetter(int bestWeapon, int toCheck, boolean normal){
         if(normal){
             if (bestWeapon < toCheck) {
@@ -962,6 +1324,9 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Pick Passive Object
+     */
     private void pickPassive(){
         int bestWeapon = Weapons.getBestWeapon();
 
@@ -999,6 +1364,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Continue picking passive object
+     * @param bestWeapon Current best weapon
+     */
     private void pickPassive2(int bestWeapon){
         switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_CLIP:
@@ -1053,6 +1422,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Continues picking passive
+     * @param bestWeapon Current Best Weapon
+     */
     private void pickPassive3(int bestWeapon){
         switch(State.objectsMap[floatToInt(State.heroY)][floatToInt(State.heroX)]){
             case TextureLoader.OBJ_SHOTGUN:
@@ -1090,12 +1463,19 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Ignores Monster on pickup
+     */
     private void ignoreMonsters(){
         if ((State.passableMap[floatToInt(State.heroY)][floatToInt(State.heroX)] & Level.PASSABLE_IS_OBJECT_ORIG) != 0) {
             State.pickedItems++;
         }
     }
 
+    /**
+     * Is Object Pickable?
+     * @return True if pickable, false otherwise
+     */
     private boolean isPickable(){
         // decide shall we pick object or not
         switch (State.objectsMap[(int)State.heroY][(int)State.heroX]) {
@@ -1122,6 +1502,10 @@ public class Game extends ZameGame {
         return true;
     }
 
+    /**
+     * Is Object Pickable?
+     * @return True if pickable, false otherwise
+     */
     private boolean isPickable2(){
         switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
             case TextureLoader.OBJ_CLIP:
@@ -1147,17 +1531,29 @@ public class Game extends ZameGame {
         return true;
     }
 
+    /**
+     * Is Ammo Pickable?
+     * @return True if Hero doesn't have Max Ammo, false otherwise
+     */
     private boolean isBJPickable(){
         return (State.heroHealth >= 100)
                 && (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO)
                 && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
     }
 
+    /**
+     * Is Shotgun Ammo Pickable?
+     * @return True if Hero doesn't have Max Ammo, false otherwise
+     */
     private boolean isShotgunPickable(){
         return State.heroHasWeapon[Weapons.WEAPON_SHOTGUN]
                 && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
     }
 
+    /**
+     * Is Object Pickable?
+     * @return True if object is pickable, false otherwise
+     */
     private boolean isPickable3(){
         switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
             case TextureLoader.OBJ_BPACK:
@@ -1182,16 +1578,28 @@ public class Game extends ZameGame {
         return true;
     }
 
+    /**
+     * Is Chaingun Pickable?
+     * @return True if pickable, false otherwise
+     */
     private boolean isChaingunPickable(){
         return State.heroHasWeapon[Weapons.WEAPON_CHAINGUN]
                 && (State.heroAmmo[Weapons.AMMO_PISTOL] >= Weapons.MAX_PISTOL_AMMO);
     }
 
+    /**
+     * Is Double Shotgun Pickable?
+     * @return True if pickable, false otherwise
+     */
     private boolean isDBLShotgunPickable(){
         return State.heroHasWeapon[Weapons.WEAPON_DBLSHOTGUN]
                 && (State.heroAmmo[Weapons.AMMO_SHOTGUN] >= Weapons.MAX_SHOTGUN_AMMO);
     }
 
+    /**
+     * Is Object Pickable?
+     * @return True if pickable, false otherwise
+     */
     private boolean isPickable4(){
         switch(State.objectsMap[(int)State.heroY][(int)State.heroX]){
             case TextureLoader.OBJ_CHAINGUN:
@@ -1215,6 +1623,9 @@ public class Game extends ZameGame {
         return true;
     }
 
+    /**
+     * Process picking an object
+     */
     @SuppressWarnings("MagicNumber")
     private void pickObjects() {
         if ((State.passableMap[(int)State.heroY][(int)State.heroX] & Level.PASSABLE_IS_OBJECT) == 0) {
@@ -1241,12 +1652,20 @@ public class Game extends ZameGame {
         Overlay.showOverlay(Overlay.ITEM);
     }
 
+    /**
+     * When Surface is created
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @Override
     protected void surfaceCreated(GL10 gl) {
         createdTexturesCount = 0;
         totalTexturesCount = TextureLoader.TEXTURES_TO_LOAD.length + 1;
     }
 
+    /**
+     * When surface size changes
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @Override
     protected void surfaceSizeChanged(GL10 gl) {
         Common.ratio = (float)width / (float)height;
@@ -1254,6 +1673,10 @@ public class Game extends ZameGame {
         LevelRenderer.surfaceSizeChanged(gl);
     }
 
+    /**
+     * Process the Average FPS the player gets
+     * @return Average FPS value
+     */
     @SuppressWarnings("MagicNumber")
     private int getAvgFps() {
         mFrames++;
@@ -1279,6 +1702,12 @@ public class Game extends ZameGame {
 
         return (sum / FPS_AVG_LEN);
     }
+
+    /**
+     * Casts int value to float
+     * @param a value to cast
+     * @return float value of a
+     */
     private static float intToFloat(int a)
     {
         if (a < Float.MIN_VALUE || a > Float.MAX_VALUE) {
@@ -1286,6 +1715,11 @@ public class Game extends ZameGame {
         }
         return (float) a;
     }
+
+    /**
+     * Draws FPS value on screen
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @SuppressWarnings("MagicNumber")
     private void drawFps(GL10 gl) {
         int fps = getAvgFps();
@@ -1302,6 +1736,11 @@ public class Game extends ZameGame {
         Labels.numeric.draw(gl, xpos + Labels.maker.getWidth(Labels.map[Labels.LABEL_FPS]) + 5, ypos, width, height);
     }
 
+    /**
+     * Renders End Level Layer
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * @param dt Time derivate
+     */
     @SuppressWarnings("MagicNumber")
     private static void renderEndLevelLayer(GL10 gl, float dt) {
         gl.glMatrixMode(GL10.GL_PROJECTION);
@@ -1331,6 +1770,10 @@ public class Game extends ZameGame {
         gl.glPopMatrix();
     }
 
+    /**
+     * Renders Gamma Layer
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     private static void renderGammaLayer(GL10 gl) {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glPushMatrix();
@@ -1354,6 +1797,10 @@ public class Game extends ZameGame {
         gl.glPopMatrix();
     }
 
+    /**
+     * Renders the Crosshair
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @SuppressWarnings("MagicNumber")
     private void drawCrosshair(GL10 gl) {
         gl.glMatrixMode(GL10.GL_PROJECTION);
@@ -1380,6 +1827,10 @@ public class Game extends ZameGame {
         gl.glPopMatrix();
     }
 
+    /**
+     * Renders the Pre Loader
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @SuppressWarnings("MagicNumber")
     private void drawPreloader(GL10 gl) {
         if (totalTexturesCount <= 0) {
@@ -1411,6 +1862,11 @@ public class Game extends ZameGame {
         gl.glPopMatrix();
     }
 
+    /**
+     * Casts float value to Int
+     * @param a value to cast
+     * @return int value of a
+     */
     private static int floatToInt(float a){
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
@@ -1418,10 +1874,18 @@ public class Game extends ZameGame {
         return Math.round(a-0.5f);
     }
 
+    /**
+     * Is Game Over?
+     * @return True if game is over, false otherwise
+     */
     private boolean isGameOver(){
         return (killedTime > 0) && ((elapsedTime - killedTime) > 3500);
     }
 
+    /**
+     * Renders the Next level
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     private void renderNextLevel(GL10 gl){
         if (nextLevelTime > 0) {
             renderEndLevelLayer(gl, (float)(elapsedTime - nextLevelTime) / 500.0f);
@@ -1449,6 +1913,11 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Renders Movement
+     * @param walkTime How long did the Hero walk?
+     * @return Updated walkTime
+     */
     private long renderMoved(long walkTime){
         if (hasMoved) {
             if (prevMovedTime != 0) {
@@ -1462,6 +1931,10 @@ public class Game extends ZameGame {
         return walkTime;
     }
 
+    /**
+     * Loads all the textures
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     private void loadTextures(GL10 gl){
         if (createdTexturesCount == 0) {
             Labels.createLabels(gl);
@@ -1471,6 +1944,10 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Renders the game
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     */
     @SuppressWarnings("MagicNumber")
     @Override
     protected void render(GL10 gl) {
@@ -1524,6 +2001,11 @@ public class Game extends ZameGame {
         // Debug.stopMethodTracing();
     }
 
+    /**
+     * Safely renames a file
+     * @param tmpName Temporary file name
+     * @param fileName Name to assign
+     */
     private static void safeRename(String tmpName, String fileName) {
         String oldName = fileName + ".old";
 
@@ -1546,6 +2028,11 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Saves game state
+     * @param name Save state name
+     * @return True if saved, false otherwise
+     */
     private static boolean saveGameState(String name) {
         initPaths(ZameApplication.self);
 
@@ -1591,12 +2078,22 @@ public class Game extends ZameGame {
         return success;
     }
 
+    /**
+     * Returns the Save Name
+     * @param name Name to assign
+     * @return Complete Path to save
+     */
     private static String getSaveName(String name){
         return (name.equals(INSTANT_NAME)
                 ? INSTANT_PATH
                 : (name.equals(AUTOSAVE_NAME) ? AUTOSAVE_PATH : (SAVES_ROOT + name + ".save")));
     }
 
+    /**
+     * Check if reload is needed
+     * @param success Successfully saved?
+     * @param errorMessage Error while saving
+     */
     private static void needToReload(boolean success, String errorMessage){
         if (!success) {
             Toast.makeText(ZameApplication.self, errorMessage, Toast.LENGTH_LONG).show();
@@ -1608,6 +2105,11 @@ public class Game extends ZameGame {
         }
     }
 
+    /**
+     * Loads Game State
+     * @param name Name of the save
+     * @return True if loaded, false otherwise
+     */
     private static boolean loadGameState(String name) {
         initPaths(ZameApplication.self);
 

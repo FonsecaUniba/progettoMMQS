@@ -9,55 +9,175 @@ import zame.game.SoundManager;
 import zame.game.ZameApplication;
 import zame.game.ZameGame;
 
+/**
+ * Class representing a Level
+ */
 @SuppressWarnings("WeakerAccess")
 public final class Level {
+    /**
+     * First Real Level
+     */
     public static final int FIRST_REAL_LEVEL = 2;
+    /**
+     * Max Number of levels
+     */
     public static final int MAX_LEVEL = 27;
 
+    /**
+     * Max Width Allowed
+     */
     public static final int MAX_WIDTH = 64;
+    /**
+     * Max Height Allowed
+     */
     public static final int MAX_HEIGHT = 64;
+    /**
+     * Max number of Doors Allowed
+     */
     public static final int MAX_DOORS = 128;
+    /**
+     * Max number of Monsters Allowed
+     */
     public static final int MAX_MONSTERS = 256;
+    /**
+     * Max Number of Marks Allowed
+     */
     public static final int MAX_MARKS = 253;
+    /**
+     * Max Number of Actions Allowed
+     */
     public static final int MAX_ACTIONS = MAX_MARKS + 1;
 
+    /**
+     * Constant for Action close
+     */
     public static final int ACTION_CLOSE = 1;
+    /**
+     * Constant for Action open
+     */
     public static final int ACTION_OPEN = 2;
+    /**
+     * Constant for Requires Key
+     */
     public static final int ACTION_REQ_KEY = 3;
+    /**
+     * Constant for Wall
+     */
     public static final int ACTION_WALL = 4;
+    /**
+     * Constant for Next Level
+     */
     public static final int ACTION_NEXT_LEVEL = 5;
+    /**
+     * Constant for Next Tutorial Level
+     */
     public static final int ACTION_NEXT_TUTOR_LEVEL = 6;
+    /**
+     * Constant for Disable Pistol
+     */
     public static final int ACTION_DISABLE_PISTOL = 7;
+    /**
+     * Constant for Enable Pistol
+     */
     public static final int ACTION_ENABLE_PISTOL = 8;
+    /**
+     * Constant for Weapon Hand
+     */
     public static final int ACTION_WEAPON_HAND = 9;
+    /**
+     * Constant for Restore Health
+     */
     public static final int ACTION_RESTORE_HEALTH = 10;
+    /**
+     * Constant for Secret Found
+     */
     public static final int ACTION_SECRET = 11;
+    /**
+     * Constant for Unmark
+     */
     public static final int ACTION_UNMARK = 12;
+    /**
+     * Constant for Ensure Weapon
+     */
     public static final int ACTION_ENSURE_WEAPON = 13;
+    /**
+     * Constant for Button On
+     */
     public static final int ACTION_BTN_ON = 14;
+    /**
+     * Constant for Button Off
+     */
     public static final int ACTION_BTN_OFF = 15;
+    /**
+     * Constant for Message On
+     */
     public static final int ACTION_MSG_ON = 16;
+    /**
+     * Constant for Message Off
+     */
     public static final int ACTION_MSG_OFF = 17;
 
+    /**
+     * Constant for Passable Wall
+     */
     public static final int PASSABLE_IS_WALL = 1;
+    /**
+     * Constant for Passable Transparent Wall
+     */
     public static final int PASSABLE_IS_TRANSP_WALL = 2;
+    /**
+     * Constant for Passable Object
+     */
     public static final int PASSABLE_IS_OBJECT = 4;
+    /**
+     * Constant for Passable Decoration
+     */
     public static final int PASSABLE_IS_DECORATION = 8;
+    /**
+     * Constant for Passable Door
+     */
     public static final int PASSABLE_IS_DOOR = 16;
+    /**
+     * Constant for Passable Hero
+     */
     public static final int PASSABLE_IS_HERO = 32;
+    /**
+     * Constant for Passable Monster
+     */
     public static final int PASSABLE_IS_MONSTER = 64;
+    /**
+     * Constant for Passable Dead Monster
+     */
     public static final int PASSABLE_IS_DEAD_CORPSE = 128;
+    /**
+     * Constant for Object Original
+     */
     public static final int PASSABLE_IS_OBJECT_ORIG = 256; // original object [not leaved by monster]
+    /**
+     * Constant for Passable Transparent
+     */
     public static final int PASSABLE_IS_TRANSP = 512; // additional state, used in LevelRenderer
+    /**
+     * Constant for Passable Key
+     */
     public static final int PASSABLE_IS_OBJECT_KEY = 1024;
+    /**
+     * Constant for Passable Opened Door
+     */
     public static final int PASSABLE_IS_DOOR_OPENED_BY_HERO = 2048; // was door opened by hero at least once?
 
+    /**
+     * Constant for Passable Hero Mask
+     */
     public static final int PASSABLE_MASK_HERO = PASSABLE_IS_WALL
             | PASSABLE_IS_TRANSP_WALL
             | PASSABLE_IS_DECORATION
             | PASSABLE_IS_DOOR
             | PASSABLE_IS_MONSTER;
 
+    /**
+     * Constant for Passable Monster Mask
+     */
     public static final int PASSABLE_MASK_MONSTER = PASSABLE_IS_WALL
             | PASSABLE_IS_TRANSP_WALL
             | PASSABLE_IS_DECORATION
@@ -65,37 +185,76 @@ public final class Level {
             | PASSABLE_IS_MONSTER
             | PASSABLE_IS_HERO; // PASSABLE_IS_OBJECT_KEY
 
+    /**
+     * Constant for Passable Mask Shoot Width
+     */
     public static final int PASSABLE_MASK_SHOOT_W = PASSABLE_IS_WALL | PASSABLE_IS_DOOR;
 
+    /**
+     * Constant for passable Mask Shoot Heigth
+     */
     public static final int PASSABLE_MASK_SHOOT_WM = PASSABLE_IS_WALL
             | PASSABLE_IS_DOOR
             | PASSABLE_IS_DECORATION
             | PASSABLE_IS_MONSTER;
 
+    /**
+     * Constant for passable Transparent Wall
+     */
     public static final int PASSABLE_MASK_WALL_N_TRANSP = PASSABLE_IS_WALL | PASSABLE_IS_TRANSP;
 
+    /**
+     * Constant for Passable Mask Object
+     */
     public static final int PASSABLE_MASK_OBJECT = PASSABLE_IS_OBJECT
             | PASSABLE_IS_OBJECT_ORIG
             | PASSABLE_IS_OBJECT_KEY;
 
+    /**
+     * Constant for Passable Mask Door
+     */
     public static final int PASSABLE_MASK_DOOR = ~PASSABLE_IS_DOOR_OPENED_BY_HERO;
 
+    /**
+     * Constant for Passable Mask Object Dropped
+     */
     public static final int PASSABLE_MASK_OBJECT_DROP = PASSABLE_IS_WALL
             | PASSABLE_IS_TRANSP_WALL
             | PASSABLE_IS_DECORATION
             | PASSABLE_IS_DOOR
             | PASSABLE_IS_OBJECT;
 
-    public static Door[][] doorsMap = new Door[199][199];
-    public static Mark[][] marksMap = new Mark[200][200];
+    /**
+     * Map of Doors in level
+     */
+    public static Door[][] doorsMap = new Door[MAX_DOORS][MAX_DOORS];
+    /**
+     * Map of Marks in Level
+     */
+    public static Mark[][] marksMap = new Mark[MAX_MARKS][MAX_MARKS];
+    /**
+     * Hashmap of Marks
+     */
     public static ArrayList<ArrayList<Mark>> marksHash = new ArrayList<ArrayList<Mark>>();
 
+    /**
+     * Boolean Array for Object In Wall
+     */
     private static boolean[] wasAlreadyInWall = new boolean[100];
+    /**
+     * Quickly return object
+     */
     public static boolean quickReturnFromFillInitialInWall = true; // set to false before using fillInitialInWallMap
 
+    /**
+     * Class constructor
+     */
     private Level() {
     }
 
+    /**
+     * Initializes Level
+     */
     public static void init() {
         State.levelWidth = 1;
         State.levelHeight = 1;
@@ -120,6 +279,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Checks if level exists
+     * @param idx Level ID
+     * @return True if exists, false otherwise
+     */
     public static boolean exists(int idx) {
         if (idx > MAX_LEVEL) {
             return false;
@@ -135,6 +299,10 @@ public final class Level {
         return false;
     }
 
+    /**
+     * Loads a level
+     * @param idx Level ID
+     */
     public static void load(int idx) {
         try {
             Level.create(ZameGame.readBytes(Game.assetManager.open(String.format(Locale.US,
@@ -159,6 +327,9 @@ public final class Level {
         }
     }
 
+    /**
+     * Checks Level Size
+     */
     private static void checkLevelSize(){
         if ((State.levelWidth > MAX_WIDTH) || (State.levelHeight > MAX_HEIGHT)) {
             //throw new RuntimeException("Too big level");
@@ -166,6 +337,9 @@ public final class Level {
         }
     }
 
+    /**
+     * Initializes Level State
+     */
     private static void initializeState(){
         for (int i = 0; i < MAX_ACTIONS; i++) {
             State.actions.add(new ArrayList<Action>());
@@ -182,6 +356,13 @@ public final class Level {
         }
     }
 
+    /**
+     * Sets Starting Level Value
+     * @param value Value to set
+     * @param i Index I of map
+     * @param j Index J of map
+     * @return Updated value
+     */
     private static int setValue(int value, int i, int j){
         // guarantee 1-cell wall border around level
         if (((value < 0x10) || (value >= 0x30))
@@ -196,6 +377,13 @@ public final class Level {
         return value;
     }
 
+    /**
+     * Configures Monsters
+     * @param mon Monster to configure
+     * @param conf Level configuration
+     * @param num Monster ID
+     * @return Configured Monster
+     */
     private static Monster configureMonster(Monster mon, LevelConfig conf, int num){
         if (conf.monsters[num].hitType == LevelConfig.HIT_TYPE_PIST) {
             mon.shootSoundIdx = SoundManager.SOUND_SHOOT_PIST;
@@ -211,6 +399,9 @@ public final class Level {
         return mon;
     }
 
+    /**
+     * Check Door Size
+     */
     private static void checkDoorSize(){
         if (State.doorsCount >= MAX_DOORS) {
             //throw new RuntimeException("Too many doors");
@@ -218,6 +409,9 @@ public final class Level {
         }
     }
 
+    /**
+     * Check Monster Size
+     */
     private static void checkMonsterSize(){
         if (State.monstersCount >= MAX_MONSTERS) {
             //throw new RuntimeException("Too many monsters");
@@ -225,18 +419,38 @@ public final class Level {
         }
     }
 
+    /**
+     * Is Door Locked?
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isLocked(Action act){
         return (act.type == ACTION_REQ_KEY) || (act.type == ACTION_WALL);
     }
 
+    /**
+     * Is Open?
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isOpen(Action act){
         return (act.type == ACTION_CLOSE) || (act.type == ACTION_OPEN) || (act.type == ACTION_UNMARK);
     }
 
+    /**
+     * Is Ensured
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isEnsured(Action act){
         return (act.type == ACTION_ENSURE_WEAPON) || (act.type == ACTION_MSG_ON);
     }
 
+    /**
+     * Add Secret
+     * @param act Action to perform
+     * @param secretsMask Secret Mask
+     */
     private static void addSecret(Action act, int secretsMask){
         if ((secretsMask & act.param) == 0) {
             secretsMask |= act.param;
@@ -244,6 +458,13 @@ public final class Level {
         }
     }
 
+    /**
+     * Add Action
+     * @param data Data read from file
+     * @param pos data index
+     * @param secretsMask Secrets Mask
+     * @return updated data index
+     */
     private static int addAction(byte[] data, int pos, int secretsMask){
         int mark = (int)data[pos++] & 0x000000FF;
         ArrayList<Action> actions = State.actions.get(mark);
@@ -273,6 +494,13 @@ public final class Level {
         return pos;
     }
 
+    /**
+     * Sets Actions
+     * @param data Data read from file
+     * @param pos data index
+     * @param secretsMask secrets mask
+     * @return updated data index
+     */
     private static int setAction(byte[] data, int pos, int secretsMask){
         while (((int)data[pos] & 0x000000FF) != 255) {
             pos = addAction(data, pos, secretsMask);
@@ -283,6 +511,12 @@ public final class Level {
         return pos;
     }
 
+    /**
+     * Checks if hero is transparent
+     * @param value Value to check
+     * @param i Index I of Map
+     * @param j Index J of Map
+     */
     private static void checkHeroOrTransparent(int value, int i, int j){
         if (value > 0) {
             if (value <= 4) {
@@ -298,12 +532,23 @@ public final class Level {
         }
     }
 
+    /**
+     * Check if Transparent Wall
+     * @param value Value to check
+     * @param i Index I of Map
+     * @param j Index J of Map
+     */
     private static void checkPassableTransparentWall(int value, int i, int j){
         if ((value < 0x38) || (value >= 0x40)) {
             State.passableMap[i][j] |= PASSABLE_IS_TRANSP_WALL;
         }
     }
 
+    /**
+     * Checks if Key
+     * @param i Index I of Map
+     * @param j Index J of Map
+     */
     private static void checkKey(int i, int j){
         if ((State.objectsMap[i][j] == TextureLoader.OBJ_KEY_BLUE) || (State.objectsMap[i][j]
                 == TextureLoader.OBJ_KEY_RED) || (State.objectsMap[i][j] == TextureLoader.OBJ_KEY_GREEN)) {
@@ -312,12 +557,25 @@ public final class Level {
         }
     }
 
+    /**
+     * Checks if Decoration
+     * @param value Value to check
+     * @param i Index I of Map
+     * @param j Index J of Map
+     */
     private static void checkDecoration(int value, int i, int j){
         if ((value % 0x10) < 12) {
             State.passableMap[i][j] |= PASSABLE_IS_DECORATION;
         }
     }
 
+    /**
+     * Checks value
+     * @param value Value to check
+     * @param i Index I of Map
+     * @param j Index J of Map
+     * @param conf Level Configuration
+     */
     private static void checkValue(int value, int i, int j, LevelConfig conf){
         if (value < 0x10) {
             checkHeroOrTransparent(value, i, j);
@@ -377,6 +635,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Create Level
+     * @param data Data from file
+     * @param conf Level Configuration
+     */
     @SuppressWarnings("MagicNumber")
     private static void create(byte[] data, LevelConfig conf) {
         int pos = 0;
@@ -435,6 +698,9 @@ public final class Level {
         executeActions(0);
     }
 
+    /**
+     * Sets Doors and Monsters
+     */
     private static void setDoorsAndMonsters(){
         for (int i = 0; i < MAX_DOORS; i++) {
             State.doors[i].index = i;
@@ -446,6 +712,9 @@ public final class Level {
         }
     }
 
+    /**
+     * Sets Marks on Doors
+     */
     private static void DoorsAndMarks(){
         for (int i = 0; i < State.doorsCount; i++) {
             Door door = State.doors[i];
@@ -464,6 +733,9 @@ public final class Level {
         }
     }
 
+    /**
+     * Updates Level Map
+     */
     public static void updateMaps() {
         setDoorsAndMonsters();
 
@@ -486,6 +758,11 @@ public final class Level {
         DoorsAndMarks();
     }
 
+    /**
+     * Marks all Doors
+     * @param marks ArrayList of Marks
+     * @param act Action to perform
+     */
     private static void markDoors(ArrayList<Mark> marks, Action act){
         for (Mark mark : marks) {
             Door door = doorsMap[mark.y][mark.x];
@@ -500,6 +777,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Clear All Marks
+     * @param marks ArrayList of Marks
+     * @param act Action to perform
+     */
     private static void clearMarks(ArrayList<Mark> marks, Action act){
         for (Mark mark : marks) {
             marksMap[mark.y][mark.x] = null;
@@ -514,6 +796,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Unmark Object
+     * @param marks ArrayList of Marks
+     * @param act Action to perform
+     */
     private static void actionUnmark(ArrayList<Mark> marks, Action act){
         clearMarks(marks, act);
 
@@ -537,20 +824,39 @@ public final class Level {
         State.marksCount = idx;
     }
 
+    /**
+     * Is Last Weapon Equipped?
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isLastWeapon(Action act){
         return (act.param > 0) && (act.param < Weapons.WEAPON_LAST);
     }
 
+    /**
+     * Is Gun Equipped?
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isGun(Action act){
         return (act.param == Weapons.WEAPON_PISTOL)
                 || (act.param == Weapons.WEAPON_CHAINGUN)
                 || (act.param == Weapons.WEAPON_DBLCHAINGUN);
     }
 
+    /**
+     * Is Shotgun Equipped?
+     * @param act Action to perform
+     * @return True or false
+     */
     private static boolean isShotgun(Action act){
         return (act.param == Weapons.WEAPON_SHOTGUN) || (act.param == Weapons.WEAPON_DBLSHOTGUN);
     }
 
+    /**
+     * Ensures the Weapon
+     * @param act Action to perform
+     */
     private static void ensureWeapon(Action act){
         if (isLastWeapon(act)) {
             State.heroHasWeapon[act.param] = true;
@@ -568,6 +874,10 @@ public final class Level {
         }
     }
 
+    /**
+     * Iterate on Monsters
+     * @param mark Mark of Object
+     */
     private static void iteraMonsters(Mark mark){
         for (int i = 0; i < State.monstersCount; i++) {
             Monster mon = State.monsters[i];
@@ -586,6 +896,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Action on Wall
+     * @param marks ArrayList of Marks
+     * @param act Action to perform
+     */
     private static void actionWall(ArrayList<Mark> marks, Action act){
         for (Mark mark : marks) {
             if ((State.passableMap[mark.y][mark.x] & Level.PASSABLE_IS_MONSTER) != 0) {
@@ -617,6 +932,10 @@ public final class Level {
         }
     }
 
+    /**
+     * Sets Secret as Found
+     * @param act Action to perform
+     */
     private static void actionSecret(Action act){
         if ((State.foundSecretsMask & act.param) == 0) {
             State.foundSecretsMask |= act.param;
@@ -625,6 +944,10 @@ public final class Level {
         }
     }
 
+    /**
+     * Determines Action Type
+     * @param act Action to perform
+     */
     private static void iterateActions(Action act){
         ArrayList<Mark> marks = marksHash.get(act.mark);
 
@@ -658,6 +981,10 @@ public final class Level {
         }
     }
 
+    /**
+     * Determines Action Type
+     * @param act Action to perform
+     */
     private static void iterateActions2(Action act){
         switch(act.type){
             case ACTION_DISABLE_PISTOL:
@@ -695,6 +1022,10 @@ public final class Level {
         }
     }
 
+    /**
+     * Determines Action type
+     * @param act Action to perform
+     */
     private static void iterateActions3(Action act){
         switch(act.type){
             case ACTION_BTN_ON:
@@ -717,6 +1048,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Executes the Action
+     * @param id Action ID
+     * @return True if performed, false otherwise
+     */
     public static boolean executeActions(int id) {
         ArrayList<Action> actions = State.actions.get(id);
 
@@ -735,6 +1071,13 @@ public final class Level {
         return true;
     }
 
+    /**
+     * Sets Object as Passable
+     * @param x Object Position X
+     * @param y Object Position Y
+     * @param wallDist Distance from Wall
+     * @param mask Object Mask
+     */
     public static void setPassable(float x, float y, float wallDist, int mask) {
         int fx = Math.max(0, (int)(x - wallDist));
         int tx = Math.min(State.levelWidth - 1, (int)(x + wallDist));
@@ -748,6 +1091,13 @@ public final class Level {
         }
     }
 
+    /**
+     * Clears all passables
+     * @param x Object Position X
+     * @param y Object Position Y
+     * @param wallDist Distance from Wall
+     * @param mask Object Mask
+     */
     public static void clearPassable(float x, float y, float wallDist, int mask) {
         int fx = Math.max(0, (int)(x - wallDist));
         int tx = Math.min(State.levelWidth - 1, (int)(x + wallDist));
@@ -763,6 +1113,11 @@ public final class Level {
         }
     }
 
+    /**
+     * Checks for collisions
+     * @param cnt collision counter
+     * @param atLeastOneAtWall Is there a wall?
+     */
     private static void checkCollision(int cnt, boolean atLeastOneAtWall){
         while (cnt < 9) {
             wasAlreadyInWall[cnt++] = false;
@@ -773,6 +1128,13 @@ public final class Level {
         }
     }
 
+    /**
+     * Fills Initial Wall Map
+     * @param x Object Position X
+     * @param y Object Position Y
+     * @param wallDist Distance from Wall
+     * @param mask Object Mask
+     */
     public static void fillInitialInWallMap(float x, float y, float wallDist, int mask) {
         if (quickReturnFromFillInitialInWall) {
             return;
@@ -806,6 +1168,14 @@ public final class Level {
     }
 
     // call fillInitialInWallMap before using isPassable
+    /**
+     * Checks if Object is passable
+     * @param x Object position X
+     * @param y Object Position Y
+     * @param wallDist Distance from wall
+     * @param mask Object mask
+     * @return True if passable, false otherwise
+     */
     public static boolean isPassable(float x, float y, float wallDist, int mask) {
         // level always have 1-cell wall border, so we can skip border checks (like x>=0 && x<width)
         // but just for case limit coordinates
@@ -829,6 +1199,12 @@ public final class Level {
 
         return true;
     }
+
+    /**
+     * Casts float value to int
+     * @param a float value to cast
+     * @return int value of a
+     */
     private static int floatToInt(float a){
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE){
             throw new IllegalArgumentException("Value not castable");
