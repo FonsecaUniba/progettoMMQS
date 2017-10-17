@@ -6,30 +6,99 @@ import android.view.KeyEvent;
 import javax.microedition.khronos.opengles.GL10;
 import zame.game.engine.Controls;
 
+/**
+ * Class representing the Game Configuration
+ */
 public final class Config {
+    /**
+     * Active Controls Type
+     */
     public static int controlsType=0;
+    /**
+     * Current Rotation Angle
+     */
     public static float maxRotateAngle=0;
+    /**
+     * Trackball current acceleration
+     */
     public static float trackballAcceleration=0;
+    /**
+     * Current Movement Speed
+     */
     public static float moveSpeed=0;
+    /**
+     * Current Strafe Speed
+     */
     public static float strafeSpeed=0;
+    /**
+     * Current Rotation Speed
+     */
     public static float rotateSpeed=0;
+    /**
+     * Is rotation inverted?
+     */
     public static boolean invertRotation=true;
+    /**
+     * Current Gamma setting
+     */
     public static float gamma=0;
+    /**
+     * Current Filter
+     */
     @SuppressWarnings("WeakerAccess") public static int levelTextureFilter=0;
+    /**
+     * Current Weapon Filter
+     */
     @SuppressWarnings("WeakerAccess") public static int weaponsTextureFilter=0;
+    /**
+     * Current Key Mappings
+     */
     public static int[] keyMappings = new int[15];
+    /**
+     * Current Map Position
+     */
     public static float mapPosition=0;
+    /**
+     * Is Crosshair shown?
+     */
     public static boolean showCrosshair=true;
+    /**
+     * Is the screen Rotated?
+     */
     public static boolean rotateScreen=true;
+    /**
+     * Is Accelerometer enabled?
+     */
     @SuppressWarnings("WeakerAccess") public static boolean accelerometerEnabled=true;
+    /**
+     * Current Control Transparency
+     */
     public static float controlsAlpha=0;
+    /**
+     * Current Pad X Acceleration
+     */
     public static float padXAccel=0;
+    /**
+     * Current Pad Y Acceleration
+     */
     public static float padYAccel=0;
+    /**
+     * Current Accelerometer Acceleration
+     */
     public static float accelerometerAcceleration=0;
 
+    /**
+     * Class Constructor
+     */
     private Config() {
     }
 
+    /**
+     * Updates the Key Mappings
+     * @param sp Shared Preferences
+     * @param key Key to get
+     * @param type Type of input
+     */
     private static void updateKeyMap(SharedPreferences sp, String key, int type) {
         int keyCode = sp.getInt(key, 0);
 
@@ -38,6 +107,11 @@ public final class Config {
         }
     }
 
+    /**
+     * Returns the Control Mask Constant corresponding to the name
+     * @param name Name of the Control
+     * @return Control Mask
+     */
     @SuppressWarnings({ "unused", "WeakerAccess" })
     protected static int getControlMaskByName(String name) {
         if ("Action".equals(name)) {
@@ -53,6 +127,9 @@ public final class Config {
         }
     }
 
+    /**
+     * Checks what Controls are in use
+     */
     @SuppressWarnings({ "SizeReplaceableByIsEmpty", "unused" })
     public static void checkControlsType() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ZameApplication.self);
@@ -74,20 +151,39 @@ public final class Config {
         }
     }
 
+    /**
+     * Is Control Zeemote?
+     * @param controlsTypeStr Control Type
+     * @return True or false
+     */
     private static boolean isZeemote(String controlsTypeStr){
         return BuildConfig.WITH_ZEEMOTE && "Zeemote".equals(controlsTypeStr);
     }
 
+    /**
+     * Is Control Classic?
+     * @param controlsTypeStr Control Type
+     * @return True or false
+     */
     private static boolean isClassic(String controlsTypeStr){
         return "Classic".equals(controlsTypeStr) || "TypeA".equals(controlsTypeStr);
     }
 
+    /**
+     * Is Control Experimental?
+     * @param controlsTypeStr Control Type
+     * @return True or false
+     */
     private static boolean isExperimental(String controlsTypeStr){
         return "ExperimentalA".equals(controlsTypeStr)
                 || "Experimental".equals(controlsTypeStr)
                 || "TypeC".equals(controlsTypeStr);
     }
 
+    /**
+     * Checks Controls
+     * @param controlsTypeStr Control Type
+     */
     private static void checkControls(String controlsTypeStr){
         if (isZeemote(controlsTypeStr)) {
             controlsType = Controls.TYPE_ZEEMOTE;
@@ -106,6 +202,9 @@ public final class Config {
         }
     }
 
+    /**
+     * Initializes the class
+     */
     @SuppressWarnings("MagicNumber")
     public static void initialize() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ZameApplication.self);

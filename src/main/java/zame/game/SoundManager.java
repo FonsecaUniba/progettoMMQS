@@ -13,54 +13,166 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Class Representing Sound Manager
+ */
 public final class SoundManager {
+    /**
+     * Class Representing PlayList
+     */
     private static class PlayList {
+        /**
+         * List of Songs
+         */
         public String[] list;
+        /**
+         * PlayList ID
+         */
         @SuppressWarnings("WeakerAccess") public int idx;
 
+        /**
+         * Class Constructor
+         * @param list List of Songs
+         */
         @SuppressWarnings("WeakerAccess")
         public PlayList(String[] list) {
             this.list = list;
         }
     }
 
+    /**
+     * App Context
+     */
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static Context appContext;
+    /**
+     * Asset Manager
+     */
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static AssetManager assetManager ;
+    /**
+     * Media Player
+     */
     private static volatile MediaPlayer mediaPlayer = new MediaPlayer();
+    /**
+     * Sound Pool
+     */
     private static volatile SoundPool soundPool = new SoundPool(300,1,128);
 
+    /**
+     * Main Song PlayList
+     */
     public static final PlayList LIST_MAIN = new PlayList(new String[] { "l1.mid", "l2.mid", "l3.mid", "l4.mid", });
 
+    /**
+     * End Level Playlist
+     */
     public static final PlayList LIST_ENDL = new PlayList(new String[] { "endl.mid" });
+    /**
+     * Game Over PlayList
+     */
     public static final PlayList LIST_GAMEOVER = new PlayList(new String[] { "gameover.mid" });
 
+    /**
+     * Button Press Sound
+     */
     public static final int SOUND_BTN_PRESS = 0;
+    /**
+     * No Way Sound
+     */
     public static final int SOUND_NOWAY = 1;
+    /**
+     * Door Open Sound
+     */
     public static final int SOUND_DOOR_OPEN = 2;
+    /**
+     * Door Closing Sound
+     */
     public static final int SOUND_DOOR_CLOSE = 3;
+    /**
+     * Gun Shooting Sound
+     */
     public static final int SOUND_SHOOT_PIST = 4;
+    /**
+     * Shotgun Shooting Sound
+     */
     public static final int SOUND_SHOOT_SHTG = 5;
+    /**
+     * Level Start Sound
+     */
     public static final int SOUND_LEVEL_START = 6;
+    /**
+     * Level End Sound
+     */
     public static final int SOUND_LEVEL_END = 7;
+    /**
+     * Switch Sound
+     */
     public static final int SOUND_SWITCH = 8;
+    /**
+     * Pick Item Sound
+     */
     public static final int SOUND_PICK_ITEM = 9;
+    /**
+     * Pick Ammo Sound
+     */
     public static final int SOUND_PICK_AMMO = 10;
+    /**
+     * Pick Weapon Sound
+     */
     public static final int SOUND_PICK_WEAPON = 11;
+    /**
+     * Eat Sound
+     */
     public static final int SOUND_SHOOT_EAT = 12;
+    /**
+     * Death Sound
+     */
     public static final int SOUND_DETH_HERO = 13;
+    /**
+     * Gun Sound
+     */
     @SuppressWarnings("WeakerAccess") public static final int SOUND_SHOOT_HAND = 14;
+    /**
+     * Shotgun Sound
+     */
     @SuppressWarnings("WeakerAccess") public static final int SOUND_SHOOT_DBLSHTG = 15;
+    /**
+     * Chainsaw Sound
+     */
     @SuppressWarnings("WeakerAccess") public static final int SOUND_SHOOT_SAW = 16;
+    /**
+     * Fist Sound
+     */
     @SuppressWarnings("WeakerAccess") public static final int SOUND_LAST = 17;
 
+    /**
+     * Monster Death Sound
+     */
     public static final int SOUND_DETH_MON = SOUND_DETH_HERO;
 
+    /**
+     * Sound IDs
+     */
     private static final int[] soundIds = new int[SOUND_LAST];
+    /**
+     * Sound Volumes
+     */
     private static final float[] soundVolumes = new float[SOUND_LAST];
 
+    /**
+     * Current Playlist
+     */
     private static PlayList current = new PlayList(new String[] { "l1.mid", "l2.mid", "l3.mid", "l4.mid", } ) ;
+    /**
+     * Did Music Load?
+     */
     private static boolean musicLoaded=true;
+    /**
+     * Timer for Music Pause
+     */
     private static volatile Timer pauseTimer =new Timer();//////
+    /**
+     * Timed Task
+     */
     private static volatile TimerTask pauseTask = new TimerTask() {
         @Override
         public void run() {
@@ -68,10 +180,22 @@ public final class SoundManager {
         }
     };//////
 
+    /**
+     * Is Sound Enabled?
+     */
     private static boolean soundEnabled=true;
+    /**
+     * Music Volume
+     */
     private static float musicVolume = 1.0f;
+    /**
+     * Effect Volume
+     */
     private static float effectsVolume = 1.0f;
 
+    /**
+     * Class representing a Timed Task
+     */
     private static class PauseTask extends TimerTask {
         @Override
         public void run() {
@@ -83,9 +207,18 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Class Constructor
+     */
     private SoundManager() {
     }
 
+    /**
+     * Initializes Sound Manager
+     * @param context App Context
+     * @param assets AssetManager
+     * @param reInitialize Do we need to reinitialize?
+     */
     @SuppressWarnings("MagicNumber")
     public static synchronized void init(Context context, AssetManager assets, boolean reInitialize) {
         appContext = context;
@@ -149,6 +282,12 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Load Sound
+     * @param name Sound Name
+     * @param idx Sound ID
+     * @param volume Volume
+     */
     private static void loadSound(String name, int idx, float volume) {
         try {
             AssetFileDescriptor afd = assetManager.openFd("sounds/" + name + ".ogg");
@@ -163,6 +302,9 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Update Volume
+     */
     @SuppressWarnings("MagicNumber")
     private static void updateVolume() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(appContext);
@@ -193,6 +335,10 @@ public final class SoundManager {
 		*/
     }
 
+    /**
+     * Play Sound
+     * @param wasPlaying Were we already playing?
+     */
     private static void play(boolean wasPlaying) {
         mediaPlayer.reset();
         musicLoaded = false;
@@ -227,10 +373,19 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Play Sound
+     * @param idx Sound ID
+     */
     public static void playSound(int idx) {
         playSound(idx, 1.0f);
     }
 
+    /**
+     * Play Sound
+     * @param idx Sound ID
+     * @param volume Volume
+     */
     @SuppressWarnings("MagicNumber")
     public static void playSound(int idx, float volume) {
         if ((soundPool != null) && (soundIds[idx] >= 0) && soundEnabled && (effectsVolume > 0.01f) && (volume
@@ -241,6 +396,9 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Ensure Playlist
+     */
     @SuppressWarnings("WeakerAccess")
     public static void ensurePlaylist() {
         if (current == null) {
@@ -249,8 +407,13 @@ public final class SoundManager {
     }
 
     // SoundManager.init should be called in every activity constructor
+
+    /**
+     * Sets Playlist
+     * @param playlist Playlist to set
+     */
     public static void setPlaylist(PlayList playlist) {
-        if (current != playlist) {
+        if (!current.equals(playlist)) {
             current = playlist;
 
             if (mediaPlayer != null) {
@@ -259,6 +422,9 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * When SoundManager Starts
+     */
     @SuppressWarnings({ "WeakerAccess", "MagicNumber" })
     public static void onStart() {
         updateVolume();
@@ -283,10 +449,17 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * When Sound Manager Pauses
+     */
     public static void onPause() {
         onPause(false);
     }
 
+    /**
+     * When Sound Manager Pauses
+     * @param instant Is instant pause?
+     */
     public static synchronized void onPause(boolean instant) {
         if ((mediaPlayer != null) && mediaPlayer.isPlaying()) {
             if (instant) {

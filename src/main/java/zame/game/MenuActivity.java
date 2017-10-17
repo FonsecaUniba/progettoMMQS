@@ -11,16 +11,41 @@ import android.view.MenuItem;
 import zame.game.engine.Game;
 import zame.game.views.MenuView;
 
+/**
+ * Class representing Menu Activity
+ */
 public class MenuActivity extends Activity {
+    /**
+     * Did the game just load?
+     */
     public static boolean justLoaded=true; // or just saved, or just new game started
+    /**
+     * This activity
+     */
     public static MenuActivity self = new MenuActivity();
 
+    /**
+     * Just Unpaused?
+     */
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean justAfterPause;
+    /**
+     * Did the sound already stop?
+     */
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean soundAlreadyStopped; // fix multi-activity issues
 
+    /**
+     * Do we pause music?
+     */
     public boolean instantMusicPause = true;
+    /**
+     * Data to show
+     */
     public MenuView.Data menuViewData = new MenuView.Data();
 
+    /**
+     * When Activity is created
+     * @param state State
+     */
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -36,6 +61,10 @@ public class MenuActivity extends Activity {
         ZameApplication.trackPageView("/menu");
     }
 
+    /**
+     * When Focus Changes
+     * @param hasFocus Does Activity have focus?
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -58,12 +87,18 @@ public class MenuActivity extends Activity {
         }
     }
 
+    /**
+     * When Activity is resumed
+     */
     @Override
     protected void onResume() {
         super.onResume();
         justAfterPause = false;
     }
 
+    /**
+     * When Activity is paused
+     */
     @Override
     public void onPause() {
         justAfterPause = true;
@@ -78,6 +113,9 @@ public class MenuActivity extends Activity {
 
     }
 
+    /**
+     * When Activity is destroyed
+     */
     @Override
     protected void onDestroy() {
         self = null;
@@ -85,6 +123,9 @@ public class MenuActivity extends Activity {
 
     }
 
+    /**
+     * When Back is pressed
+     */
     @Override
     public void onBackPressed() {
         //noinspection ConstantConditions
@@ -93,6 +134,11 @@ public class MenuActivity extends Activity {
         }
     }
 
+    /**
+     * When Options Menu is created
+     * @param menu Menu to show
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -101,6 +147,11 @@ public class MenuActivity extends Activity {
         return true;
     }
 
+    /**
+     * When Option Item is selected
+     * @param item Item selected
+     * @return True or MenuView.onOptionsItemSelected(this, item)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -114,6 +165,11 @@ public class MenuActivity extends Activity {
         return MenuView.onOptionsItemSelected(this, item);
     }
 
+    /**
+     * When Dialog is created
+     * @param id Dialog ID
+     * @return Dialog or null
+     */
     @SuppressWarnings("deprecation")
     @Override
     protected Dialog onCreateDialog(int id) {

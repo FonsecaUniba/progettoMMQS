@@ -16,22 +16,66 @@ import zame.game.engine.State;
 // http://www.rbgrn.net/content/342-using-input-pipelines-your-android-game
 // http://habrahabr.ru/blogs/gdev/136878/
 
+/**
+ * Abstract Class for ZameGame
+ */
 public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
+    /**
+     * Constant for lockUpdate
+     */
     protected static final Object lockUpdate = new Object();
+    /**
+     * Constant for lockControls
+     */
     private static final Object lockControls = new Object();
 
+    /**
+     * Update Interval
+     */
     private static long updateInterval;
+    /**
+     * Game Start Time
+     */
     private static long startTime;
+    /**
+     * Last Time
+     */
     private static long lastTime=0;
+    /**
+     * Is Game Paused?
+     */
     @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized") private static boolean isPaused=false;
 
+    /**
+     * Do we resume after surface creation?
+     */
     public static boolean callResumeAfterSurfaceCreated = true;
+    /**
+     * Time elapsed
+     */
     public static long elapsedTime=0;
+    /**
+     * Game width
+     */
     public static int width = 1;
+    /**
+     * Game Height
+     */
     public static int height = 1;
+    /**
+     * App Resources
+     */
     public static Resources resources;
+    /**
+     * App AssetManager
+     */
     public static AssetManager assetManager;
 
+    /**
+     * Class Constructor
+     * @param res App Resources
+     * @param assets App Assets
+     */
     public ZameGame(Resources res, AssetManager assets) {
         callResumeAfterSurfaceCreated = true;
         width = 1;
@@ -43,6 +87,12 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         startTime = SystemClock.elapsedRealtime();        // (*1)
     }
 
+    /**
+     * Reads bytes from file
+     * @param is Input stream
+     * @return byte array
+     * @throws IOException Error while reading
+     */
     public static byte[] readBytes(InputStream is) throws IOException {
         byte[] buffer = new byte[is.available()];
 
@@ -53,6 +103,12 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         return buffer;
     }
 
+    /**
+     * When Surface is created
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     * @param config the EGLConfig of the created surface. Can be used
+     */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -70,6 +126,13 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         }
     }
 
+    /**
+     * When Surface is changed
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     * @param larghezza Surface Width
+     * @param altezza Surface Heigth
+     */
     @Override
     public void onSurfaceChanged(GL10 gl, int larghezza, int altezza) {
         gl.glViewport(0, 0, larghezza, altezza);
@@ -81,12 +144,20 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
     }
 
     // FPS = 1000 / updateInterval
+
+    /**
+     * Sets game update interval
+     * @param updateInterval New Update Interval
+     */
     protected void setUpdateInterval(long updateInterval) {
         synchronized (lockUpdate) {
             ZameGame.updateInterval = ((updateInterval > 1) ? updateInterval : 1);
         }
     }
 
+    /**
+     * Pause Game
+     */
     public void pause() {
         synchronized (lockUpdate) {
             if (!isPaused) {
@@ -100,6 +171,9 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         }
     }
 
+    /**
+     * Resume Game
+     */
     public void resume() {
         synchronized (lockUpdate) {
             elapsedTime = State.tempElapsedTime;
@@ -112,26 +186,73 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         }
     }
 
+    /**
+     * Update Controls
+     */
     protected abstract void updateControls();
 
+    /**
+     * Update Game
+     */
     protected abstract void update();
 
+    /**
+     * Render the game
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     */
     protected abstract void render(GL10 gl);
 
+    /**
+     * When Key is released
+     * @param keyCode Key released
+     * @return false
+     */
     protected boolean keyUp(int keyCode) { return false; }
 
+    /**
+     * When key is pressed
+     * @param keyCode Key pressed
+     * @return false
+     */
     protected boolean keyDown(int keyCode) { return false; }
 
+    /**
+     * Handles Touch Events
+     * @param event event
+     */
     protected void touchEvent(MotionEvent event) {}
 
+    /**
+     * Handles Trackball Events
+     * @param event Event
+     */
     protected void trackballEvent(MotionEvent event) {}
 
+    /**
+     * When Surface is created
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     */
     protected void surfaceCreated(GL10 gl) {}
 
+    /**
+     * When Surface changes
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     */
     protected void surfaceSizeChanged(GL10 gl) {}
 
+    /**
+     * Save Game state
+     */
     protected void saveState() {}
 
+    /**
+     * When a Frame is drawn
+     * @param gl the GL interface. Use <code>instanceof</code> to
+     * test if the interface supports GL11 or higher interfaces.
+     */
     @Override
     public void onDrawFrame(GL10 gl) {
         if (isPaused) {
@@ -174,6 +295,11 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         render(gl); // (*2) but moved here to fix problems with locked mutex
     }
 
+    /**
+     * Handles Key Release
+     * @param keyCode Key released
+     * @return false
+     */
     public boolean handleKeyUp(int keyCode) {
         boolean ret=true;
 
@@ -184,6 +310,11 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         return ret;
     }
 
+    /**
+     * Handles Key Down
+     * @param keyCode Key pressed
+     * @return false
+     */
     public boolean handleKeyDown(int keyCode) {
         boolean ret=true;
 
@@ -194,12 +325,20 @@ public abstract class ZameGame implements zame.libs.GLSurfaceView21.Renderer {
         return ret;
     }
 
+    /**
+     * Handles Touch Event
+     * @param event Event
+     */
     public void handleTouchEvent(MotionEvent event) {
         synchronized (lockControls) {
             touchEvent(event);
         }
     }
 
+    /**
+     * Handles TrackBall Event
+     * @param event event
+     */
     public void handleTrackballEvent(MotionEvent event) {
         synchronized (lockControls) {
             trackballEvent(event);

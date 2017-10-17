@@ -25,28 +25,82 @@ import zame.game.engine.Game;
 import zame.game.views.GameView;
 import zame.game.views.IZameView;
 
+/**
+ * Class representing Game Activity
+ */
 public class GameActivity extends Activity implements SensorEventListener {
+    /**
+     * Constant for Enter Code Dialog
+     */
     private static final int DIALOG_ENTER_CODE = 1;
 
+    /**
+     * Constant for Reload Level
+     */
     public static final int ACTION_RELOAD_LEVEL = 1;
+    /**
+     * Constant for Reinitialize Level
+     */
     public static final int ACTION_REINITIALIZE = 2;
+    /**
+     * Constant for Load Autosave
+     */
     public static final int ACTION_LOAD_AUTOSAVE = 3;
 
+    /**
+     * This Activity
+     */
     @SuppressLint("StaticFieldLeak") public static GameActivity self = new GameActivity();
 
+    /**
+     * Current View loaded
+     */
     private View currentView;
+    /**
+     * Current Layout Resource ID
+     */
     private int currentLayoutResId;
+    /**
+     * Event Handler
+     */
     private final Handler handler = new Handler();
+    /**
+     * Sensor Manager
+     */
     private SensorManager sensorManager;
+    /**
+     * Accelerometer
+     */
     private Sensor accelerometer;
+    /**
+     * Current Device Rotation
+     */
     private int deviceRotation;
+    /**
+     * Did Game just unpause?
+     */
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean justAfterPause;
+    /**
+     * Did Sound stop?
+     */
     @SuppressWarnings("BooleanVariableAlwaysNegated") private boolean soundAlreadyStopped ; // fix multi-activity issues
+    /**
+     * Zeemote Helper
+     */
     private GameActivityZeemoteHelper zeemoteHelper;
 
+    /**
+     * Does Music need to be Paused?
+     */
     public boolean instantMusicPause = true;
+    /**
+     * Data to show
+     */
     public GameView.Data gameViewData;
 
+    /**
+     * Opens Option Menu
+     */
     public static void doOpenOptionsMenu() {
         if (GameActivity.self != null) {
             GameActivity.self.handler.post(new Runnable() {
@@ -58,10 +112,19 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
     }
 
+    /**
+     * Change to new View
+     * @param viewId View ID
+     */
     public static void changeView(int viewId) {
         changeView(viewId, 0);
     }
 
+    /**
+     * Change to new View
+     * @param viewId View ID
+     * @param additionalAction ACTION_RELOAD_LEVEL, ACTION_REINITIALIZE, ACTION_LOAD_AUTOSAVE
+     */
     public static void changeView(int viewId, int additionalAction) {
         if (GameActivity.self == null) {
             return;
@@ -103,6 +166,10 @@ public class GameActivity extends Activity implements SensorEventListener {
         });
     }
 
+    /**
+     * When Activity is Created
+     * @param state State
+     */
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -122,6 +189,10 @@ public class GameActivity extends Activity implements SensorEventListener {
         setZameView(R.layout.game);
     }
 
+    /**
+     * Sets Zame View
+     * @param layoutResId Layout Resource ID
+     */
     public void setZameView(int layoutResId) {
         if (currentLayoutResId == layoutResId) {
             return;
@@ -142,6 +213,11 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
     }
 
+    /**
+     * When Options Menu is created
+     * @param menu Menu to show
+     * @return True
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -152,6 +228,11 @@ public class GameActivity extends Activity implements SensorEventListener {
         return true;
     }
 
+    /**
+     * When Option Menu is prepared
+     * @param menu Menu to show
+     * @return super.onPrepareOptionsMenu(menu)
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (zeemoteHelper != null) {
@@ -161,6 +242,11 @@ public class GameActivity extends Activity implements SensorEventListener {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    /**
+     * When Options are Selected
+     * @param item Item Selected
+     * @return True if action is performed, False otherwise
+     */
     @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -188,12 +274,18 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
     }
 
+    /**
+     * When Back is pressed
+     */
     @Override
     public void onBackPressed() {
         instantMusicPause = false;
         super.onBackPressed();
     }
 
+    /**
+     * When Activity is started
+     */
     @SuppressWarnings("deprecation")
     @Override
     protected void onStart() {
@@ -222,6 +314,10 @@ public class GameActivity extends Activity implements SensorEventListener {
         SoundManager.setPlaylist(SoundManager.LIST_MAIN);
     }
 
+    /**
+     * When focus changes
+     * @param hasFocus does Activity have focus?
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -242,6 +338,9 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
     }
 
+    /**
+     * When Activity is resumed
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -256,6 +355,9 @@ public class GameActivity extends Activity implements SensorEventListener {
         }
     }
 
+    /**
+     * When Activity is paused
+     */
     @Override
     protected void onPause() {
         justAfterPause = true;
@@ -284,6 +386,11 @@ public class GameActivity extends Activity implements SensorEventListener {
 
     }
 
+    /**
+     * When Dialog is created
+     * @param id Dialog ID
+     * @return Dialog or null
+     */
     @SuppressWarnings("deprecation")
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -316,10 +423,19 @@ public class GameActivity extends Activity implements SensorEventListener {
         return null;
     }
 
+    /**
+     * When Accuracy changes
+     * @param sensor Accelerometer
+     * @param accuracy new accuracy
+     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    /**
+     * When Sensor changes
+     * @param e Event
+     */
     @Override
     public void onSensorChanged(SensorEvent e) {
         float sensorX=0;

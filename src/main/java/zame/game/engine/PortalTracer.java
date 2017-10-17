@@ -739,6 +739,6 @@ public class PortalTracer {
         if (a < Integer.MIN_VALUE || a > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Value not castable");
         }
-        return (int) a;
+        return Math.round(a-0.5f);
     }
 }
