@@ -4,14 +4,31 @@ import javax.microedition.khronos.opengles.GL10;
 import zame.game.Common;
 import zame.game.Renderer;
 
+/**
+ * Class representing Player's Stats
+ */
 @SuppressWarnings("WeakerAccess")
 public final class Stats {
+    /**
+     * Constant for Item Width
+     */
     private static final float ITEM_WIDTH = 0.275f;
+    /**
+     * Constant for Key Width
+     */
     private static final float KEY_WIDTH = 0.125f;
 
+    /**
+     * Class Constructor
+     */
     private Stats() {
     }
 
+    /**
+     * Draws the Stats Icon
+     * @param pos Position to draw on
+     * @param texNum Texture ID
+     */
     @SuppressWarnings("MagicNumber")
     private static void drawStatIcon(int pos, int texNum) {
         float sx = -0.0625f + (ITEM_WIDTH * (float)pos);
@@ -34,6 +51,12 @@ public final class Stats {
         Renderer.drawQuad(TextureLoader.BASE_ICONS + texNum);
     }
 
+    /**
+     * Draws Text for Stat
+     * @param gl Renderer
+     * @param pos Position to draw on
+     * @param value Value to display
+     */
     @SuppressWarnings("MagicNumber")
     private static void drawStatIconText(GL10 gl, int pos, int value) {
         Labels.statsNumeric.setValue(value);
@@ -45,6 +68,12 @@ public final class Stats {
                 Game.height);
     }
 
+    /**
+     * Draws the Key icon
+     * @param gl Renderer
+     * @param pos Position to draw on
+     * @param texNum Texture ID
+     */
     @SuppressWarnings("MagicNumber")
     private static void drawKeyIcon(@SuppressWarnings("UnusedParameters") GL10 gl, int pos, int texNum) {
         float sx = -0.0625f + (KEY_WIDTH * (float)pos);
@@ -64,6 +93,10 @@ public final class Stats {
         Renderer.drawQuad(TextureLoader.BASE_ICONS + texNum);
     }
 
+    /**
+     * Renders the stats
+     * @param gl Renderer
+     */
     @SuppressWarnings("MagicNumber")
     public static void render(GL10 gl) {
         Renderer.setQuadRGBA(1.0f, 1.0f, 1.0f, 0.8f);

@@ -7,44 +7,150 @@ import java.io.ObjectOutput;
 import zame.game.Common;
 import zame.game.SoundManager;
 
+/**
+ * Class representing a Monster
+ */
 @SuppressWarnings("WeakerAccess")
 public class Monster implements Externalizable {
+    /**
+     * Class Constructor
+     */
     public Monster(){}
+
+    /**
+     * Monster ID
+     */
     public int index;
+    /**
+     * Monster Cell Position X
+     */
     public int cellX;
+    /**
+     * Monster Cell Position Y
+     */
     public int cellY;
+    /**
+     * Monster Position X
+     */
     public float x;
+    /**
+     * Monster Position Y
+     */
     public float y;
+    /**
+     * Monster Texture
+     */
     public int texture;
+    /**
+     * Monster Direction
+     */
     public int dir; // 0 - right, 1 - up, 2 - left, 3 - down
+    /**
+     * Monster Max Steps
+     */
     public int maxStep;
+    /**
+     * Monster Health
+     */
     public int health;
+    /**
+     * Monster Damage Output
+     */
     public int hits;
+    /**
+     * Monster Visible Distance Squared
+     */
     public float visibleDistSq;
+    /**
+     * Monster Attack Distance Squared
+     */
     public float attackDistSq;
+    /**
+     * Monster Shoot Sound ID
+     */
     public int shootSoundIdx;
+    /**
+     * Monster Ammo Type
+     */
     public int ammoType;
 
+    /**
+     * Monster Step
+     */
     public int step;
+    /**
+     * Monster Previous Position X
+     */
     public int prevX;
+    /**
+     * Monster Previous Position Y
+     */
     public int prevY;
+    /**
+     * Monster Damage Taken Timeout
+     */
     public int hitTimeout; // hero hits monster
+    /**
+     * Monster Damage Done Timeout
+     */
     public int attackTimeout; // monster hits hero
+    /**
+     * Monster Despawn Timeout
+     */
     public int removeTimeout;
+    /**
+     * Monster Death Time
+     */
     public long dieTime;
+    /**
+     * Get Around Required Direction
+     */
     public int aroundReqDir;
+    /**
+     * Is Monster Using Inverse Rotation?
+     */
     public boolean inverseRotation;
+    /**
+     * Previous Around Position X
+     */
     public int prevAroundX;
+    /**
+     * Previous Around Position Y
+     */
     public int prevAroundY;
+    /**
+     * Monster Shooting Angle
+     */
     public int shootAngle;
+    /**
+     * Monster Hit Timeout
+     */
     public int hitHeroTimeout;
+    /**
+     * Monster Damage to Hero
+     */
     public int hitHeroHits;
+    /**
+     * Is Monster chasing hero?
+     */
     public boolean chaseMode;
+    /**
+     * Is Monster Waiting for Door to open?
+     */
     public boolean waitForDoor;
 
+    /**
+     * Is Monster Hostile?
+     */
     public boolean isInAttackState;
+    /**
+     * Is Aim on Hero?
+     */
     public boolean isAimedOnHero;
 
+    /**
+     * Initializes Monster
+     */
     @SuppressWarnings("MagicNumber")
     public void init() {
         step = 0;
@@ -63,6 +169,11 @@ public class Monster implements Externalizable {
         waitForDoor = false;
     }
 
+    /**
+     * Write Monster Info on file
+     * @param os Output Stream
+     * @throws IOException Error while writing
+     */
     @Override
     public void writeExternal(ObjectOutput os) throws IOException {
         os.writeInt(cellX);
@@ -96,6 +207,11 @@ public class Monster implements Externalizable {
         os.writeBoolean(waitForDoor);
     }
 
+    /**
+     * Reads Monster info from file
+     * @param is Input Stream
+     * @throws IOException Error while reading
+     */
     @Override
     public void readExternal(ObjectInput is) throws IOException {
         cellX = is.readInt();
@@ -133,16 +249,30 @@ public class Monster implements Externalizable {
         dieTime = ((health <= 0) ? -1 : 0);
     }
 
+    /**
+     * Set Monster Attack Distance
+     * @param longAttackDist Is Attack Long range?
+     */
     @SuppressWarnings("MagicNumber")
     public void setAttackDist(boolean longAttackDist) {
         attackDistSq = (longAttackDist ? (10.0f * 10.0f) : (1.8f * 1.8f));
     }
 
+    /**
+     * Checks if two ints are equal
+     * @param a first int value
+     * @param b second int value
+     * @return true if a equals b, false otherwise
+     */
     private static boolean isEquals(int a, int b)
     {
         return Math.abs(a-b) < 1e-6;
     }
 
+    /**
+     * Copy monster info
+     * @param mon Monster to copy from
+     */
     public void copyFrom(Monster mon) {
         cellX = mon.cellX;
         cellY = mon.cellY;
@@ -178,16 +308,32 @@ public class Monster implements Externalizable {
         isAimedOnHero = mon.isAimedOnHero;
     }
 
+    /**
+     * Checks if Monster is passable
+     * @param dx Derivate X
+     * @param dy Derivate Y
+     * @return True if passable, false otherwise
+     */
     private boolean checkPassable(int dx, int dy){
         return ((!isEquals(dy,0)) || (!isEquals(dx,0)))
                 && (isEquals((State.passableMap[cellY + dy][cellX + dx]
                 & Level.PASSABLE_MASK_OBJECT_DROP),0));
     }
 
+    /**
+     * Checks if mask is allowed
+     * @return True if Mask is allowed
+     */
     private boolean checkMask(){
         return (State.passableMap[cellY][cellX] & Level.PASSABLE_MASK_OBJECT_DROP) == 0;
     }
 
+    /**
+     * Checks if Loop has to continue
+     * @param dx Derivate X
+     * @param dy Derivate Y
+     * @return True if loop continues, false otherwise
+     */
     private boolean setKeepGoing(int dx, int dy){
         boolean result = true;
         if (checkPassable(dx, dy)) {
@@ -199,6 +345,9 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    /**
+     * Processes Monster Mask
+     */
     private void processMask(){
         if (checkMask()) {
             State.objectsMap[cellY][cellX] = ammoType;
@@ -215,6 +364,11 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Monster Gets hit
+     * @param amt Amount of Damage Taken
+     * @param hitTm Hit Timeout
+     */
     public void hit(int amt, int hitTm) {
         hitTimeout = hitTm;
         health -= amt;
@@ -233,6 +387,9 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Removes Monster from Game
+     */
     public void remove() {
         State.passableMap[cellY][cellX] &= ~Level.PASSABLE_IS_DEAD_CORPSE;
         State.monstersCount--;
@@ -246,6 +403,9 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Hero Timeout
+     */
     private void heroTimeout(){
         if (hitHeroTimeout > 0) {
             hitHeroTimeout--;
@@ -256,6 +416,13 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Sets Monster Direction
+     * @param dx Derivate X
+     * @param dy Derivate Y
+     * @param distSq Distance Squared
+     * @return True if direction is set, false otherwise
+     */
     private boolean setDir(float dx, float dy, float distSq){
         boolean result = false;
 
@@ -276,6 +443,11 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    /**
+     * Updates Angle Difference
+     * @param angleDiff Angle Difference
+     * @return Updated Angle Difference
+     */
     private int updateAngleDiff(int angleDiff){
         if (angleDiff > 180) {
             angleDiff -= 360;
@@ -286,6 +458,11 @@ public class Monster implements Externalizable {
         return angleDiff;
     }
 
+    /**
+     * Checks if Monster is Visible
+     * @param distSq Distance Squared
+     * @return True if visible, false otherwise
+     */
     private boolean checkVisible(float distSq){
         boolean result = false;
         if ((distSq <= visibleDistSq) && Common.traceLine((float)cellX + 0.5f,
@@ -300,6 +477,12 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    /**
+     * Sets Values
+     * @param angleDiff Angle Difference
+     * @param minAngle Minimal Angle
+     * @param dist Distance
+     */
     private void setValues(int angleDiff, int minAngle, float dist){
         if (angleDiff <= minAngle) {
             isAimedOnHero = true;
@@ -312,6 +495,9 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Updates Cell Values
+     */
     private void updateCells(){
         switch (dir) {
             case 0:
@@ -333,6 +519,11 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Checks for Rotation
+     * @param tryAround Do we try to go around?
+     * @return False
+     */
     private boolean checkRotation(boolean tryAround){
         if (tryAround) {
             if ((prevAroundX == cellX) && (prevAroundY == cellY)) {
@@ -347,6 +538,9 @@ public class Monster implements Externalizable {
         return false;
     }
 
+    /**
+     * Updates Attack, Hit, Step
+     */
     private void finalUpdate(){
         if (attackTimeout > 0) {
             attackTimeout--;
@@ -359,18 +553,29 @@ public class Monster implements Externalizable {
         }
     }
 
+    /**
+     * Updates Step
+     */
     private void updateStep(){
         if (step == 0) {
             step = maxStep / 2;
         }
     }
 
+    /**
+     * Check Chase mode on Door
+     * @return True if Monster can pass door, False otherwise
+     */
     private boolean checkChaseDoor(){
         return chaseMode
                 && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR) != 0)
                 && ((State.passableMap[cellY][cellX] & Level.PASSABLE_IS_DOOR_OPENED_BY_HERO) != 0);
     }
 
+    /**
+     * Checks Monster Mask
+     * @return True or False
+     */
     private boolean checkMonsterMask(){
         boolean result = true;
 
@@ -386,6 +591,10 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    /**
+     * Checks Door Interaction
+     * @return False if Door is opened, False otherwise
+     */
     private boolean checkDoorInteraction(){
         boolean result = true;
         if (checkChaseDoor()) {
@@ -406,18 +615,37 @@ public class Monster implements Externalizable {
         return result;
     }
 
+    /**
+     * Get absolute value of Angle Difference
+     * @param angleDiff Current Angle difference
+     * @return -angleDiff if angleDiff is negative, false otherwise
+     */
     private int getAngleDiff(int angleDiff){
         return ((angleDiff < 0) ? -angleDiff : angleDiff);
     }
 
+    /**
+     * Checks if Visible
+     * @param vis Was visible?
+     * @param distSq Distance squared
+     * @return True is visible, false otherwise
+     */
     private boolean isVisible(boolean vis, float distSq){
         return vis && (distSq <= attackDistSq);
     }
 
+    /**
+     * Returns new direction
+     * @param direction Current direction
+     * @return new Direction
+     */
     private int getDir(int direction){
         return (direction + (inverseRotation ? 1 : 3)) % 4;
     }
 
+    /**
+     * Updates Monster
+     */
     @SuppressWarnings("MagicNumber")
     public void update() {
         if (health <= 0) {
